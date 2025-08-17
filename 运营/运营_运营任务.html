@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>运营任务管理 - 睿涵音乐后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 180px;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #4a5f7a;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 15px 20px;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: #34495e;
+            color: white;
+            border-left-color: #3498db;
+        }
+        
+        .nav-item.active {
+            background: #34495e;
+            color: white;
+            border-left-color: #3498db;
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            width: 16px;
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+        }
+        
+        /* 标签页 */
+        .tabs {
+            background: white;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .tab-buttons {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .tab-button {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+        
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+        }
+        
+        .tab-button:hover {
+            background: #f8f9fa;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 20px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* 搜索和筛选栏 */
+        .search-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .filter-select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
+            color: white;
+        }
+        
+        .btn-warning:hover {
+            background: #e67e22;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .btn-info:hover {
+            background: #138496;
+        }
+        
+        /* 操作栏 */
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .actions-section {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            color: #495057;
+        }
+        
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-contacted {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-replied {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-no-reply {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .status-closed {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .group-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .group-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .source-tag {
+            background: #f3e5f5;
+            color: #7b1fa2;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .count-badge {
+            background: #ffeaa7;
+            color: #d63031;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .btn-edit {
+            background: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .btn-edit:hover {
+            background: #138496;
+        }
+        
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sortable:hover {
+            background: #e9ecef;
+        }
+        
+        .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .page-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .page-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>睿涵音乐后台</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item">
+                    <i>👥</i> 学员信息中心
+                </a>
+                <a href="#" class="nav-item active">
+                    <i>📋</i> 运营任务
+                </a>
+                <a href="#" class="nav-item">
+                    <i>📊</i> 学员监控
+                </a>
+                <a href="#" class="nav-item">
+                    <i>💬</i> 内部沟通
+                </a>
+            </nav>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="header">
+                <h2>运营任务管理</h2>
+            </div>
+            
+            <div class="content">
+                <!-- 标签页 -->
+                <div class="tabs">
+                    <div class="tab-buttons">
+                        <button class="tab-button active" onclick="switchTab('todo')">回访待办事项</button>
+                        <button class="tab-button" onclick="switchTab('records')">回访记录管理</button>
+                    </div>
+                    
+                    <!-- 回访待办事项 -->
+                    <div id="todo-tab" class="tab-content active">
+                        <!-- 搜索栏 -->
+                        <div class="search-bar">
+                            <div class="search-row">
+                                <input type="text" class="search-input" placeholder="搜索学生昵称" id="todoSearchInput">
+                                <select class="filter-select" id="todoStatusFilter">
+                                    <option value="">全部状态</option>
+                                    <option value="待办">待办</option>
+                                    <option value="已联系">已联系</option>
+                                    <option value="未回复">未回复</option>
+                                    <option value="已关闭">已关闭</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="searchTodos()">搜索</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 操作工具栏 -->
+                        <div class="toolbar">
+                            <div class="actions-section">
+                                <button class="btn btn-success" onclick="openAddTodoModal()">添加待办事项</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 待办事项列表 -->
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>学生昵称</th>
+                                        <th>分组</th>
+                                        <th>学员状态</th>
+                                        <th>进度</th>
+                                        <th>回访次数</th>
+                                        <th>来源</th>
+                                        <th>处理情况</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="todoTableBody">
+                                    <!-- 示例数据 -->
+                                    <tr>
+                                        <td><a href="#" onclick="openStudentDetail('1')" style="color: #3498db; text-decoration: none;">小明同学</a></td>
+                                        <td>
+                                            <div class="group-tags">
+                                                <span class="group-tag">基础班</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="status-badge status-contacted">活跃</span></td>
+                                        <td>第12课</td>
+                                        <td><span class="count-badge">3</span></td>
+                                        <td><span class="source-tag">教师-黄老师</span></td>
+                                        <td>
+                                            <select class="form-input" style="width: auto; padding: 6px;" onchange="updateTodoStatus(this, '1')">
+                                                <option value="待办" selected>待办</option>
+                                                <option value="已联系">已联系</option>
+                                                <option value="未回复">未回复</option>
+                                                <option value="已关闭">已关闭</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn-edit" onclick="openEditTodoModal('1')">编辑</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#" onclick="openStudentDetail('2')" style="color: #3498db; text-decoration: none;">音乐小天使</a></td>
+                                        <td>
+                                            <div class="group-tags">
+                                                <span class="group-tag">中级班</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="status-badge status-replied">加入</span></td>
+                                        <td>第8课</td>
+                                        <td><span class="count-badge">1</span></td>
+                                        <td><span class="source-tag">教研-王老师</span></td>
+                                        <td>
+                                            <select class="form-input" style="width: auto; padding: 6px;" onchange="updateTodoStatus(this, '2')">
+                                                <option value="待办">待办</option>
+                                                <option value="已联系" selected>已联系</option>
+                                                <option value="未回复">未回复</option>
+                                                <option value="已关闭">已关闭</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn-edit" onclick="openEditTodoModal('2')">编辑</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><a href="#" onclick="openStudentDetail('3')" style="color: #3498db; text-decoration: none;">钢琴王子</a></td>
+                                        <td>
+                                            <div class="group-tags">
+                                                <span class="group-tag">高级班</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="status-badge status-pending">已毕业</span></td>
+                                        <td>第20课</td>
+                                        <td><span class="count-badge">5</span></td>
+                                        <td><span class="source-tag">运营老师</span></td>
+                                        <td>
+                                            <select class="form-input" style="width: auto; padding: 6px;" onchange="updateTodoStatus(this, '3')">
+                                                <option value="待办">待办</option>
+                                                <option value="已联系">已联系</option>
+                                                <option value="未回复" selected>未回复</option>
+                                                <option value="已关闭">已关闭</option>
+                                            </select>
+                                        </td>
+                                        <td>
+                                            <button class="btn-edit" onclick="openEditTodoModal('3')">编辑</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="pagination">
+                            <button class="page-btn">上一页</button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">下一页</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 回访记录管理 -->
+                    <div id="records-tab" class="tab-content">
+                        <!-- 搜索栏 -->
+                        <div class="search-bar">
+                            <div class="search-row">
+                                <input type="text" class="search-input" placeholder="搜索学生昵称或备注名" id="recordsSearchInput">
+                                <select class="filter-select" id="recordsStatusFilter">
+                                    <option value="">全部状态</option>
+                                    <option value="待办">待办</option>
+                                    <option value="已联系">已联系</option>
+                                    <option value="未回复">未回复</option>
+                                    <option value="已关闭">已关闭</option>
+                                </select>
+                                <button class="btn btn-primary" onclick="searchRecords()">搜索</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 操作工具栏 -->
+                        <div class="toolbar">
+                            <div class="actions-section">
+                                <button class="btn btn-info" onclick="exportData('pdf')">导出PDF</button>
+                                <button class="btn btn-info" onclick="exportData('xlsx')">导出XLSX</button>
+                                <button class="btn btn-warning" onclick="pushToEducation()">推送教务</button>
+                                <button class="btn btn-secondary" onclick="openPushToTeacherModal()">推送老师</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 回访记录列表 -->
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th><input type="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                                        <th>回访记录ID</th>
+                                        <th>学生昵称</th>
+                                        <th>学生备注名</th>
+                                        <th class="sortable" onclick="sortRecords('time')">
+                                            回访时间 <span class="sort-icon">↕</span>
+                                        </th>
+                                        <th>回访状态</th>
+                                        <th>回访次数</th>
+                                        <th>任课老师</th>
+                                        <th>回访记录</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recordsTableBody">
+                                    <!-- 示例数据 -->
+                                    <tr>
+                                        <td><input type="checkbox" class="record-checkbox" value="R001"></td>
+                                        <td>R001</td>
+                                        <td>小明同学</td>
+                                        <td>小明</td>
+                                        <td>2024-01-15 14:30</td>
+                                        <td><span class="status-badge status-replied">已联系</span></td>
+                                        <td><span class="count-badge">3</span></td>
+                                        <td>黄老师</td>
+                                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">学生反馈练习进度良好，建议增加难度...</td>
+                                        <td>
+                                            <button class="btn-edit" onclick="openEditRecordModal('R001')">编辑</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="record-checkbox" value="R002"></td>
+                                        <td>R002</td>
+                                        <td>音乐小天使</td>
+                                        <td>小天使</td>
+                                        <td>2024-01-14 16:45</td>
+                                        <td><span class="status-badge status-contacted">已联系</span></td>
+                                        <td><span class="count-badge">1</span></td>
+                                        <td>王老师</td>
+                                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">已联系家长，了解学习情况...</td>
+                                        <td>
+                                            <button class="btn-edit" onclick="openEditRecordModal('R002')">编辑</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="record-checkbox" value="R003"></td>
+                                        <td>R003</td>
+                                        <td>钢琴王子</td>
+                                        <td>王子</td>
+                                        <td>2024-01-13 10:20</td>
+                                        <td><span class="status-badge status-pending">待办</span></td>
+                                        <td><span class="count-badge">5</span></td>
+                                        <td>钟老师</td>
+                                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">需要跟进学习进度...</td>
+                                        <td>
+                                            <button class="btn-edit" onclick="openEditRecordModal('R003')">编辑</button>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" class="record-checkbox" value="R004"></td>
+                                        <td>R004</td>
+                                        <td>小提琴少女</td>
+                                        <td>少女</td>
+                                        <td>2024-01-12 09:15</td>
+                                        <td><span class="status-badge status-no-reply">未回复</span></td>
+                                        <td><span class="count-badge">2</span></td>
+                                        <td>李老师</td>
+                                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">家长反馈孩子练习时间不够...</td>
+                                        <td>
+                                            <button class="btn-edit" onclick="openEditRecordModal('R004')">编辑</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <!-- 分页 -->
+                        <div class="pagination">
+                            <button class="page-btn">上一页</button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">下一页</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 添加待办事项模态框 -->
+    <div id="addTodoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加待办事项</h2>
+                <span class="close" onclick="closeModal('addTodoModal')">&times;</span>
+            </div>
+            
+            <form id="addTodoForm">
+                <div class="form-group">
+                    <label class="form-label">学生昵称 *</label>
+                    <input type="text" class="form-input" id="addTodoStudent" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">来源</label>
+                    <select class="form-input" id="addTodoSource">
+                        <option value="运营老师">运营老师</option>
+                        <option value="教师-黄老师">教师-黄老师</option>
+                        <option value="教研-王老师">教研-王老师</option>
+                        <option value="教师-钟老师">教师-钟老师</option>
+                        <option value="教师-李老师">教师-李老师</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">备注</label>
+                    <textarea class="form-textarea" id="addTodoNotes" placeholder="记录待办事项详情..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addTodoModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 编辑回访记录模态框 -->
+    <div id="editRecordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑回访记录</h2>
+                <span class="close" onclick="closeModal('editRecordModal')">&times;</span>
+            </div>
+            
+            <form id="editRecordForm">
+                <div class="form-group">
+                    <label class="form-label">回访记录ID</label>
+                    <input type="text" class="form-input" id="editRecordId" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">学生昵称</label>
+                    <input type="text" class="form-input" id="editRecordStudent" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">回访状态</label>
+                    <select class="form-input" id="editRecordStatus">
+                        <option value="待办">待办</option>
+                        <option value="已联系">已联系</option>
+                        <option value="未回复">未回复</option>
+                        <option value="已关闭">已关闭</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">回访记录</label>
+                    <textarea class="form-textarea" id="editRecordContent" placeholder="记录回访详情..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editRecordModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 推送老师端模态框 -->
+    <div id="pushToTeacherModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>推送老师端</h2>
+                <span class="close" onclick="closeModal('pushToTeacherModal')">&times;</span>
+            </div>
+            
+            <form id="pushToTeacherForm">
+                <div class="form-group">
+                    <label class="form-label">选择老师 *</label>
+                    <select class="form-input" id="selectTeacher" required>
+                        <option value="">请选择老师</option>
+                        <option value="黄老师">黄老师</option>
+                        <option value="王老师">王老师</option>
+                        <option value="钟老师">钟老师</option>
+                        <option value="李老师">李老师</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">推送说明</label>
+                    <textarea class="form-textarea" id="pushNotes" placeholder="添加推送说明..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('pushToTeacherModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">推送</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 标签页切换
+        function switchTab(tabName) {
+            // 移除所有活跃状态
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 添加当前活跃状态
+            event.target.classList.add('active');
+            document.getElementById(tabName + '-tab').classList.add('active');
+        }
+        
+        // 导航菜单切换
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有活跃状态
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                // 添加当前活跃状态
+                this.classList.add('active');
+                
+                const moduleName = this.textContent.trim();
+                console.log('切换到模块:', moduleName);
+            });
+        });
+        
+        // 模态框控制
+        function openAddTodoModal() {
+            document.getElementById('addTodoModal').style.display = 'block';
+        }
+        
+        function openEditTodoModal(todoId) {
+            // 这里应该根据todoId加载待办事项数据
+            console.log('编辑待办事项:', todoId);
+        }
+        
+        function openEditRecordModal(recordId) {
+            // 这里应该根据recordId加载回访记录数据
+            document.getElementById('editRecordModal').style.display = 'block';
+            document.getElementById('editRecordId').value = recordId;
+        }
+        
+        function openPushToTeacherModal() {
+            const selectedRecords = document.querySelectorAll('.record-checkbox:checked');
+            if (selectedRecords.length === 0) {
+                alert('请先选择要推送的记录');
+                return;
+            }
+            document.getElementById('pushToTeacherModal').style.display = 'block';
+        }
+        
+        function openStudentDetail(studentId) {
+            // 这里应该打开学员详情页
+            alert('打开学员详情页: ' + studentId);
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 搜索功能
+        function searchTodos() {
+            const searchTerm = document.getElementById('todoSearchInput').value;
+            const statusFilter = document.getElementById('todoStatusFilter').value;
+            console.log('搜索待办事项:', searchTerm, statusFilter);
+            alert('搜索待办事项：' + searchTerm + ' 状态：' + statusFilter);
+        }
+        
+        function searchRecords() {
+            const searchTerm = document.getElementById('recordsSearchInput').value;
+            const statusFilter = document.getElementById('recordsStatusFilter').value;
+            console.log('搜索回访记录:', searchTerm, statusFilter);
+            alert('搜索回访记录：' + searchTerm + ' 状态：' + statusFilter);
+        }
+        
+        // 排序功能
+        function sortRecords(column) {
+            console.log('排序列:', column);
+            alert('排序功能：' + column);
+        }
+        
+        // 更新待办状态
+        function updateTodoStatus(selectElement, todoId) {
+            const newStatus = selectElement.value;
+            console.log('更新待办状态:', todoId, newStatus);
+            
+            if (newStatus === '已关闭') {
+                if (confirm('确定要关闭此待办事项吗？关闭后将不再显示在待办列表中。')) {
+                    // 这里应该实现实际的状态更新逻辑
+                    alert('待办事项已关闭');
+                } else {
+                    // 恢复原来的选择
+                    selectElement.selectedIndex = 0;
+                }
+            }
+        }
+        
+        // 全选功能
+        function toggleSelectAll() {
+            const selectAll = document.getElementById('selectAll');
+            const checkboxes = document.querySelectorAll('.record-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+            });
+        }
+        
+        // 推送功能
+        function pushToEducation() {
+            const selectedRecords = document.querySelectorAll('.record-checkbox:checked');
+            if (selectedRecords.length === 0) {
+                alert('请先选择要推送的记录');
+                return;
+            }
+            
+            const recordIds = Array.from(selectedRecords).map(cb => cb.value);
+            console.log('推送到教务:', recordIds);
+            alert('已推送 ' + recordIds.length + ' 条记录到教务端');
+        }
+        
+        // 表单提交处理
+        document.getElementById('addTodoForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('待办事项已添加');
+            closeModal('addTodoModal');
+        });
+        
+        document.getElementById('editRecordForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            alert('回访记录已更新');
+            closeModal('editRecordModal');
+        });
+        
+        document.getElementById('pushToTeacherForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const teacher = document.getElementById('selectTeacher').value;
+            const selectedRecords = document.querySelectorAll('.record-checkbox:checked');
+            alert('已推送 ' + selectedRecords.length + ' 条记录到 ' + teacher);
+            closeModal('pushToTeacherModal');
+        });
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modals = ['addTodoModal', 'editRecordModal', 'pushToTeacherModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        }
+        
+        // 支持回车键搜索
+        document.getElementById('todoSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchTodos();
+            }
+        });
+        
+        document.getElementById('recordsSearchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchRecords();
+            }
+        });
+    </script>
+</body>
+</html>

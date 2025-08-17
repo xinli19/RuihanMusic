@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学员信息中心 - 睿涵音乐教研</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+        
+        .sidebar-header {
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+        
+        .nav-item.active {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border-left-color: #fff;
+        }
+        
+        .nav-item i {
+            margin-right: 12px;
+            font-size: 16px;
+        }
+        
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            background: #f8f9fa;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+        }
+        
+        /* 搜索和筛选栏 - 保持教研的筛选功能但使用运营的样式 */
+        .search-filter-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-label {
+            font-weight: 500;
+            color: #555;
+            white-space: nowrap;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            color: #495057;
+        }
+        
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-joined {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-graduated {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-archived {
+            background: #e2e3e5;
+            color: #383d41;
+        }
+        
+        .group-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .group-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .btn-edit {
+            background: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+        
+        .btn-edit:hover {
+            background: #138496;
+        }
+        
+        .btn-view {
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-view:hover {
+            background: #545b62;
+        }
+        
+        .nickname-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .nickname-link:hover {
+            color: #2980b9;
+            text-decoration: underline;
+        }
+        
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sortable:hover {
+            background: #e9ecef;
+        }
+        
+        .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .readonly {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .page-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .page-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+        
+        .alert-info {
+            background-color: #e8f4fd;
+            border-left-color: #3498db;
+            color: #2980b9;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>睿涵音乐教研</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <i>👥</i> 学员信息中心
+                </a>
+                <a href="#" class="nav-item">
+                    <i>📋</i> 分配任务
+                </a>
+                <a href="#" class="nav-item">
+                    <i>📝</i> 待办事项
+                </a>
+                <a href="#" class="nav-item">
+                    <i>💬</i> 内部沟通
+                </a>
+            </nav>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="header">
+                <h2>学员信息中心</h2>
+            </div>
+            
+            <div class="content">
+                <!-- 搜索和筛选栏 -->
+                <div class="search-filter-bar">
+                    <div class="search-row">
+                        <input type="text" class="search-input" placeholder="搜索昵称、备注名、用户ID或点评记录关键词" id="searchInput">
+                        <button class="btn btn-primary" onclick="searchStudents()">搜索</button>
+                        <button class="btn btn-secondary" onclick="clearSearch()">清空</button>
+                    </div>
+                    
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <span class="filter-label">进度:</span>
+                            <select class="filter-select" id="progressFilter">
+                                <option value="">全部进度</option>
+                                <!-- 基础班26课 -->
+                                <option value="基础班-第1课">基础班-第1课</option>
+                                <option value="基础班-第2课">基础班-第2课</option>
+                                <option value="基础班-第3课">基础班-第3课</option>
+                                <option value="基础班-第4课">基础班-第4课</option>
+                                <option value="基础班-第5课">基础班-第5课</option>
+                                <option value="基础班-第6课">基础班-第6课</option>
+                                <option value="基础班-第7课">基础班-第7课</option>
+                                <option value="基础班-第8课">基础班-第8课</option>
+                                <option value="基础班-第9课">基础班-第9课</option>
+                                <option value="基础班-第10课">基础班-第10课</option>
+                                <option value="基础班-第11课">基础班-第11课</option>
+                                <option value="基础班-第12课">基础班-第12课</option>
+                                <option value="基础班-第13课">基础班-第13课</option>
+                                <option value="基础班-第14课">基础班-第14课</option>
+                                <option value="基础班-第15课">基础班-第15课</option>
+                                <option value="基础班-第16课">基础班-第16课</option>
+                                <option value="基础班-第17课">基础班-第17课</option>
+                                <option value="基础班-第18课">基础班-第18课</option>
+                                <option value="基础班-第19课">基础班-第19课</option>
+                                <option value="基础班-第20课">基础班-第20课</option>
+                                <option value="基础班-第21课">基础班-第21课</option>
+                                <option value="基础班-第22课">基础班-第22课</option>
+                                <option value="基础班-第23课">基础班-第23课</option>
+                                <option value="基础班-第24课">基础班-第24课</option>
+                                <option value="基础班-第25课">基础班-第25课</option>
+                                <option value="基础班-第26课">基础班-第26课</option>
+                                <!-- 中级班20课 -->
+                                <option value="中级班-第1课">中级班-第1课</option>
+                                <option value="中级班-第2课">中级班-第2课</option>
+                                <option value="中级班-第3课">中级班-第3课</option>
+                                <option value="中级班-第4课">中级班-第4课</option>
+                                <option value="中级班-第5课">中级班-第5课</option>
+                                <option value="中级班-第6课">中级班-第6课</option>
+                                <option value="中级班-第7课">中级班-第7课</option>
+                                <option value="中级班-第8课">中级班-第8课</option>
+                                <option value="中级班-第9课">中级班-第9课</option>
+                                <option value="中级班-第10课">中级班-第10课</option>
+                                <option value="中级班-第11课">中级班-第11课</option>
+                                <option value="中级班-第12课">中级班-第12课</option>
+                                <option value="中级班-第13课">中级班-第13课</option>
+                                <option value="中级班-第14课">中级班-第14课</option>
+                                <option value="中级班-第15课">中级班-第15课</option>
+                                <option value="中级班-第16课">中级班-第16课</option>
+                                <option value="中级班-第17课">中级班-第17课</option>
+                                <option value="中级班-第18课">中级班-第18课</option>
+                                <option value="中级班-第19课">中级班-第19课</option>
+                                <option value="中级班-第20课">中级班-第20课</option>
+                                <!-- 高级班25课 -->
+                                <option value="高级班-第1课">高级班-第1课</option>
+                                <option value="高级班-第2课">高级班-第2课</option>
+                                <option value="高级班-第3课">高级班-第3课</option>
+                                <option value="高级班-第4课">高级班-第4课</option>
+                                <option value="高级班-第5课">高级班-第5课</option>
+                                <option value="高级班-第6课">高级班-第6课</option>
+                                <option value="高级班-第7课">高级班-第7课</option>
+                                <option value="高级班-第8课">高级班-第8课</option>
+                                <option value="高级班-第9课">高级班-第9课</option>
+                                <option value="高级班-第10课">高级班-第10课</option>
+                                <option value="高级班-第11课">高级班-第11课</option>
+                                <option value="高级班-第12课">高级班-第12课</option>
+                                <option value="高级班-第13课">高级班-第13课</option>
+                                <option value="高级班-第14课">高级班-第14课</option>
+                                <option value="高级班-第15课">高级班-第15课</option>
+                                <option value="高级班-第16课">高级班-第16课</option>
+                                <option value="高级班-第17课">高级班-第17课</option>
+                                <option value="高级班-第18课">高级班-第18课</option>
+                                <option value="高级班-第19课">高级班-第19课</option>
+                                <option value="高级班-第20课">高级班-第20课</option>
+                                <option value="高级班-第21课">高级班-第21课</option>
+                                <option value="高级班-第22课">高级班-第22课</option>
+                                <option value="高级班-第23课">高级班-第23课</option>
+                                <option value="高级班-第24课">高级班-第24课</option>
+                                <option value="高级班-第25课">高级班-第25课</option>
+                                <!-- 视唱练耳不分课 -->
+                                <option value="视唱练耳-进行中">视唱练耳-进行中</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <span class="filter-label">状态:</span>
+                            <select class="filter-select" id="statusFilter">
+                                <option value="">全部状态</option>
+                                <option value="加入">加入</option>
+                                <option value="活跃">活跃</option>
+                                <option value="已毕业">已毕业</option>
+                                <option value="已归档">已归档</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <span class="filter-label">分组:</span>
+                            <select class="filter-select" id="groupFilter">
+                                <option value="">全部分组</option>
+                                <option value="基础班">基础班</option>
+                                <option value="中级班">中级班</option>
+                                <option value="高级班">高级班</option>
+                                <option value="视唱练耳">视唱练耳</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <span class="filter-label">老师:</span>
+                            <select class="filter-select" id="teacherFilter">
+                                <option value="">全部老师</option>
+                                <option value="张老师">张老师</option>
+                                <option value="李老师">李老师</option>
+                                <option value="王老师">王老师</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn btn-secondary" onclick="applyFilters()">应用筛选</button>
+                        <button class="btn btn-secondary" onclick="clearFilters()">清空筛选</button>
+                    </div>
+                </div>
+                
+                <!-- 搜索结果提示 -->
+                <div id="searchAlert" class="alert alert-info" style="display: none;">
+                    <span id="searchResultText"></span>
+                </div>
+                
+                <!-- 学员列表表格 -->
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>昵称</th>
+                                <th>分组</th>
+                                <th class="sortable" onclick="sortTable('progress')">
+                                    进度 <span class="sort-icon">↕</span>
+                                </th>
+                                <th class="sortable" onclick="sortTable('reply_count')">
+                                    被回复次数 <span class="sort-icon">↕</span>
+                                </th>
+                                <th>学员状态</th>
+                                <th>教研备注</th>
+                                <th>运营备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <!-- 示例数据 -->
+                            <tr>
+                                <td><a href="#" class="nickname-link" onclick="viewStudentProfile('1')">小明同学</a></td>
+                                <td>
+                                    <div class="group-tags">
+                                        <span class="group-tag">基础班</span>
+                                        <span class="group-tag">视唱练耳</span>
+                                    </div>
+                                </td>
+                                <td>基础班-第12课</td>
+                                <td>15</td>
+                                <td><span class="status-badge status-active">活跃</span></td>
+                                <td>音准需要加强练习，手腕放松要注意</td>
+                                <td>积极参与课堂互动</td>
+                                <td>
+                                    <button class="btn-edit" onclick="openEditModal('1')">编辑</button>
+                                    <button class="btn-view" onclick="viewComments('1')">查看评论</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" class="nickname-link" onclick="viewStudentProfile('2')">音乐小天使</a></td>
+                                <td>
+                                    <div class="group-tags">
+                                        <span class="group-tag">中级班</span>
+                                    </div>
+                                </td>
+                                <td>中级班-第8课</td>
+                                <td>23</td>
+                                <td><span class="status-badge status-joined">加入</span></td>
+                                <td>节奏感很好，手腕技巧掌握不错</td>
+                                <td>需要多鼓励</td>
+                                <td>
+                                    <button class="btn-edit" onclick="openEditModal('2')">编辑</button>
+                                    <button class="btn-view" onclick="viewComments('2')">查看评论</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" class="nickname-link" onclick="viewStudentProfile('3')">钢琴王子</a></td>
+                                <td>
+                                    <div class="group-tags">
+                                        <span class="group-tag">高级班</span>
+                                    </div>
+                                </td>
+                                <td>高级班-第20课</td>
+                                <td>42</td>
+                                <td><span class="status-badge status-graduated">已毕业</span></td>
+                                <td>技巧娴熟，表现力强</td>
+                                <td>可以考虑推荐高级课程</td>
+                                <td>
+                                    <button class="btn-edit" onclick="openEditModal('3')">编辑</button>
+                                    <button class="btn-view" onclick="viewComments('3')">查看评论</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><a href="#" class="nickname-link" onclick="viewStudentProfile('4')">小李同学</a></td>
+                                <td>
+                                    <div class="group-tags">
+                                        <span class="group-tag">基础班</span>
+                                    </div>
+                                </td>
+                                <td>基础班-第6课</td>
+                                <td>8</td>
+                                <td><span class="status-badge status-active">活跃</span></td>
+                                <td>手腕还需要多练习，节拍要稳定</td>
+                                <td>学习态度认真</td>
+                                <td>
+                                    <button class="btn-edit" onclick="openEditModal('4')">编辑</button>
+                                    <button class="btn-view" onclick="viewComments('4')">查看评论</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="pagination">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑学员模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑学员信息</h2>
+                <span class="close" onclick="closeModal('editModal')">&times;</span>
+            </div>
+            
+            <form id="editStudentForm">
+                <div class="form-group">
+                    <label class="form-label">学员状态（只读）</label>
+                    <input type="text" class="form-input readonly" id="editStatus" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">教研备注</label>
+                    <textarea class="form-textarea" id="editResearchNotes" placeholder="记录学习情况、技巧掌握程度等..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 查看点评记录模态框 -->
+    <div id="commentsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>学员点评记录</h2>
+                <span class="close" onclick="closeModal('commentsModal')">&times;</span>
+            </div>
+            
+            <div id="commentsContent">
+                <!-- 评论内容将在这里动态加载 -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 搜索功能
+        function searchStudents() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const alertDiv = document.getElementById('searchAlert');
+            const resultText = document.getElementById('searchResultText');
+            
+            if (searchTerm) {
+                // 模拟搜索结果
+                if (searchTerm === '手腕') {
+                    resultText.textContent = `搜索关键词"${searchTerm}"，找到2个学员的点评记录包含此关键词`;
+                    alertDiv.style.display = 'block';
+                    
+                    // 高亮显示搜索结果
+                    highlightSearchResults(searchTerm);
+                } else {
+                    resultText.textContent = `搜索"${searchTerm}"，找到相关学员信息`;
+                    alertDiv.style.display = 'block';
+                }
+            } else {
+                alertDiv.style.display = 'none';
+                clearHighlight();
+            }
+        }
+        
+        // 清空搜索
+        function clearSearch() {
+            document.getElementById('searchInput').value = '';
+            document.getElementById('searchAlert').style.display = 'none';
+            clearHighlight();
+        }
+        
+        // 高亮搜索结果
+        function highlightSearchResults(term) {
+            const tableBody = document.getElementById('studentTableBody');
+            const rows = tableBody.getElementsByTagName('tr');
+            
+            for (let row of rows) {
+                const researchNoteCell = row.cells[5]; // 教研备注列
+                if (researchNoteCell && researchNoteCell.textContent.includes(term)) {
+                    researchNoteCell.innerHTML = researchNoteCell.textContent.replace(
+                        new RegExp(term, 'gi'),
+                        `<span class="highlight">${term}</span>`
+                    );
+                }
+            }
+        }
+        
+        // 清除高亮
+        function clearHighlight() {
+            const highlights = document.querySelectorAll('.highlight');
+            highlights.forEach(highlight => {
+                highlight.outerHTML = highlight.textContent;
+            });
+        }
+        
+        // 应用筛选
+        function applyFilters() {
+            const progressFilter = document.getElementById('progressFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const groupFilter = document.getElementById('groupFilter').value;
+            const teacherFilter = document.getElementById('teacherFilter').value;
+            
+            // 这里实现筛选逻辑
+            console.log('应用筛选:', { progress, status, group, teacher });
+            
+            // 显示筛选结果提示
+            const alertDiv = document.getElementById('searchAlert');
+            const resultText = document.getElementById('searchResultText');
+            resultText.textContent = '筛选条件已应用，显示符合条件的学员';
+            alertDiv.style.display = 'block';
+        }
+        
+        // 清空筛选
+        function clearFilters() {
+            document.getElementById('progressFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('groupFilter').value = '';
+            document.getElementById('teacherFilter').value = '';
+            document.getElementById('searchAlert').style.display = 'none';
+        }
+        
+        // 排序功能
+        function sortTable(column) {
+            console.log('排序列:', column);
+            // 这里实现排序逻辑
+        }
+        
+        // 查看学生个人主页
+        function viewStudentProfile(studentId) {
+            // 模拟跳转到学生个人主页
+            alert(`跳转到学生${studentId}的个人主页`);
+            // 实际实现中这里应该是页面跳转或路由切换
+            // window.location.href = `/student/profile/${studentId}`;
+        }
+        
+        // 打开编辑模态框
+        function openEditModal(studentId) {
+            // 模拟加载学员数据
+            const studentData = {
+                '1': {
+                    status: '活跃',
+                    researchNotes: '音准需要加强练习，手腕放松要注意'
+                },
+                '2': {
+                    status: '加入',
+                    researchNotes: '节奏感很好，手腕技巧掌握不错'
+                },
+                '3': {
+                    status: '已毕业',
+                    researchNotes: '技巧娴熟，表现力强'
+                },
+                '4': {
+                    status: '活跃',
+                    researchNotes: '手腕还需要多练习，节拍要稳定'
+                }
+            };
+            
+            const data = studentData[studentId] || studentData['1'];
+            
+            document.getElementById('editStatus').value = data.status;
+            document.getElementById('editResearchNotes').value = data.researchNotes;
+            
+            document.getElementById('editModal').style.display = 'block';
+        }
+        
+        // 查看点评记录
+        function viewComments(studentId) {
+            const commentsData = {
+                '1': [
+                    { date: '2024-01-29', teacher: '王老师', content: '今天练习了音阶，手腕还需要放松，音准有进步' },
+                    { date: '2024-01-27', teacher: '王老师', content: '节拍掌握不错，但手腕紧张，需要多练习放松技巧' },
+                    { date: '2024-01-25', teacher: '王老师', content: '表现很好，继续保持，注意手腕姿势' }
+                ],
+                '2': [
+                    { date: '2024-01-28', teacher: '钟老师', content: '节奏感很棒，手腕技巧掌握得很好' },
+                    { date: '2024-01-26', teacher: '钟老师', content: '今天学习了新曲子，手腕动作标准' }
+                ]
+            };
+            
+            const comments = commentsData[studentId] || [];
+            const commentsContent = document.getElementById('commentsContent');
+            
+            let html = '<div style="max-height: 400px; overflow-y: auto;">';
+            
+            if (comments.length > 0) {
+                comments.forEach(comment => {
+                    html += `
+                        <div style="border-bottom: 1px solid #eee; padding: 15px 0;">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                                <strong>${comment.teacher}</strong>
+                                <span style="color: #666; font-size: 12px;">${comment.date}</span>
+                            </div>
+                            <div style="color: #555; line-height: 1.5;">${comment.content}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                html += '<p style="text-align: center; color: #666; padding: 20px;">暂无点评记录</p>';
+            }
+            
+            html += '</div>';
+            commentsContent.innerHTML = html;
+            
+            document.getElementById('commentsModal').style.display = 'block';
+        }
+        
+        // 关闭模态框
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 表单提交
+        document.getElementById('editStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const researchNotes = document.getElementById('editResearchNotes').value;
+            
+            // 模拟保存
+            alert('学员信息已更新！');
+            closeModal('editModal');
+        });
+        
+        // 点击模态框外部关闭
+        window.addEventListener('click', function(event) {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                if (event.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+        
+        // 回车搜索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchStudents();
+            }
+        });
+    </script>
+</body>
+</html>

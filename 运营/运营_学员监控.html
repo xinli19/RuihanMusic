@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学员学习与质量监控 - 睿涵音乐运营后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 250px;
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 18px;
+            color: #ecf0f1;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-item {
+            margin-bottom: 5px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 12px 20px;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: #34495e;
+            color: #ecf0f1;
+            border-left-color: #3498db;
+        }
+
+        .nav-link.active {
+            background-color: #3498db;
+            color: white;
+            border-left-color: #2980b9;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            padding: 20px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .page-description {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .module-tabs {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background-color: #f8f9fa;
+        }
+
+        .tab-content {
+            padding: 20px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-group label {
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            background-color: white;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #229954;
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e67e22;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .data-table {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .table th,
+        .table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .table th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color: #2c3e50;
+            position: sticky;
+            top: 0;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-normal {
+            background-color: #d5f4e6;
+            color: #27ae60;
+        }
+
+        .status-warning {
+            background-color: #fef9e7;
+            color: #f39c12;
+        }
+
+        .status-danger {
+            background-color: #fadbd8;
+            color: #e74c3c;
+        }
+
+        .group-tag {
+            display: inline-block;
+            padding: 2px 8px;
+            background-color: #e8f4fd;
+            color: #3498db;
+            border-radius: 12px;
+            font-size: 12px;
+            margin-right: 4px;
+        }
+
+        .student-link {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .student-link:hover {
+            text-decoration: underline;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border-left: 4px solid;
+        }
+
+        .alert-info {
+            background-color: #e8f4fd;
+            border-left-color: #3498db;
+            color: #2980b9;
+        }
+
+        .alert-success {
+            background-color: #d5f4e6;
+            border-left-color: #27ae60;
+            color: #229954;
+        }
+
+        .alert-warning {
+            background-color: #fef9e7;
+            border-left-color: #f39c12;
+            color: #e67e22;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .action-bar {
+                flex-direction: column;
+            }
+
+            .tab-header {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏导航 -->
+        <nav class="sidebar">
+            <h2>睿涵音乐运营后台</h2>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="运营_1.1.html" class="nav-link">
+                        📊 学员信息中心
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="运营_2.html" class="nav-link">
+                        📋 运营任务管理
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        🔍 学员学习与质量监控
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        💬 内部沟通协作
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1 class="page-title">学员学习与质量监控</h1>
+                <p class="page-description">监控教师和学员的互动质量，发现异常并生成干预任务</p>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">128</div>
+                    <div class="stat-label">本周点评学员数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">8</div>
+                    <div class="stat-label">预警学员数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">待处理预警</div>
+                </div>
+            </div>
+
+            <!-- 功能模块标签页 -->
+            <div class="module-tabs">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="feedback-list">
+                        📝 本周点评名单
+                    </button>
+                    <button class="tab-button" data-tab="student-alert">
+                        ⚠️ 学员预警服务
+                    </button>
+                </div>
+
+                <!-- 本周点评名单 -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="feedback-list">
+                        <div class="action-bar">
+                            <button class="btn btn-primary" id="getWeeklyList">
+                                📋 获取本周点评名单
+                            </button>
+                            <button class="btn btn-success" id="exportExcel">
+                                📤 导出Excel
+                            </button>
+                            
+                            <div class="filter-group">
+                                <label>分组筛选：</label>
+                                <select class="filter-select" id="groupFilter">
+                                    <option value="">全部分组</option>
+                                    <option value="6-10课">6-10课</option>
+                                    <option value="1-5课">1-5课</option>
+                                    <option value="11-16课">11-16课</option>
+                                    <option value="17-26课">17-26课</option>
+                                </select>
+                            </div>
+                            
+                            <div class="filter-group">
+                                <label>点评老师：</label>
+                                <select class="filter-select" id="teacherFilter">
+                                    <option value="">全部老师</option>
+                                    <option value="王老师">王老师</option>
+                                    <option value="钟老师">钟老师</option>
+                                    <option value="黄老师">黄老师</option>
+                                    <option value="李老师">李老师</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="weeklyListAlert" class="alert alert-info" style="display: none;">
+                            📅 本周点评名单已更新，共获取到 <span id="studentCount">0</span> 名学员的点评记录
+                        </div>
+
+                        <div class="data-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>学员用户ID</th>
+                                        <th>学员昵称</th>
+                                        <th>分组</th>
+                                        <th>点评老师</th>
+                                        <th>任务推送时间</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="feedbackTableBody">
+                                    <tr>
+                                        <td colspan="5">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">📋</div>
+                                                <p>点击"获取本周点评名单"开始加载数据</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 学员预警服务 -->
+                    <div class="tab-pane" id="student-alert">
+                        <div class="action-bar">
+                            <button class="btn btn-primary" id="refreshAlerts">
+                                🔄 刷新预警列表
+                            </button>
+                            <button class="btn btn-warning" id="addToCallback">
+                                📞 加入回访待办
+                            </button>
+                            <button class="btn btn-danger" id="deleteSelected">
+                                🗑️ 删除选中学员
+                            </button>
+                            <button class="btn btn-success" id="exportAlertList">
+                                📤 导出名单
+                            </button>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            ⚠️ 系统基于规则引擎自动推送学员预警信息，包括三周未回课学员和同一作业三次及以上未通过学员
+                        </div>
+
+                        <div class="data-table">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <input type="checkbox" id="selectAll">
+                                        </th>
+                                        <th>学员昵称</th>
+                                        <th>分组</th>
+                                        <th>点评老师</th>
+                                        <th>进度</th>
+                                        <th>最近一次点评时间</th>
+                                        <th>预警类型</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="alertTableBody">
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="student-checkbox" data-student-id="10001">
+                                        </td>
+                                        <td>
+                                            <a href="#" class="student-link" onclick="viewStudentDetail('10001')">小明同学</a>
+                                        </td>
+                                        <td><span class="group-tag">钢琴初级A组</span></td>
+                                        <td>张老师</td>
+                                        <td>第3课</td>
+                                        <td>2024-01-08</td>
+                                        <td><span class="status-badge status-danger">三周未回课</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="student-checkbox" data-student-id="10002">
+                                        </td>
+                                        <td>
+                                            <a href="#" class="student-link" onclick="viewStudentDetail('10002')">小红同学</a>
+                                        </td>
+                                        <td><span class="group-tag">声乐中级B组</span></td>
+                                        <td>李老师</td>
+                                        <td>第5课</td>
+                                        <td>2024-01-25</td>
+                                        <td><span class="status-badge status-warning">作业三次未通过</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="student-checkbox" data-student-id="10003">
+                                        </td>
+                                        <td>
+                                            <a href="#" class="student-link" onclick="viewStudentDetail('10003')">小李同学</a>
+                                        </td>
+                                        <td><span class="group-tag">钢琴高级A组</span></td>
+                                        <td>王老师</td>
+                                        <td>第8课</td>
+                                        <td>2024-01-10</td>
+                                        <td><span class="status-badge status-danger">三周未回课</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="student-checkbox" data-student-id="10004">
+                                        </td>
+                                        <td>
+                                            <a href="#" class="student-link" onclick="viewStudentDetail('10004')">小王同学</a>
+                                        </td>
+                                        <td><span class="group-tag">声乐初级C组</span></td>
+                                        <td>赵老师</td>
+                                        <td>第2课</td>
+                                        <td>2024-01-28</td>
+                                        <td><span class="status-badge status-warning">作业三次未通过</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 标签页切换功能
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                // 移除所有活跃状态
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                
+                // 添加当前活跃状态
+                button.classList.add('active');
+                const targetTab = button.getAttribute('data-tab');
+                document.getElementById(targetTab).classList.add('active');
+            });
+        });
+
+        // 获取本周点评名单
+        document.getElementById('getWeeklyList').addEventListener('click', function() {
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            // 显示加载状态
+            button.innerHTML = '<span class="loading"></span> 获取中...';
+            button.disabled = true;
+            
+            // 模拟API调用
+            setTimeout(() => {
+                // 更新统计信息
+                document.getElementById('studentCount').textContent = '128';
+                document.getElementById('weeklyListAlert').style.display = 'block';
+                
+                // 更新表格数据
+                const tableBody = document.getElementById('feedbackTableBody');
+                tableBody.innerHTML = `
+                    <tr>
+                        <td>10001</td>
+                        <td>小明同学</td>
+                        <td><span class="group-tag">6-10课</span></td>
+                        <td>王老师</td>
+                        <td>2024-01-29 09:00</td>
+                    </tr>
+                    <tr>
+                        <td>10002</td>
+                        <td>小红同学</td>
+                        <td><span class="group-tag">1-5课</span></td>
+                        <td>钟老师</td>
+                        <td>2024-01-29 10:30</td>
+                    </tr>
+                    <tr>
+                        <td>10003</td>
+                        <td>小李同学</td>
+                        <td><span class="group-tag">11-16课</span></td>
+                        <td>黄老师</td>
+                        <td>2024-01-29 14:00</td>
+                    </tr>
+                    <tr>
+                        <td>10004</td>
+                        <td>小王同学</td>
+                        <td><span class="group-tag">17-26课</span></td>
+                        <td>李老师</td>
+                        <td>2024-01-29 16:00</td>
+                    </tr>
+                    <tr>
+                        <td>10005</td>
+                        <td>小张同学</td>
+                        <td><span class="group-tag">6-10课</span></td>
+                        <td>王老师</td>
+                        <td>2024-01-29 17:30</td>
+                    </tr>
+                `;
+                
+                // 恢复按钮状态
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 2000);
+        });
+
+        // 导出Excel功能
+        document.getElementById('exportExcel').addEventListener('click', function() {
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            // 显示加载状态
+            button.innerHTML = '<span class="loading"></span> 导出中...';
+            button.disabled = true;
+            
+            // 模拟导出
+            setTimeout(() => {
+                // 恢复按钮状态
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // 显示导出完成提示
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.innerHTML = '📤 Excel文件导出成功，文件已保存到下载目录';
+                document.querySelector('#feedback-list .action-bar').parentNode.insertBefore(alert, document.querySelector('#feedback-list .action-bar').nextSibling);
+                
+                // 3秒后自动隐藏提示
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }, 1500);
+        });
+
+        // 筛选功能
+        document.getElementById('groupFilter').addEventListener('change', function() {
+            filterTable();
+        });
+
+        document.getElementById('teacherFilter').addEventListener('change', function() {
+            filterTable();
+        });
+
+        function filterTable() {
+            const groupFilter = document.getElementById('groupFilter').value;
+            const teacherFilter = document.getElementById('teacherFilter').value;
+            const rows = document.querySelectorAll('#feedbackTableBody tr');
+            
+            rows.forEach(row => {
+                if (row.cells.length < 5) return; // 跳过空状态行
+                
+                const group = row.cells[2].textContent.trim();
+                const teacher = row.cells[3].textContent.trim();
+                
+                const groupMatch = !groupFilter || group.includes(groupFilter);
+                const teacherMatch = !teacherFilter || teacher === teacherFilter;
+                
+                row.style.display = (groupMatch && teacherMatch) ? '' : 'none';
+            });
+        }
+
+        // 全选功能
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.student-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+        });
+
+        // 刷新预警列表
+        document.getElementById('refreshAlerts').addEventListener('click', function() {
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            // 显示加载状态
+            button.innerHTML = '<span class="loading"></span> 刷新中...';
+            button.disabled = true;
+            
+            // 模拟刷新
+            setTimeout(() => {
+                // 恢复按钮状态
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // 显示刷新完成提示
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-info';
+                alert.innerHTML = '🔄 预警列表已更新，当前共有 4 条预警信息';
+                document.querySelector('#student-alert .action-bar').parentNode.insertBefore(alert, document.querySelector('#student-alert .action-bar').nextSibling);
+                
+                // 3秒后自动隐藏提示
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }, 1000);
+        });
+
+        // 加入回访待办
+        document.getElementById('addToCallback').addEventListener('click', function() {
+            const selectedStudents = document.querySelectorAll('.student-checkbox:checked');
+            
+            if (selectedStudents.length === 0) {
+                alert('请先选择要加入回访待办的学员');
+                return;
+            }
+            
+            const studentNames = Array.from(selectedStudents).map(checkbox => {
+                const row = checkbox.closest('tr');
+                return row.cells[1].textContent.trim();
+            });
+            
+            if (confirm(`确认将以下学员加入回访待办？\n${studentNames.join(', ')}`)) {
+                // 显示成功提示
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.innerHTML = `📞 已将 ${selectedStudents.length} 名学员加入回访待办列表`;
+                document.querySelector('#student-alert .action-bar').parentNode.insertBefore(alert, document.querySelector('#student-alert .action-bar').nextSibling);
+                
+                // 取消选中状态
+                selectedStudents.forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                document.getElementById('selectAll').checked = false;
+                
+                // 3秒后自动隐藏提示
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }
+        });
+
+        // 删除选中学员
+        document.getElementById('deleteSelected').addEventListener('click', function() {
+            const selectedStudents = document.querySelectorAll('.student-checkbox:checked');
+            
+            if (selectedStudents.length === 0) {
+                alert('请先选择要删除的学员');
+                return;
+            }
+            
+            const studentNames = Array.from(selectedStudents).map(checkbox => {
+                const row = checkbox.closest('tr');
+                return row.cells[1].textContent.trim();
+            });
+            
+            if (confirm(`确认从预警名单中删除以下学员？\n${studentNames.join(', ')}`)) {
+                // 删除选中的行
+                selectedStudents.forEach(checkbox => {
+                    checkbox.closest('tr').remove();
+                });
+                
+                // 显示成功提示
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.innerHTML = `🗑️ 已从预警名单中删除 ${selectedStudents.length} 名学员`;
+                document.querySelector('#student-alert .action-bar').parentNode.insertBefore(alert, document.querySelector('#student-alert .action-bar').nextSibling);
+                
+                // 重置全选状态
+                document.getElementById('selectAll').checked = false;
+                
+                // 3秒后自动隐藏提示
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }
+        });
+
+        // 导出预警名单
+        document.getElementById('exportAlertList').addEventListener('click', function() {
+            const button = this;
+            const originalText = button.innerHTML;
+            
+            // 显示加载状态
+            button.innerHTML = '<span class="loading"></span> 导出中...';
+            button.disabled = true;
+            
+            // 模拟导出
+            setTimeout(() => {
+                // 恢复按钮状态
+                button.innerHTML = originalText;
+                button.disabled = false;
+                
+                // 显示导出完成提示
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success';
+                alert.innerHTML = '📤 预警名单导出成功，文件已保存到下载目录';
+                document.querySelector('#student-alert .action-bar').parentNode.insertBefore(alert, document.querySelector('#student-alert .action-bar').nextSibling);
+                
+                // 3秒后自动隐藏提示
+                setTimeout(() => {
+                    alert.remove();
+                }, 3000);
+            }, 1500);
+        });
+
+        // 查看学员详情
+        function viewStudentDetail(studentId) {
+            alert(`查看学员详情：${studentId}\n\n这里将跳转到学员详情页面，显示该学员的具体学习情况、作业完成情况、点评记录等详细信息。`);
+        }
+
+        // 导航菜单切换（保持与其他页面一致）
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

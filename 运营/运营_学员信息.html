@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学员信息中心 - 睿涵音乐后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 180px;
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 4px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            background: #34495e;
+            border-bottom: 1px solid #4a5f7a;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 15px 20px;
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: #34495e;
+            color: white;
+            border-left-color: #3498db;
+        }
+        
+        .nav-item.active {
+            background: #34495e;
+            color: white;
+            border-left-color: #3498db;
+        }
+        
+        .nav-item i {
+            margin-right: 10px;
+            width: 16px;
+        }
+        
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .header h2 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 20px 30px;
+            overflow-y: auto;
+        }
+        
+        /* 搜索栏 - 单独一行，删除筛选器 */
+        .search-bar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .search-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #2980b9;
+        }
+        
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #229954;
+        }
+        
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #7f8c8d;
+        }
+        
+        /* 操作栏 */
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .actions-section {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .table th {
+            background: #f8f9fa;
+            padding: 15px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e9ecef;
+            color: #495057;
+        }
+        
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .status-joined {
+            background: #cce5ff;
+            color: #004085;
+        }
+        
+        .status-graduated {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .group-tags {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        
+        .group-tag {
+            background: #e3f2fd;
+            color: #1565c0;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+        }
+        
+        .btn-edit {
+            background: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .btn-edit:hover {
+            background: #138496;
+        }
+        
+        .sortable {
+            cursor: pointer;
+            user-select: none;
+        }
+        
+        .sortable:hover {
+            background: #e9ecef;
+        }
+        
+        .sort-icon {
+            margin-left: 5px;
+            opacity: 0.5;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #000;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            color: #555;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 20px;
+        }
+        
+        .page-btn {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        
+        .page-btn:hover {
+            background: #f8f9fa;
+        }
+        
+        .page-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 左侧导航栏 -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1>睿涵音乐后台</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <i>👥</i> 学员信息中心
+                </a>
+                <a href="#" class="nav-item">
+                    <i>📋</i> 运营任务
+                </a>
+                <a href="#" class="nav-item">
+                    <i>📊</i> 学员监控
+                </a>
+                <a href="#" class="nav-item">
+                    <i>💬</i> 内部沟通
+                </a>
+            </nav>
+        </div>
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="header">
+                <h2>学员信息中心</h2>
+            </div>
+            
+            <div class="content">
+                <!-- 搜索栏 - 删除筛选器，只保留搜索功能 -->
+                <div class="search-bar">
+                    <div class="search-row">
+                        <input type="text" class="search-input" placeholder="搜索昵称、备注名或用户ID" id="searchInput">
+                        <button class="btn btn-primary" onclick="searchStudents()">搜索</button>
+                    </div>
+                </div>
+                
+                <!-- 操作工具栏 -->
+                <div class="toolbar">
+                    <div class="actions-section">
+                        <button class="btn btn-success" onclick="openImportModal()">批量导入学员</button>
+                        <button class="btn btn-secondary" onclick="openAddStudentModal()">添加学员</button>
+                    </div>
+                </div>
+                
+                <!-- 学员列表表格 -->
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>昵称</th>
+                                <th>分组</th>
+                                <th class="sortable" onclick="sortTable('progress')">
+                                    进度 <span class="sort-icon">↕</span>
+                                </th>
+                                <th class="sortable" onclick="sortTable('featured')">
+                                    被精选数 <span class="sort-icon">↕</span>
+                                </th>
+                                <th class="sortable" onclick="sortTable('study_time')">
+                                    累计学习时长 <span class="sort-icon">↕</span>
+                                </th>
+                                <th>学员状态</th>
+                                <th>教研备注</th>
+                                <th>运营备注</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <!-- 示例数据 -->
+                            <tr>
+                                <td>小明同学</td>
+                                <td>
+                                    <div class="group-tags">
+                                        <span class="group-tag">基础班</span>
+                                        <span class="group-tag">视唱练耳</span>
+                                    </div>
+                                </td>
+                                <td>第12课</td>
+                                <td>8</td>
+                                <td>45小时</td>
+                                <td><span class="status-badge status-active">活跃</span></td>
+                                <td>音准需要加强练习</td>
+                                <td>积极参与课堂互动</td>
+                                <td>
+                                    <button class="btn-edit" onclick="openEditModal('1')">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>音乐小天使</td>
+                                <td>
+                                    <div class="group-tags">
+                                        <span class="group-tag">中级班</span>
+                                    </div>
+                                </td>
+                                <td>第8课</td>
+                                <td>15</td>
+                                <td>32小时</td>
+                                <td><span class="status-badge status-joined">加入</span></td>
+                                <td>节奏感很好</td>
+                                <td>需要多鼓励</td>
+                                <td>
+                                    <button class="btn-edit" onclick="openEditModal('2')">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>钢琴王子</td>
+                                <td>
+                                    <div class="group-tags">
+                                        <span class="group-tag">高级班</span>
+                                    </div>
+                                </td>
+                                <td>第20课</td>
+                                <td>25</td>
+                                <td>78小时</td>
+                                <td><span class="status-badge status-graduated">已毕业</span></td>
+                                <td>技巧娴熟</td>
+                                <td>可以考虑推荐高级课程</td>
+                                <td>
+                                    <button class="btn-edit" onclick="openEditModal('3')">编辑</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- 分页 -->
+                <div class="pagination">
+                    <button class="page-btn">上一页</button>
+                    <button class="page-btn active">1</button>
+                    <button class="page-btn">2</button>
+                    <button class="page-btn">3</button>
+                    <button class="page-btn">下一页</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 编辑学员模态框 -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>编辑学员信息</h2>
+                <span class="close" onclick="closeModal('editModal')">&times;</span>
+            </div>
+            
+            <form id="editStudentForm">
+                <div class="form-group">
+                    <label class="form-label">用户ID</label>
+                    <input type="text" class="form-input" id="editUserId" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">昵称</label>
+                    <input type="text" class="form-input" id="editNickname" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">备注名</label>
+                    <input type="text" class="form-input" id="editRemarkName">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">分组（可多选）</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="group1" value="基础班">
+                            <label for="group1">基础班</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="group2" value="中级班">
+                            <label for="group2">中级班</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="group3" value="高级班">
+                            <label for="group3">高级班</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="group4" value="视唱练耳">
+                            <label for="group4">视唱练耳</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">学员状态</label>
+                    <select class="form-input" id="editStatus">
+                        <option value="加入">加入</option>
+                        <option value="活跃">活跃</option>
+                        <option value="已毕业">已毕业</option>
+                        <option value="已归档">已归档</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">运营备注</label>
+                    <textarea class="form-textarea" id="editNotes" placeholder="记录跟进情况等..."></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 添加学员模态框 -->
+    <div id="addModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>添加新学员</h2>
+                <span class="close" onclick="closeModal('addModal')">&times;</span>
+            </div>
+            
+            <form id="addStudentForm">
+                <div class="form-group">
+                    <label class="form-label">用户ID *</label>
+                    <input type="text" class="form-input" id="addUserId" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">昵称 *</label>
+                    <input type="text" class="form-input" id="addNickname" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">备注名</label>
+                    <input type="text" class="form-input" id="addRemarkName">
+                </div>
+                
+                <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('addModal')">取消</button>
+                    <button type="submit" class="btn btn-primary">添加</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- 批量导入模态框 -->
+    <div id="importModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>批量导入学员</h2>
+                <span class="close" onclick="closeModal('importModal')">&times;</span>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <p style="color: #666; margin-bottom: 15px;">请上传从小鹅通导出的XLSX文件，文件应包含用户ID和昵称列。</p>
+                <input type="file" id="importFile" accept=".xlsx" style="margin-bottom: 15px;">
+                <div style="background: #f8f9fa; padding: 15px; border-radius: 4px; font-size: 14px;">
+                    <strong>导入规则：</strong><br>
+                    • 新用户ID将创建新学员记录<br>
+                    • 已存在的用户ID仅更新昵称（如有变化）<br>
+                    • 缺少用户ID的行将被跳过
+                </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('importModal')">取消</button>
+                <button type="button" class="btn btn-success" onclick="importStudents()">开始导入</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 导航菜单切换
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // 移除所有活跃状态
+                document.querySelectorAll('.nav-item').forEach(nav => {
+                    nav.classList.remove('active');
+                });
+                
+                // 添加当前活跃状态
+                this.classList.add('active');
+                
+                // 这里可以添加页面切换逻辑
+                const moduleName = this.textContent.trim();
+                console.log('切换到模块:', moduleName);
+            });
+        });
+        
+        // 模态框控制
+        function openEditModal(studentId) {
+            // 这里应该根据studentId加载学员数据
+            document.getElementById('editModal').style.display = 'block';
+        }
+        
+        function openAddStudentModal() {
+            document.getElementById('addModal').style.display = 'block';
+        }
+        
+        function openImportModal() {
+            document.getElementById('importModal').style.display = 'block';
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // 搜索功能
+        function searchStudents() {
+            const searchTerm = document.getElementById('searchInput').value;
+            
+            // 这里应该实现实际的搜索逻辑
+            console.log('搜索:', searchTerm);
+            alert('搜索功能：' + searchTerm);
+        }
+        
+        // 排序功能
+        function sortTable(column) {
+            // 这里应该实现实际的排序逻辑
+            console.log('排序列:', column);
+            alert('排序功能：' + column);
+        }
+        
+        // 导入学员
+        function importStudents() {
+            const fileInput = document.getElementById('importFile');
+            if (!fileInput.files[0]) {
+                alert('请选择要导入的文件');
+                return;
+            }
+            
+            // 这里应该实现实际的文件上传和处理逻辑
+            alert('导入功能：文件已选择，开始处理...');
+            closeModal('importModal');
+        }
+        
+        // 表单提交处理
+        document.getElementById('editStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // 这里应该实现实际的更新逻辑
+            alert('学员信息已更新');
+            closeModal('editModal');
+        });
+        
+        document.getElementById('addStudentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // 这里应该实现实际的添加逻辑
+            alert('新学员已添加');
+            closeModal('addModal');
+        });
+        
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const modals = ['editModal', 'addModal', 'importModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (event.target === modal) {
+                    closeModal(modalId);
+                }
+            });
+        }
+        
+        // 支持回车键搜索
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchStudents();
+            }
+        });
+    </script>
+</body>
+</html>
