@@ -28,7 +28,7 @@ def task_assignment(request):
         return redirect('accounts:profile')
     
     # 获取所有教师
-    teachers = User.objects.filter(roles__contains=['teacher'])
+    teachers = User.objects.filter(roles_json__contains='"teacher"')
     
     # 获取最近的任务分配记录
     recent_tasks = TeachingTask.objects.select_related('student', 'teacher', 'researcher').order_by('-created_at')[:10]
@@ -51,7 +51,7 @@ def create_task_assignment(request):
         teacher_id = data.get('teacher_id')
         student_assignments = data.get('assignments', [])
         
-        teacher = get_object_or_404(User, id=teacher_id, roles__contains=['teacher'])
+        teacher = get_object_or_404(User, id=teacher_id, roles_json__contains='"teacher"')
         
         created_tasks = []
         for assignment in student_assignments:
@@ -131,7 +131,7 @@ def task_history(request):
     page_obj = paginator.get_page(page_number)
     
     # 获取教师列表用于筛选
-    teachers = User.objects.filter(roles__contains=['teacher'])
+    teachers = User.objects.filter(roles_json__contains='"teacher"')
     
     context = {
         'page_obj': page_obj,
@@ -172,72 +172,103 @@ def quality_monitoring(request):
         messages.error(request, '您没有权限访问此页面')
         return redirect('accounts:profile')
     
-    return render(request, 'research/quality_monitoring.html')
+    # 获取教师列表用于筛选
+    teachers = User.objects.filter(roles_json__contains='"teacher"') 
+    
+    # 获取分组选项
+    groups = Student.GROUP_CHOICES
+    
+    # 获取需关注学员名单
+    attention_students = Student.objects.filter(
+        is_difficult=True
+    ).select_related('teacher').prefetch_related('feedback_set')
+    
+    context = {
+        'current_user': request.user,
+        'teachers': teachers,
+        'groups': groups,
+        'attention_students': attention_students,
+    }
+    
+    return render(request, 'research/quality_monitor.html', context)
 
 @login_required
 def feedback_monitoring(request):
-    """点评记录监控"""
+    """点评记录监控 - AJAX接口"""
     if not request.user.has_role('researcher'):
-        messages.error(request, '您没有权限访问此页面')
-        return redirect('accounts:profile')
+        return JsonResponse({'success': False, 'message': '权限不足'})
     
-    # 获取本周点评
-    week_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
-    week_start = week_start - timedelta(days=week_start.weekday())
-    week_end = week_start + timedelta(days=7)
+    # 如果是AJAX请求，返回JSON数据
+    if request.GET.get('ajax') == '1':
+        # 获取本周点评
+        week_start = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        week_start = week_start - timedelta(days=week_start.weekday())
+        week_end = week_start + timedelta(days=7)
+        
+        # 筛选条件
+        teacher_id = request.GET.get('teacher')
+        group = request.GET.get('group')
+        keyword = request.GET.get('keyword')
+        course_from = request.GET.get('course_from')
+        course_to = request.GET.get('course_to')
+        
+        feedbacks = Feedback.objects.select_related('student', 'teacher')
+        
+        # 默认显示本周点评
+        if not any([teacher_id, group, keyword, course_from, course_to]):
+            feedbacks = feedbacks.filter(reply_time__gte=week_start, reply_time__lt=week_end)
+        
+        if teacher_id:
+            feedbacks = feedbacks.filter(teacher_id=teacher_id)
+        if group:
+            # 原来的groups查询
+            # feedbacks = feedbacks.filter(student__groups__contains=[group])
+            # 改为SQLite兼容的查询
+            feedbacks = feedbacks.filter(student__groups_json__icontains=f'"{group}"')
+        if keyword:
+            feedbacks = feedbacks.filter(
+                Q(student__student_name__icontains=keyword) |
+                Q(teacher_comment__icontains=keyword)
+            )
+        if course_from and course_to:
+            # 这里需要根据实际的课程进度字段来筛选
+            pass
+        
+        feedbacks = feedbacks.order_by('-reply_time')
+        
+        # 分页
+        paginator = Paginator(feedbacks, 20)
+        page_number = request.GET.get('page')
+        page_obj = paginator.get_page(page_number)
+        
+        # 序列化数据
+        feedbacks_data = []
+        for feedback in feedbacks:
+            feedbacks_data.append({
+                'id': feedback.id,
+                'student': {
+                    'id': feedback.student.id,
+                    'student_id': feedback.student.student_id,
+                    'student_name': feedback.student.student_name,
+                    'groups': feedback.student.groups,
+                },
+                'teacher': {
+                    'id': feedback.teacher.id,
+                    'real_name': feedback.teacher.real_name,
+                },
+                'teacher_comment': feedback.teacher_comment,
+                'reply_time': feedback.reply_time.isoformat(),
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'feedbacks': feedbacks_data,
+            'total': paginator.count,
+        })
     
-    # 筛选条件
-    teacher_id = request.GET.get('teacher')
-    group = request.GET.get('group')
-    keyword = request.GET.get('keyword')
-    course_from = request.GET.get('course_from')
-    course_to = request.GET.get('course_to')
-    
-    feedbacks = Feedback.objects.select_related('student', 'teacher')
-    
-    # 默认显示本周点评
-    if not any([teacher_id, group, keyword, course_from, course_to]):
-        feedbacks = feedbacks.filter(reply_time__gte=week_start, reply_time__lt=week_end)
-    
-    if teacher_id:
-        feedbacks = feedbacks.filter(teacher_id=teacher_id)
-    if group:
-        feedbacks = feedbacks.filter(student__groups__contains=[group])
-    if keyword:
-        feedbacks = feedbacks.filter(
-            Q(student__student_name__icontains=keyword) |
-            Q(teacher_comment__icontains=keyword)
-        )
-    if course_from and course_to:
-        # 这里需要根据实际的课程进度字段来筛选
-        pass
-    
-    feedbacks = feedbacks.order_by('-reply_time')
-    
-    # 分页
-    paginator = Paginator(feedbacks, 20)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    # 获取教师和分组列表用于筛选
-    teachers = User.objects.filter(roles__contains=['teacher'])
-    groups = Student.GROUP_CHOICES
-    
-    context = {
-        'page_obj': page_obj,
-        'teachers': teachers,
-        'groups': groups,
-        'week_start': week_start,
-        'week_end': week_end,
-        'current_filters': {
-            'teacher': teacher_id,
-            'group': group,
-            'keyword': keyword,
-            'course_from': course_from,
-            'course_to': course_to,
-        }
-    }
-    return render(request, 'research/feedback_monitoring.html', context)
+    # 非AJAX请求返回模板
+    messages.error(request, '您没有权限访问此页面')
+    return redirect('accounts:profile')
 
 @login_required
 def student_search(request):
@@ -302,6 +333,197 @@ def update_student_research_note(request, student_id):
         return JsonResponse({
             'success': True,
             'message': '教研备注已更新'
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+
+@login_required
+def get_task_detail(request, task_id):
+    """获取任务分配详情"""
+    if not request.user.has_role('researcher'):
+        return JsonResponse({'success': False, 'message': '权限不足'})
+    
+    try:
+        task = get_object_or_404(TeachingTask, id=task_id)
+        
+        # 获取分配的学员信息
+        students_data = []
+        for student in task.students.all():
+            students_data.append({
+                'id': student.id,
+                'name': student.name,
+                'student_id': student.student_id,
+                'phone': student.phone,
+                'level': student.level,
+                'instrument': student.instrument
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'id': task.id,
+                'teacher_name': task.teacher.get_full_name(),
+                'teacher_id': task.teacher.id,
+                'created_at': task.created_at.strftime('%Y-%m-%d %H:%M'),
+                'remarks': task.remarks,
+                'status': task.status,
+                'students': students_data,
+                'student_count': len(students_data)
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+
+@login_required
+def get_teacher_stats(request):
+    """获取教师统计信息"""
+    if not request.user.has_role('researcher'):
+        return JsonResponse({'success': False, 'message': '权限不足'})
+    
+    try:
+        # 获取所有教师
+        teachers = User.objects.filter(role='teacher')
+        
+        stats = []
+        for teacher in teachers:
+            # 统计该教师的任务数量
+            total_tasks = TeachingTask.objects.filter(teacher=teacher).count()
+            pending_tasks = TeachingTask.objects.filter(teacher=teacher, status='pending').count()
+            completed_tasks = TeachingTask.objects.filter(teacher=teacher, status='completed').count()
+            
+            # 统计分配的学员数量
+            total_students = 0
+            for task in TeachingTask.objects.filter(teacher=teacher):
+                total_students += task.students.count()
+            
+            stats.append({
+                'teacher_id': teacher.id,
+                'teacher_name': teacher.get_full_name(),
+                'total_tasks': total_tasks,
+                'pending_tasks': pending_tasks,
+                'completed_tasks': completed_tasks,
+                'total_students': total_students
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': stats
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+
+@login_required
+def export_assignment_results(request):
+    """导出分配结果"""
+    if not request.user.has_role('researcher'):
+        return JsonResponse({'success': False, 'message': '权限不足'})
+    
+    try:
+        # 获取查询参数
+        teacher_id = request.GET.get('teacher_id')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        
+        # 构建查询条件
+        tasks = TeachingTask.objects.all()
+        
+        if teacher_id:
+            tasks = tasks.filter(teacher_id=teacher_id)
+        
+        if start_date:
+            start_date = datetime.strptime(start_date, '%Y-%m-%d')
+            tasks = tasks.filter(created_at__gte=start_date)
+        
+        if end_date:
+            end_date = datetime.strptime(end_date, '%Y-%m-%d')
+            tasks = tasks.filter(created_at__lte=end_date + timedelta(days=1))
+        
+        # 创建PDF
+        buffer = BytesIO()
+        p = canvas.Canvas(buffer, pagesize=letter)
+        width, height = letter
+        
+        # 设置标题
+        p.setFont("Helvetica-Bold", 16)
+        p.drawString(50, height - 50, "Teaching Task Assignment Report")
+        
+        # 设置内容
+        y_position = height - 100
+        p.setFont("Helvetica", 12)
+        
+        for task in tasks:
+            if y_position < 100:  # 换页
+                p.showPage()
+                y_position = height - 50
+            
+            # 任务信息
+            p.drawString(50, y_position, f"Teacher: {task.teacher.get_full_name()}")
+            y_position -= 20
+            p.drawString(50, y_position, f"Date: {task.created_at.strftime('%Y-%m-%d %H:%M')}")
+            y_position -= 20
+            p.drawString(50, y_position, f"Status: {task.status}")
+            y_position -= 20
+            
+            # 学员列表
+            p.drawString(50, y_position, "Students:")
+            y_position -= 20
+            
+            for student in task.students.all():
+                p.drawString(70, y_position, f"- {student.name} ({student.student_id})")
+                y_position -= 15
+            
+            if task.remarks:
+                p.drawString(50, y_position, f"Remarks: {task.remarks}")
+                y_position -= 20
+            
+            y_position -= 20  # 任务间隔
+        
+        p.save()
+        buffer.seek(0)
+        
+        # 返回PDF文件
+        response = HttpResponse(buffer.getvalue(), content_type='application/pdf')
+        response['Content-Disposition'] = f'attachment; filename="assignment_report_{timezone.now().strftime("%Y%m%d_%H%M%S")}.pdf"'
+        
+        return response
+        
+    except Exception as e:
+        return JsonResponse({'success': False, 'message': str(e)})
+
+
+@login_required
+def use_history_assignment(request, task_id):
+    """使用历史分配记录"""
+    if not request.user.has_role('researcher'):
+        return JsonResponse({'success': False, 'message': '权限不足'})
+    
+    try:
+        # 获取历史任务
+        history_task = get_object_or_404(TeachingTask, id=task_id)
+        
+        # 获取学员信息
+        students_data = []
+        for student in history_task.students.all():
+            students_data.append({
+                'id': student.id,
+                'name': student.name,
+                'student_id': student.student_id,
+                'phone': student.phone,
+                'level': student.level,
+                'instrument': student.instrument
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'data': {
+                'teacher_id': history_task.teacher.id,
+                'teacher_name': history_task.teacher.get_full_name(),
+                'students': students_data,
+                'remarks': history_task.remarks
+            }
         })
     except Exception as e:
         return JsonResponse({'success': False, 'message': str(e)})

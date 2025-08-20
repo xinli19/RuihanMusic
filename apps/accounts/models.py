@@ -1,6 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.contrib.postgres.fields import ArrayField
+import json
 
 class User(AbstractUser):
     """扩展用户模型"""
@@ -11,11 +11,11 @@ class User(AbstractUser):
         ('admin', '管理员'),
     ]
     
-    # 修改为ArrayField支持多角色
-    roles = ArrayField(
-        models.CharField(max_length=20, choices=ROLE_CHOICES),
-        default=list,
-        verbose_name='角色'
+    # 使用CharField存储JSON格式的角色数据，兼容SQLite
+    roles_json = models.CharField(
+        max_length=200,
+        default='[]',
+        verbose_name='角色JSON'
     )
     
     real_name = models.CharField(max_length=50, verbose_name='真实姓名')
@@ -28,6 +28,19 @@ class User(AbstractUser):
         verbose_name = '用户'
         verbose_name_plural = '用户'
         db_table = 'auth_user_extended'
+    
+    @property
+    def roles(self):
+        """获取角色列表"""
+        try:
+            return json.loads(self.roles_json)
+        except (json.JSONDecodeError, TypeError):
+            return []
+    
+    @roles.setter
+    def roles(self, value):
+        """设置角色列表"""
+        self.roles_json = json.dumps(value if value else [])
     
     def has_role(self, role):
         """检查用户是否拥有指定角色"""

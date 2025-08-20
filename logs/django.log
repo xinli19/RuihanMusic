@@ -1,0 +1,2369 @@
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 302 0
+Internal Server Error: /accounts/login/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: accounts/login.html
+"GET /accounts/login/?next=/teaching/ HTTP/1.1" 500 74485
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3023
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4172
+"GET /static/admin/css/login.css HTTP/1.1" 200 958
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+"GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+"GET /static/admin/css/base.css HTTP/1.1" 200 21544
+"GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 9693
+"GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+"GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+"GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+Internal Server Error: /admin/teaching/feedback/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: feedback
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 716, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 1987, in changelist_view
+    cl = self.get_changelist_instance(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 864, in get_changelist_instance
+    return ChangeList(
+        request,
+    ...<12 lines>...
+        self.search_help_text,
+    )
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/views/main.py", line 145, in __init__
+    self.get_results(request)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/views/main.py", line 312, in get_results
+    result_count = paginator.count
+                   ^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/paginator.py", line 110, in count
+    return c()
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 620, in count
+    return self.query.get_count(using=self.db)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 629, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 615, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such table: feedback
+"GET /admin/teaching/feedback/ HTTP/1.1" 500 186032
+"GET /accounts/login/?next=/teaching/ HTTP/1.1" 200 3832
+"POST /accounts/login/?next=/teaching/ HTTP/1.1" 302 0
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 28, in teacher_dashboard
+    return render(request, 'common/permission_denied.html')
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: common/permission_denied.html
+"GET /teaching/ HTTP/1.1" 500 80786
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 28, in teacher_dashboard
+    return render(request, 'common/permission_denied.html')
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: common/permission_denied.html
+"GET /teaching/ HTTP/1.1" 500 80786
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 28, in teacher_dashboard
+    return render(request, 'common/permission_denied.html')
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: common/permission_denied.html
+"GET /teaching/ HTTP/1.1" 500 80786
+"GET /accounts/login/?next=/teaching/ HTTP/1.1" 200 3832
+"POST /accounts/login/?next=/teaching/ HTTP/1.1" 302 0
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 28, in teacher_dashboard
+    return render(request, 'common/permission_denied.html')
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: common/permission_denied.html
+"GET /teaching/ HTTP/1.1" 500 80786
+"GET /admin/ HTTP/1.1" 200 9693
+"GET /accounts/login/?next=/teaching/ HTTP/1.1" 200 3832
+"GET /accounts/login/?next=/teaching/ HTTP/1.1" 200 3832
+"GET /accounts/login/?next=/teaching/ HTTP/1.1" 200 3832
+"POST /accounts/login/?next=/teaching/ HTTP/1.1" 302 0
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 28, in teacher_dashboard
+    return render(request, 'common/permission_denied.html')
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: common/permission_denied.html
+"GET /teaching/ HTTP/1.1" 500 80786
+"GET /teaching/ HTTP/1.1" 200 3671
+"GET /admin/ HTTP/1.1" 200 9693
+"GET /admin/accounts/user/ HTTP/1.1" 200 14311
+"GET /static/admin/css/changelists.css HTTP/1.1" 200 6811
+"GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+"GET /static/admin/js/core.js HTTP/1.1" 200 6208
+"GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+"GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+"GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+"GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/img/icon-yes.svg HTTP/1.1" 200 436
+"GET /static/admin/img/search.svg HTTP/1.1" 200 458
+"GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+"GET /static/admin/js/filters.js HTTP/1.1" 200 978
+"GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+"GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+"GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+"GET /static/admin/img/sorting-icons.svg HTTP/1.1" 200 1097
+"POST /admin/accounts/user/ HTTP/1.1" 302 0
+"GET /admin/accounts/user/ HTTP/1.1" 200 14432
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/img/icon-alert.svg HTTP/1.1" 200 504
+"GET /admin/auth/group/add/ HTTP/1.1" 200 15936
+"GET /static/admin/js/prepopulate_init.js HTTP/1.1" 200 586
+"GET /static/admin/js/SelectBox.js HTTP/1.1" 200 4530
+"GET /static/admin/css/forms.css HTTP/1.1" 200 9090
+"GET /static/admin/js/SelectFilter2.js HTTP/1.1" 200 15492
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/css/widgets.css HTTP/1.1" 200 11800
+"GET /static/admin/js/change_form.js HTTP/1.1" 200 606
+"GET /static/admin/img/selector-icons.svg HTTP/1.1" 200 3291
+"POST /admin/auth/group/add/ HTTP/1.1" 200 16528
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/auth/group/add/ HTTP/1.1" 302 0
+"GET /admin/auth/group/ HTTP/1.1" 200 12010
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/auth/group/1/change/ HTTP/1.1" 200 16588
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/auth/group/1/change/ HTTP/1.1" 302 0
+"GET /admin/auth/group/ HTTP/1.1" 200 12010
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+Internal Server Error: /admin/students/student/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+sqlite3.OperationalError: no such table: students
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 716, in wrapper
+    return self.admin_site.admin_view(view)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/views/decorators/cache.py", line 80, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/sites.py", line 240, in inner
+    return view(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 48, in _wrapper
+    return bound_method(*args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 188, in _view_wrapper
+    result = _process_exception(request, e)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/decorators.py", line 186, in _view_wrapper
+    response = view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 1987, in changelist_view
+    cl = self.get_changelist_instance(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/options.py", line 864, in get_changelist_instance
+    return ChangeList(
+        request,
+    ...<12 lines>...
+        self.search_help_text,
+    )
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/views/main.py", line 145, in __init__
+    self.get_results(request)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/admin/views/main.py", line 312, in get_results
+    result_count = paginator.count
+                   ^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/utils/functional.py", line 47, in __get__
+    res = instance.__dict__[self.name] = self.func(instance)
+                                         ~~~~~~~~~^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/paginator.py", line 110, in count
+    return c()
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 620, in count
+    return self.query.get_count(using=self.db)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 629, in get_count
+    return obj.get_aggregation(using, {"__count": Count("*")})["__count"]
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 615, in get_aggregation
+    result = compiler.execute_sql(SINGLE)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/compiler.py", line 1562, in execute_sql
+    cursor.execute(sql, params)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 122, in execute
+    return super().execute(sql, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 79, in execute
+    return self._execute_with_wrappers(
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        sql, params, many=False, executor=self._execute
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 92, in _execute_with_wrappers
+    return executor(sql, params, many, context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 100, in _execute
+    with self.db.wrap_database_errors:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/utils.py", line 91, in __exit__
+    raise dj_exc_value.with_traceback(traceback) from exc_value
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/utils.py", line 105, in _execute
+    return self.cursor.execute(sql, params)
+           ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/backends/sqlite3/base.py", line 329, in execute
+    return super().execute(query, params)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+django.db.utils.OperationalError: no such table: students
+"GET /admin/students/student/ HTTP/1.1" 500 186271
+"GET /admin/auth/group/ HTTP/1.1" 200 11825
+"GET /admin/accounts/user/ HTTP/1.1" 200 14311
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+"GET /static/admin/css/base.css HTTP/1.1" 304 0
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+"GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/theme.js HTTP/1.1" 304 0
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+"GET /admin/accounts/user/1/change/ HTTP/1.1" 200 27275
+"GET /static/admin/js/calendar.js HTTP/1.1" 200 9141
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 200 19319
+"GET /static/admin/img/icon-clock.svg HTTP/1.1" 200 677
+"GET /static/admin/img/icon-calendar.svg HTTP/1.1" 200 1086
+"POST /admin/accounts/user/1/change/ HTTP/1.1" 200 27867
+"GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/accounts/user/1/change/ HTTP/1.1" 302 0
+"GET /admin/accounts/user/ HTTP/1.1" 200 14507
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/ HTTP/1.1" 200 10777
+"GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 302 0
+"GET /accounts/login/?next=/teaching/ HTTP/1.1" 200 3832
+"POST /accounts/login/?next=/teaching/ HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+"GET /admin/ HTTP/1.1" 200 9691
+"GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+"GET /admin/auth/group/add/ HTTP/1.1" 200 15934
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/auth/group/add/ HTTP/1.1" 302 0
+"GET /admin/auth/group/ HTTP/1.1" 200 11996
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/ HTTP/1.1" 200 14305
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/1/change/ HTTP/1.1" 200 27259
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/accounts/user/1/change/ HTTP/1.1" 200 27860
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/accounts/user/1/change/ HTTP/1.1" 302 0
+"GET /admin/accounts/user/ HTTP/1.1" 200 14499
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+Method Not Allowed (GET): /accounts/logout/
+Method Not Allowed: /accounts/logout/
+"GET /accounts/logout/ HTTP/1.1" 405 0
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+"GET /admin/ HTTP/1.1" 200 10419
+"GET /admin/common/systemconfig/ HTTP/1.1" 200 10627
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/auth/group/ HTTP/1.1" 200 11815
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/auth/group/1/change/ HTTP/1.1" 200 16570
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/auth/group/1/change/ HTTP/1.1" 302 0
+"GET /admin/auth/group/ HTTP/1.1" 200 11996
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/research/teachingtask/ HTTP/1.1" 200 12207
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/ HTTP/1.1" 200 14314
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/?o=-1 HTTP/1.1" 200 14489
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/?o=1 HTTP/1.1" 200 14474
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/1/change/?_changelist_filters=o%3D1 HTTP/1.1" 200 27806
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/accounts/user/1/change/?_changelist_filters=o%3D1 HTTP/1.1" 302 0
+"GET /admin/accounts/user/?o=1 HTTP/1.1" 200 14659
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+"GET /admin/ HTTP/1.1" 200 11115
+"GET /admin/accounts/user/ HTTP/1.1" 200 14314
+"GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+"GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+"GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+"GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+"GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+"GET /static/admin/js/actions.js HTTP/1.1" 304 0
+"GET /static/admin/js/core.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-yes.svg HTTP/1.1" 304 0
+"GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+"GET /static/admin/img/search.svg HTTP/1.1" 304 0
+"GET /static/admin/js/filters.js HTTP/1.1" 304 0
+"GET /admin/accounts/user/?is_active__exact=1 HTTP/1.1" 200 14812
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/1/change/?_changelist_filters=is_active__exact%3D1 HTTP/1.1" 200 27851
+"GET /static/admin/js/SelectFilter2.js HTTP/1.1" 304 0
+"GET /static/admin/css/forms.css HTTP/1.1" 304 0
+"GET /static/admin/js/SelectBox.js HTTP/1.1" 304 0
+"GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+"GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+"GET /static/admin/img/selector-icons.svg HTTP/1.1" 304 0
+"POST /admin/accounts/user/1/change/?_changelist_filters=is_active__exact%3D1 HTTP/1.1" 302 0
+"GET /admin/accounts/user/?is_active__exact=1 HTTP/1.1" 200 14997
+"GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+"GET /static/admin/css/base.css HTTP/1.1" 304 0
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/theme.js HTTP/1.1" 304 0
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+"GET /admin/ HTTP/1.1" 200 11465
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 3669
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET /admin/ HTTP/1.1" 302 0
+"GET /admin/login/?next=/admin/ HTTP/1.1" 200 4172
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 200 2682
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 200 2810
+"GET /static/admin/css/responsive.css HTTP/1.1" 200 17905
+"GET /static/admin/css/login.css HTTP/1.1" 200 958
+"GET /static/admin/css/base.css HTTP/1.1" 200 21544
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 200 3063
+"GET /static/admin/js/theme.js HTTP/1.1" 200 1943
+Not Found: /favicon.ico
+"GET /favicon.ico HTTP/1.1" 404 3023
+"POST /admin/login/?next=/admin/ HTTP/1.1" 200 4320
+"POST /admin/login/?next=/admin/ HTTP/1.1" 302 0
+"GET /admin/ HTTP/1.1" 200 11465
+"GET /static/admin/css/dashboard.css HTTP/1.1" 200 441
+"GET /static/admin/img/icon-changelink.svg HTTP/1.1" 200 380
+"GET /static/admin/img/icon-addlink.svg HTTP/1.1" 200 331
+"GET /admin/teaching/feedback/ HTTP/1.1" 200 11725
+"GET /static/admin/css/changelists.css HTTP/1.1" 200 6811
+"GET /static/admin/js/actions.js HTTP/1.1" 200 8067
+"GET /static/admin/js/jquery.init.js HTTP/1.1" 200 347
+"GET /static/admin/js/core.js HTTP/1.1" 200 6208
+"GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 200 9042
+"GET /static/admin/js/prepopulate.js HTTP/1.1" 200 1531
+"GET /static/admin/js/urlify.js HTTP/1.1" 200 7887
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/img/search.svg HTTP/1.1" 200 458
+"GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 200 285314
+"GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 200 325171
+"GET /static/admin/js/filters.js HTTP/1.1" 200 978
+"GET /static/admin/img/tooltag-add.svg HTTP/1.1" 200 331
+"GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 200 581
+"GET /admin/research/teachingtask/ HTTP/1.1" 200 12207
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/students/student/ HTTP/1.1" 200 12648
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/auth/group/ HTTP/1.1" 200 11815
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET / HTTP/1.1" 302 0
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 32, in teacher_dashboard
+    'teaching_tips': SystemConfig.objects.filter(
+                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        config_key__startswith='teaching_tip_'
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).values_list('config_value', flat=True),
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1495, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1307, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1772, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'config_key' into field. Choices are: created_at, description, id, key, updated_at, value
+"GET /teaching/ HTTP/1.1" 500 109877
+/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 41, in teacher_dashboard
+    today_tasks = TeachingTask.objects.filter(
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        assigned_teacher=request.user,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        task_status='pending',
+        ^^^^^^^^^^^^^^^^^^^^^^
+        created_at__date=timezone.now().date()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).count()
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1495, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1307, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1772, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'assigned_teacher' into field. Choices are: assigned_at, completed_at, created_at, id, researcher, researcher_id, status, student, student_id, task_id, task_note, teacher, teacher_id, updated_at
+"GET /teaching/ HTTP/1.1" 500 111445
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 41, in teacher_dashboard
+    today_tasks = TeachingTask.objects.filter(
+                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        assigned_teacher=request.user,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        task_status='pending',
+        ^^^^^^^^^^^^^^^^^^^^^^
+        created_at__date=timezone.now().date()
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    ).count()
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1495, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1307, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1772, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'assigned_teacher' into field. Choices are: assigned_at, completed_at, created_at, id, researcher, researcher_id, status, student, student_id, task_id, task_note, teacher, teacher_id, updated_at
+"GET /teaching/ HTTP/1.1" 500 111445
+/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+Watching for file changes with StatReloader
+"GET / HTTP/1.1" 302 0
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 59, in teacher_dashboard
+    return render(request, 'teaching/dashboard.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'feedback' not found. 'feedback' is not a valid view function or pattern name.
+"GET /teaching/ HTTP/1.1" 500 158610
+"GET / HTTP/1.1" 302 0
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 59, in teacher_dashboard
+    return render(request, 'teaching/dashboard.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'feedback' not found. 'feedback' is not a valid view function or pattern name.
+"GET /teaching/ HTTP/1.1" 500 158610
+"GET /admin/ HTTP/1.1" 200 11465
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+"GET /static/admin/css/base.css HTTP/1.1" 304 0
+"GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+"GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+"GET /static/admin/js/theme.js HTTP/1.1" 304 0
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 59, in teacher_dashboard
+    return render(request, 'teaching/dashboard.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'feedback' not found. 'feedback' is not a valid view function or pattern name.
+"GET /teaching/ HTTP/1.1" 500 158610
+"GET /research/ HTTP/1.1" 302 0
+Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: accounts/profile.html
+"GET /accounts/profile/ HTTP/1.1" 500 75187
+Not Found: /operations/
+"GET /operations/ HTTP/1.1" 404 2912
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 59, in teacher_dashboard
+    return render(request, 'teaching/dashboard.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'student_list' not found. 'student_list' is not a valid view function or pattern name.
+"GET /teaching/ HTTP/1.1" 500 159015
+/Users/xiny_li/睿涵音乐后台/apps/operations/urls.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/operations/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /teaching/ HTTP/1.1" 200 18761
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/ HTTP/1.1" 200 18562
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+"GET /research/ HTTP/1.1" 302 0
+Internal Server Error: /accounts/profile/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 220, in _get_response
+    response = response.render()
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 114, in render
+    self.content = self.rendered_content
+                   ^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 90, in rendered_content
+    template = self.resolve_template(self.template_name)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/response.py", line 72, in resolve_template
+    return select_template(template, using=self.using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 47, in select_template
+    raise TemplateDoesNotExist(", ".join(template_name_list), chain=chain)
+django.template.exceptions.TemplateDoesNotExist: accounts/profile.html
+"GET /accounts/profile/ HTTP/1.1" 500 75187
+"GET /accounts/profile/ HTTP/1.1" 200 6029
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /research/ HTTP/1.1" 302 0
+"GET /accounts/profile/ HTTP/1.1" 200 6029
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /research/ HTTP/1.1" 302 0
+"GET /accounts/profile/ HTTP/1.1" 200 6029
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /research/ HTTP/1.1" 302 0
+"GET /accounts/profile/ HTTP/1.1" 200 6029
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /admin/accounts/user/ HTTP/1.1" 200 14811
+"GET /static/admin/css/changelists.css HTTP/1.1" 304 0
+"GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+"GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+"GET /static/admin/js/core.js HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+"GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+"GET /static/admin/js/actions.js HTTP/1.1" 304 0
+"GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+"GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+"GET /static/admin/img/search.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-yes.svg HTTP/1.1" 304 0
+"GET /static/admin/js/filters.js HTTP/1.1" 304 0
+"GET /static/admin/img/sorting-icons.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-viewlink.svg HTTP/1.1" 304 0
+"GET /static/admin/img/tooltag-add.svg HTTP/1.1" 304 0
+"GET /admin/accounts/user/1/change/ HTTP/1.1" 200 27737
+"GET /static/admin/css/forms.css HTTP/1.1" 304 0
+"GET /static/admin/js/SelectBox.js HTTP/1.1" 304 0
+"GET /static/admin/js/calendar.js HTTP/1.1" 304 0
+"GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 304 0
+"GET /static/admin/js/SelectFilter2.js HTTP/1.1" 304 0
+"GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+"GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-calendar.svg HTTP/1.1" 304 0
+"GET /static/admin/img/selector-icons.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-clock.svg HTTP/1.1" 304 0
+"POST /admin/accounts/user/1/change/ HTTP/1.1" 302 0
+"GET /admin/accounts/user/ HTTP/1.1" 200 14996
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/?is_staff__exact=1 HTTP/1.1" 200 15416
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/ HTTP/1.1" 200 11815
+"GET /admin/accounts/user/ HTTP/1.1" 200 14811
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /admin/accounts/user/1/change/ HTTP/1.1" 200 27305
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"POST /admin/accounts/user/1/change/ HTTP/1.1" 302 0
+"GET /admin/accounts/user/ HTTP/1.1" 200 15012
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /teaching/ HTTP/1.1" 200 18562
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /accounts/profile/ HTTP/1.1" 200 5922
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 31, in task_assignment
+    teachers = User.objects.filter(roles__contains=['teacher'])
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/manager.py", line 87, in manager_method
+    return getattr(self.get_queryset(), name)(*args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1476, in filter
+    return self._filter_or_exclude(False, args, kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1494, in _filter_or_exclude
+    clone._filter_or_exclude_inplace(negate, args, kwargs)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/query.py", line 1501, in _filter_or_exclude_inplace
+    self._query.add_q(Q(*args, **kwargs))
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1613, in add_q
+    clause, _ = self._add_q(q_object, self.used_aliases)
+                ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1645, in _add_q
+    child_clause, needed_inner = self.build_filter(
+                                 ~~~~~~~~~~~~~~~~~^
+        child,
+        ^^^^^^
+    ...<7 lines>...
+        update_join_types=update_join_types,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1495, in build_filter
+    lookups, parts, reffed_expression = self.solve_lookup_type(arg, summarize)
+                                        ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1307, in solve_lookup_type
+    _, field, _, lookup_parts = self.names_to_path(lookup_splitted, self.get_meta())
+                                ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/db/models/sql/query.py", line 1772, in names_to_path
+    raise FieldError(
+    ...<2 lines>...
+    )
+django.core.exceptions.FieldError: Cannot resolve keyword 'roles' into field. Choices are: assigned_students, assigned_tasks, created_at, date_joined, email, feedback, first_name, groups, id, is_active, is_staff, is_superuser, last_login, last_name, logentry, password, phone, real_name, roles_json, teachingtask, updated_at, user_permissions, username
+"GET /research/ HTTP/1.1" 500 110525
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /research/ HTTP/1.1" 200 5321
+"GET /static/css/research.css HTTP/1.1" 404 1908
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/css/base.css HTTP/1.1" 404 1896
+"GET /static/js/research.js HTTP/1.1" 404 1902
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+Watching for file changes with StatReloader
+"GET /teaching/ HTTP/1.1" 200 18562
+"GET /static/css/base.css HTTP/1.1" 200 6564
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /research/ HTTP/1.1" 200 5321
+"GET /static/js/research.js HTTP/1.1" 404 1902
+"GET /static/css/research.css HTTP/1.1" 404 1908
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+"GET /research/ HTTP/1.1" 200 5321
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/css/research.css HTTP/1.1" 404 1908
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/js/research.js HTTP/1.1" 404 1902
+"GET /research/ HTTP/1.1" 200 5321
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/css/research.css HTTP/1.1" 200 9674
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/js/research.js HTTP/1.1" 200 11177
+"GET /research/ HTTP/1.1" 200 5321
+"GET /static/js/research.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+/Users/xiny_li/睿涵音乐后台/apps/research/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/research/urls.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /research/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 40, in task_assignment
+    return render(request, 'research/task_assignment.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'get_students' not found. 'get_students' is not a valid view function or pattern name.
+"GET /research/ HTTP/1.1" 500 152269
+Internal Server Error: /research/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 40, in task_assignment
+    return render(request, 'research/task_assignment.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'get_students' not found. 'get_students' is not a valid view function or pattern name.
+"GET /research/ HTTP/1.1" 500 152269
+Internal Server Error: /research/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 40, in task_assignment
+    return render(request, 'research/task_assignment.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 65, in render
+    result = block.nodelist.render(context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 88, in reverse
+    return resolver._reverse_with_prefix(view, prefix, *args, **kwargs)
+           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/resolvers.py", line 851, in _reverse_with_prefix
+    raise NoReverseMatch(msg)
+django.urls.exceptions.NoReverseMatch: Reverse for 'get_students' not found. 'get_students' is not a valid view function or pattern name.
+"GET /research/ HTTP/1.1" 500 152269
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/css/research.css HTTP/1.1" 304 0
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/js/research.js HTTP/1.1" 200 14699
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /admin/accounts/user/1/change/ HTTP/1.1" 200 27349
+"GET /static/admin/css/base.css HTTP/1.1" 304 0
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+"GET /static/admin/js/vendor/jquery/jquery.js HTTP/1.1" 304 0
+"GET /static/admin/css/forms.css HTTP/1.1" 304 0
+"GET /static/admin/js/calendar.js HTTP/1.1" 304 0
+"GET /static/admin/js/jquery.init.js HTTP/1.1" 304 0
+"GET /static/admin/js/admin/DateTimeShortcuts.js HTTP/1.1" 304 0
+"GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+"GET /static/admin/js/urlify.js HTTP/1.1" 304 0
+"GET /static/admin/js/core.js HTTP/1.1" 304 0
+"GET /static/admin/js/actions.js HTTP/1.1" 304 0
+"GET /static/admin/js/SelectBox.js HTTP/1.1" 304 0
+"GET /admin/jsi18n/ HTTP/1.1" 200 9327
+"GET /static/admin/js/prepopulate.js HTTP/1.1" 304 0
+"GET /static/admin/js/admin/RelatedObjectLookups.js HTTP/1.1" 304 0
+"GET /static/admin/css/widgets.css HTTP/1.1" 304 0
+"GET /static/admin/js/vendor/xregexp/xregexp.js HTTP/1.1" 304 0
+"GET /static/admin/js/SelectFilter2.js HTTP/1.1" 304 0
+"GET /static/admin/js/prepopulate_init.js HTTP/1.1" 304 0
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+"GET /static/admin/js/theme.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+"GET /static/admin/js/change_form.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-unknown.svg HTTP/1.1" 200 655
+"GET /static/admin/img/icon-unknown-alt.svg HTTP/1.1" 200 655
+"GET /static/admin/img/icon-calendar.svg HTTP/1.1" 304 0
+"GET /static/admin/img/selector-icons.svg HTTP/1.1" 304 0
+"GET /static/admin/img/search.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-clock.svg HTTP/1.1" 304 0
+"GET / HTTP/1.1" 302 0
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/css/teaching.css HTTP/1.1" 200 2520
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/js/teaching.js HTTP/1.1" 200 9931
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+Not Found: /operation/
+"GET /operation/ HTTP/1.1" 404 3020
+/Users/xiny_li/睿涵音乐后台/config/urls.py changed, reloading.
+Watching for file changes with StatReloader
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+/Users/xiny_li/睿涵音乐后台/apps/operations/urls.py changed, reloading.
+Watching for file changes with StatReloader
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+Forbidden: /operations/
+"GET /operations/ HTTP/1.1" 403 37
+/Users/xiny_li/睿涵音乐后台/apps/common/decorators.py changed, reloading.
+Watching for file changes with StatReloader
+Internal Server Error: /operations/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 71, in reverse
+    extra, resolver = resolver.namespace_dict[ns]
+                      ~~~~~~~~~~~~~~~~~~~~~~~^^^^
+KeyError: 'research'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/common/decorators.py", line 29, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/operations/views.py", line 619, in student_list
+    return render(request, 'operations/student_list.html')
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 210, in render
+    return template.render(context)
+           ~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 173, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 479, in render
+    url = reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/urls/base.py", line 82, in reverse
+    raise NoReverseMatch("%s is not a registered namespace" % key)
+django.urls.exceptions.NoReverseMatch: 'research' is not a registered namespace
+"GET /operations/ HTTP/1.1" 500 160900
+/Users/xiny_li/睿涵音乐后台/config/urls.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/css/operations.css HTTP/1.1" 200 4717
+"GET /static/js/operations.js HTTP/1.1" 200 8330
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Not Found: /operations/students/
+"GET /operations/students/?page=1&filter=all&search= HTTP/1.1" 404 5375
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Not Found: /operations/students/
+"GET /operations/students/?page=1&filter=all&search= HTTP/1.1" 404 5375
+/Users/xiny_li/睿涵音乐后台/apps/common/decorators.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/common/decorators.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 200 8389
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/css/research.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/js/research.js HTTP/1.1" 304 0
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+/Users/xiny_li/睿涵音乐后台/apps/operations/views.py changed, reloading.
+Watching for file changes with StatReloader
+/Users/xiny_li/睿涵音乐后台/apps/common/decorators.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/js/operations.js HTTP/1.1" 200 8457
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /static/js/research.js HTTP/1.1" 304 0
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 167
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+/Users/xiny_li/睿涵音乐后台/apps/operations/views.py changed, reloading.
+Watching for file changes with StatReloader
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /operations/ HTTP/1.1" 200 5477
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/css/research.css HTTP/1.1" 304 0
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /teaching/ HTTP/1.1" 200 5773
+"GET /static/js/base.js HTTP/1.1" 404 1890
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /research/ HTTP/1.1" 200 6227
+"GET /static/js/base.js HTTP/1.1" 404 1890
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /research/ HTTP/1.1" 200 6225
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/js/research.js HTTP/1.1" 304 0
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /research/ HTTP/1.1" 200 6225
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /teaching/ HTTP/1.1" 200 5771
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 6225
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /teaching/ HTTP/1.1" 200 5771
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 6225
+"GET /static/css/research.css HTTP/1.1" 304 0
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 6225
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /research/ HTTP/1.1" 200 6225
+"GET /static/css/research.css HTTP/1.1" 304 0
+"GET /static/js/research.js HTTP/1.1" 304 0
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /static/css/operations.css HTTP/1.1" 200 9758
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /teaching/ HTTP/1.1" 200 5771
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /research/ HTTP/1.1" 200 6225
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 200 13355
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/js/operations.js HTTP/1.1" 200 13376
+"GET /static/css/operations.css HTTP/1.1" 200 9706
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 6225
+"GET /static/js/research.js HTTP/1.1" 304 0
+"GET /static/css/research.css HTTP/1.1" 304 0
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /teaching/ HTTP/1.1" 200 5771
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /teaching/ HTTP/1.1" 200 5771
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /teaching/ HTTP/1.1" 200 5771
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /operations/ HTTP/1.1" 200 5475
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 6225
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+Internal Server Error: /research/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/smartif.py", line 180, in translate_token
+    op = OPERATORS[token]
+         ~~~~~~~~~^^^^^^^
+KeyError: "user.has_role:'teacher'"
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 40, in task_assignment
+    return render(request, 'research/task_assignment.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 199, in render
+    template = context.template.engine.select_template(template_name)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/engine.py", line 208, in select_template
+    return self.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 960, in do_if
+    condition = TemplateIfParser(parser, bits).parse()
+                ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 893, in __init__
+    super().__init__(*args, **kwargs)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/smartif.py", line 171, in __init__
+    mapped_tokens.append(self.translate_token(token))
+                         ~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/smartif.py", line 182, in translate_token
+    return self.create_var(token)
+           ~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 896, in create_var
+    return TemplateLiteral(self.template_parser.compile_filter(value), value)
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 597, in compile_filter
+    return FilterExpression(token, self)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 698, in __init__
+    raise TemplateSyntaxError(
+    ...<2 lines>...
+    )
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ':'teacher'' from 'user.has_role:'teacher''
+"GET /research/ HTTP/1.1" 500 224043
+Internal Server Error: /teaching/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/smartif.py", line 180, in translate_token
+    op = OPERATORS[token]
+         ~~~~~~~~~^^^^^^^
+KeyError: "user.has_role:'teacher'"
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/teaching/views.py", line 59, in teacher_dashboard
+    return render(request, 'teaching/dashboard.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 62, in render_to_string
+    return template.render(context, request)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/backends/django.py", line 61, in render
+    return self.template.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 171, in render
+    return self._render(context)
+           ~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 159, in render
+    return compiled_parent._render(context)
+           ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 163, in _render
+    return self.nodelist.render(context)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 1000, in render
+    return SafeString("".join([node.render_annotated(context) for node in self]))
+                               ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 961, in render_annotated
+    return self.render(context)
+           ~~~~~~~~~~~^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader_tags.py", line 199, in render
+    template = context.template.engine.select_template(template_name)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/engine.py", line 208, in select_template
+    return self.get_template(template_name)
+           ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/engine.py", line 177, in get_template
+    template, origin = self.find_template(template_name)
+                       ~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/engine.py", line 159, in find_template
+    template = loader.get_template(name, skip=skip)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loaders/cached.py", line 57, in get_template
+    template = super().get_template(template_name, skip)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loaders/base.py", line 28, in get_template
+    return Template(
+        contents,
+    ...<2 lines>...
+        self.engine,
+    )
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 154, in __init__
+    self.nodelist = self.compile_nodelist()
+                    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 196, in compile_nodelist
+    return parser.parse()
+           ~~~~~~~~~~~~^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 510, in parse
+    raise self.error(token, e)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 508, in parse
+    compiled_result = compile_func(self, token)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 960, in do_if
+    condition = TemplateIfParser(parser, bits).parse()
+                ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 893, in __init__
+    super().__init__(*args, **kwargs)
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/smartif.py", line 171, in __init__
+    mapped_tokens.append(self.translate_token(token))
+                         ~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/smartif.py", line 182, in translate_token
+    return self.create_var(token)
+           ~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/defaulttags.py", line 896, in create_var
+    return TemplateLiteral(self.template_parser.compile_filter(value), value)
+                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 597, in compile_filter
+    return FilterExpression(token, self)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/base.py", line 698, in __init__
+    raise TemplateSyntaxError(
+    ...<2 lines>...
+    )
+django.template.exceptions.TemplateSyntaxError: Could not parse the remainder: ':'teacher'' from 'user.has_role:'teacher''
+"GET /teaching/ HTTP/1.1" 500 223843
+"GET /teaching/ HTTP/1.1" 200 8248
+"GET /static/css/teaching.css HTTP/1.1" 304 0
+"GET /static/css/base.css HTTP/1.1" 200 9043
+"GET /static/js/teaching.js HTTP/1.1" 304 0
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /admin/ HTTP/1.1" 200 12165
+"GET /static/admin/css/dark_mode.css HTTP/1.1" 304 0
+"GET /static/admin/css/dashboard.css HTTP/1.1" 304 0
+"GET /static/admin/css/nav_sidebar.css HTTP/1.1" 304 0
+"GET /static/admin/css/base.css HTTP/1.1" 304 0
+"GET /static/admin/css/responsive.css HTTP/1.1" 304 0
+"GET /static/admin/js/theme.js HTTP/1.1" 304 0
+"GET /static/admin/js/nav_sidebar.js HTTP/1.1" 304 0
+"GET /static/admin/img/icon-changelink.svg HTTP/1.1" 304 0
+"GET /static/admin/img/icon-addlink.svg HTTP/1.1" 304 0
+"GET /accounts/profile/ HTTP/1.1" 200 8403
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /teaching/ HTTP/1.1" 200 8248
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 7952
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 8702
+"GET /static/js/research.js HTTP/1.1" 304 0
+"GET /static/css/research.css HTTP/1.1" 304 0
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /admin/ HTTP/1.1" 200 12165
+"GET /teaching/ HTTP/1.1" 200 8248
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/ HTTP/1.1" 200 8248
+"GET /static/css/base.css HTTP/1.1" 304 0
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /operations/ HTTP/1.1" 200 7952
+"GET /static/css/operations.css HTTP/1.1" 304 0
+"GET /static/js/operations.js HTTP/1.1" 304 0
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 8702
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /admin/ HTTP/1.1" 200 12165
+"GET /teaching/ HTTP/1.1" 200 8248
+"GET /teaching/feedback/completed/?page=1 HTTP/1.1" 200 113
+"GET /teaching/tasks/today/ HTTP/1.1" 200 30
+"GET /operations/ HTTP/1.1" 200 7952
+"GET /operations/students/api/?page=1&filter=all&search= HTTP/1.1" 200 142
+"GET /research/ HTTP/1.1" 200 8702
+Internal Server Error: /research/tasks/history/
+Traceback (most recent call last):
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/exception.py", line 55, in inner
+    response = get_response(request)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/core/handlers/base.py", line 197, in _get_response
+    response = wrapped_callback(request, *callback_args, **callback_kwargs)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/contrib/auth/decorators.py", line 23, in _wrapper_view
+    return view_func(request, *args, **kwargs)
+  File "/Users/xiny_li/睿涵音乐后台/apps/research/views.py", line 146, in task_history
+    return render(request, 'research/task_history.html', context)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/shortcuts.py", line 25, in render
+    content = loader.render_to_string(template_name, context, request, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 61, in render_to_string
+    template = get_template(template_name, using=using)
+  File "/Users/xiny_li/venv/lib/python3.13/site-packages/django/template/loader.py", line 19, in get_template
+    raise TemplateDoesNotExist(template_name, chain=chain)
+django.template.exceptions.TemplateDoesNotExist: research/task_history.html
+"GET /research/tasks/history/ HTTP/1.1" 500 82988
+"GET /admin/ HTTP/1.1" 200 12165

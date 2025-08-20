@@ -13,7 +13,8 @@ class FeedbackAdmin(admin.ModelAdmin):
             'fields': ('user_id', 'student', 'student_name', 'teacher', 'teacher_name')
         }),
         ('学习进度', {
-            'fields': ('progress',)
+            # 使用实际的JSON字段
+            'fields': ('progress_json',)
         }),
         ('点评内容', {
             'fields': ('teacher_comment',)

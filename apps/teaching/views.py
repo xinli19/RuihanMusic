@@ -30,17 +30,17 @@ def teacher_dashboard(request):
     # 获取公告信息
     announcements = {
         'teaching_tips': SystemConfig.objects.filter(
-            config_key__startswith='teaching_tip_'
-        ).values_list('config_value', flat=True),
+            key__startswith='teaching_tip_'  # 修复：config_key -> key
+        ).values_list('value', flat=True),  # 修复：config_value -> value
         'student_notes': SystemConfig.objects.filter(
-            config_key__startswith='student_note_'
-        ).values_list('config_value', flat=True)
+            key__startswith='student_note_'  # 修复：config_key -> key
+        ).values_list('value', flat=True)  # 修复：config_value -> value
     }
     
     # 获取今日任务统计
     today_tasks = TeachingTask.objects.filter(
-        assigned_teacher=request.user,
-        task_status='pending',
+        teacher=request.user,  # 修复：assigned_teacher -> teacher
+        status='pending',      # 修复：task_status -> status
         created_at__date=timezone.now().date()
     ).count()
     
@@ -68,8 +68,8 @@ def get_today_tasks(request):
     
     # 获取分配给当前教师的待处理任务
     tasks = TeachingTask.objects.filter(
-        assigned_teacher=request.user,
-        task_status__in=['pending', 'in_progress']
+        teacher=request.user,  # 修复：assigned_teacher -> teacher
+        status__in=['pending', 'in_progress']  # 修复：task_status -> status
     ).select_related('student').order_by('-created_at')
     
     task_list = []
@@ -78,7 +78,7 @@ def get_today_tasks(request):
         task_list.append({
             'task_id': task.task_id,
             'student_id': student.student_id,
-            'student_name': student.nickname or student.name,
+            'student_name': student.student_name,  # 修复：nickname or name -> student_name
             'student_groups': student.groups,
             'current_progress': student.current_progress,
             'is_difficult': student.status == 'difficult',
@@ -137,7 +137,7 @@ def submit_feedback(request):
                 feedback_time=timezone.now(),
                 student_id=student_id,
                 student=student,
-                student_nickname=student.nickname or student.name,
+                student_nickname=student.student_name,  # 修复：nickname or name -> student_name
                 learning_progress=progress_list,
                 teacher_name=request.user.real_name or request.user.username,
                 teacher=request.user,
@@ -149,10 +149,10 @@ def submit_feedback(request):
             # 更新相关教学任务状态
             TeachingTask.objects.filter(
                 student=student,
-                assigned_teacher=request.user,
-                task_status__in=['pending', 'in_progress']
+                teacher=request.user,  # 修复：assigned_teacher -> teacher
+                status__in=['pending', 'in_progress']  # 修复：task_status -> status
             ).update(
-                task_status='completed',
+                status='completed',  # 修复：task_status -> status
                 completed_at=timezone.now()
             )
         
@@ -187,7 +187,7 @@ def manual_feedback(request):
         
         # 查找学员
         student = Student.objects.filter(
-            Q(name__icontains=student_name) | Q(nickname__icontains=student_name)
+            Q(student_name__icontains=student_name) | Q(alias_name__icontains=student_name)  # 修复：name/nickname -> student_name/alias_name
         ).first()
         
         if not student:
@@ -207,7 +207,7 @@ def manual_feedback(request):
             feedback_time=timezone.now(),
             student_id=student.student_id,
             student=student,
-            student_nickname=student.nickname or student.name,
+            student_nickname=student.student_name,  # 修复：nickname or name -> student_name
             learning_progress=progress_list,
             teacher_name=request.user.real_name or request.user.username,
             teacher=request.user,
@@ -283,15 +283,15 @@ def search_students(request):
     
     # 搜索学员
     students = Student.objects.filter(
-        Q(name__icontains=query) | Q(nickname__icontains=query)
+        Q(student_name__icontains=query) | Q(alias_name__icontains=query)  # 修复：name/nickname -> student_name/alias_name
     ).filter(status__in=['active', 'difficult'])[:10]
     
     student_list = []
     for student in students:
         student_list.append({
             'student_id': student.student_id,
-            'name': student.name,
-            'nickname': student.nickname,
+            'student_name': student.student_name,  # 修复：name -> student_name
+            'alias_name': student.alias_name,      # 修复：nickname -> alias_name
             'groups': student.groups,
             'current_progress': student.current_progress,
             'status': student.status,
@@ -372,7 +372,7 @@ def push_to_operation(request):
                 student = Student.objects.get(student_id=student_id)
                 OpsTask.objects.create(
                     student=student,
-                    student_nickname=student.nickname or student.name,
+                    student_nickname=student.student_name,  # 修复：nickname or name -> student_name
                     push_source='teaching',
                     task_status='pending'
                 )
@@ -407,11 +407,11 @@ def batch_delete_tasks(request):
         
         # 删除教学任务（只能删除自己的任务）
         deleted_count = TeachingTask.objects.filter(
-            assigned_teacher=request.user,
+            teacher=request.user,  # 修复：assigned_teacher -> teacher
             student_id__in=student_ids,
-            task_status__in=['pending', 'in_progress']
+            status__in=['pending', 'in_progress']  # 修复：task_status -> status
         ).update(
-            task_status='cancelled',
+            status='cancelled',  # 修复：task_status -> status
             updated_at=timezone.now()
         )
         
@@ -455,8 +455,8 @@ def get_student_detail(request, student_id):
             'success': True,
             'student': {
                 'student_id': student.student_id,
-                'name': student.name,
-                'nickname': student.nickname,
+                'name': student.student_name,      # 修复：name -> student_name
+                'nickname': student.alias_name,    # 修复：nickname -> alias_name
                 'groups': student.groups,
                 'current_progress': student.current_progress,
                 'status': student.status,

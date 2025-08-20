@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}学员信息管理 - 睿涵音乐后台{% endblock %}
+
+{% block page_title %}学员信息中心{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/operations.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="operations-container">
+    <!-- 操作工具栏 -->
+    <div class="toolbar">
+        <div class="search-section">
+            <form method="GET" class="search-form">
+                <input type="text" name="search" class="search-input" placeholder="搜索学员昵称、备注名..." value="{{ request.GET.search }}">
+                <button type="submit" class="btn btn-primary">搜索</button>
+            </form>
+        </div>
+        
+        <div class="actions-section">
+            <button class="btn btn-success" onclick="openAddStudentModal()">添加学员</button>
+            <button class="btn btn-info" onclick="openBatchImportModal()">批量导入</button>
+            <button class="btn btn-warning" onclick="exportStudents()">导出数据</button>
+        </div>
+    </div>
+    
+    <!-- 学员列表表格 -->
+    <div class="table-container">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="sortable" onclick="sortTable('student_name')">学员昵称 <span class="sort-icon">↕</span></th>
+                    <th class="sortable" onclick="sortTable('alias_name')">备注名 <span class="sort-icon">↕</span></th>
+                    <th>分组</th>
+                    <th>状态</th>
+                    <th class="sortable" onclick="sortTable('created_at')">创建时间 <span class="sort-icon">↕</span></th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td>{{ student.student_name }}</td>
+                    <td>{{ student.alias_name|default:"-" }}</td>
+                    <td>
+                        <div class="group-tags">
+                            {% if student.group_name %}
+                                <span class="group-tag">{{ student.group_name }}</span>
+                            {% else %}
+                                <span class="group-tag">未分组</span>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td>
+                        <span class="status-badge status-{{ student.status }}">
+                            {% if student.status == 'active' %}正常学习
+                            {% elif student.status == 'joined' %}已入学
+                            {% elif student.status == 'graduated' %}已毕业
+                            {% else %}{{ student.get_status_display }}
+                            {% endif %}
+                        </span>
+                    </td>
+                    <td>{{ student.created_at|date:"Y-m-d" }}</td>
+                    <td>
+                        <button class="btn-edit" onclick="editStudent('{{ student.student_id }}')">编辑</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">👥</div>
+                            <p>暂无学员数据</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <!-- 分页 -->
+    {% if is_paginated %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">首页</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">上一页</a>
+        {% endif %}
+        
+        <span class="page-info">
+            第 {{ page_obj.number }} 页，共 {{ page_obj.paginator.num_pages }} 页
+        </span>
+        
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">下一页</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">末页</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
+<!-- 添加/编辑学员模态框 -->
+<div id="studentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">添加学员</h2>
+            <span class="close" onclick="closeStudentModal()">&times;</span>
+        </div>
+        <form id="studentForm">
+            {% csrf_token %}
+            <input type="hidden" id="studentId" name="student_id">
+            
+            <div class="form-group">
+                <label class="form-label">学员昵称 *</label>
+                <input type="text" id="studentName" name="student_name" class="form-input" required>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">备注名</label>
+                <input type="text" id="aliasName" name="alias_name" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">分组</label>
+                <input type="text" id="groupName" name="group_name" class="form-input">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">状态</label>
+                <select id="status" name="status" class="form-input">
+                    <option value="active">正常学习</option>
+                    <option value="joined">已入学</option>
+                    <option value="graduated">已毕业</option>
+                </select>
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">保存</button>
+                <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">取消</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/operations.js' %}"></script>
+{% endblock %}

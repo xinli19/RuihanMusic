@@ -1,0 +1,1260 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学员点评 - 睿涵音乐教学端</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 220px;
+            background: #2d5a3d;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 60px;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+        
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: #b8d4c2;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: #3a6b4a;
+            color: white;
+            border-left-color: #5cb85c;
+        }
+        
+        .nav-item.active {
+            background: #3a6b4a;
+            color: white;
+            border-left-color: #5cb85c;
+        }
+        
+        .sidebar.collapsed .nav-item {
+            padding: 15px 10px;
+            text-align: center;
+        }
+        
+        .sidebar.collapsed .sidebar-header h2 {
+            display: none;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            padding: 20px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .sidebar.collapsed + .main-content {
+            margin-left: 60px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .page-description {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* 公告栏样式 */
+        .announcement-board {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .announcement-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            padding: 15px 20px;
+            font-weight: 600;
+        }
+
+        .announcement-content {
+            padding: 20px;
+        }
+
+        .announcement-section {
+            margin-bottom: 20px;
+        }
+
+        .announcement-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .announcement-section h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .announcement-list {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .announcement-item {
+            padding: 6px 0;
+            border-bottom: 1px solid #e9ecef;
+            color: #555;
+            line-height: 1.4;
+            font-size: 12px;
+        }
+
+        .announcement-item:last-child {
+            border-bottom: none;
+        }
+
+        .module-tabs {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: #7f8c8d;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button:hover {
+            background-color: #f8f9fa;
+            color: #2c3e50;
+        }
+
+        .tab-button.active {
+            color: #3498db;
+            border-bottom-color: #3498db;
+            background-color: #f8f9fa;
+        }
+
+        .tab-content {
+            padding: 20px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background-color: #2980b9;
+        }
+
+        .btn-success {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background-color: #229954;
+        }
+
+        .btn-warning {
+            background-color: #f39c12;
+            color: white;
+        }
+
+        .btn-warning:hover:not(:disabled) {
+            background-color: #e67e22;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background-color: #7f8c8d;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background-color: #c0392b;
+        }
+
+        /* 任务列表样式 */
+        .task-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .task-header {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .select-all-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        /* 表格样式 */
+        .task-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .task-table-header {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .task-table-header th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .task-table-header th:last-child {
+            border-right: none;
+        }
+
+        .task-item {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-item.difficult-student {
+            background-color: #fff3cd;
+        }
+
+        .task-item td {
+            padding: 15px;
+            vertical-align: top;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .task-item td:last-child {
+            border-right: none;
+        }
+
+        .task-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .student-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .student-name {
+            font-weight: 600;
+            color: #2c3e50;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .student-name:hover {
+            color: #3498db;
+        }
+
+        .student-meta {
+            display: flex;
+            gap: 8px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .group-tag {
+            background-color: #e8f4fd;
+            color: #3498db;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+
+        .lesson-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .comment-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .submit-section {
+            padding: 20px;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        /* 已点评记录样式 */
+        .completed-list {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .completed-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .completed-table-header {
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .completed-table-header th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #2c3e50;
+            border-right: 1px solid #e9ecef;
+        }
+
+        .completed-table-header th:last-child {
+            border-right: none;
+        }
+
+        .completed-item {
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .completed-item:last-child {
+            border-bottom: none;
+        }
+
+        .completed-item td {
+            padding: 15px;
+            vertical-align: top;
+            border-right: 1px solid #f0f0f0;
+        }
+
+        .completed-item td:last-child {
+            border-right: none;
+        }
+
+        .completed-student {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .completed-progress {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .completed-comment {
+            color: #555;
+            line-height: 1.5;
+            word-wrap: break-word;
+        }
+
+        /* 手动点评样式 */
+        .manual-search {
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 300px;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .manual-form {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        /* 模态框样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .close {
+            color: #aaa;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #000;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .task-table, .completed-table {
+                font-size: 12px;
+            }
+
+            .task-table th, .task-table td,
+            .completed-table th, .completed-table td {
+                padding: 10px 8px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏导航 -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>教学中心</h2>
+                <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            </div>
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item active">
+                    <i>📝</i><span>学员点评模块</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1 class="page-title">学员点评</h1>
+            </div>
+
+            <!-- 公告栏 -->
+            <div class="announcement-board">
+                <div class="announcement-header">
+                    📢 本周教学提示与学员情况
+                </div>
+                <div class="announcement-content">
+                    <div class="announcement-section">
+                        <h4>🎯 教学提示</h4>
+                        <div class="announcement-list">
+                            <div class="announcement-item">
+                                本周重点关注学员的节拍感训练，建议在课程中增加节拍练习环节
+                            </div>
+                            <div class="announcement-item">
+                                请注意观察学员的手型变化，及时纠正不良习惯
+                            </div>
+                            <div class="announcement-item">
+                                运营提醒：本周有部分学员家长反馈希望了解孩子的学习进度，请详细记录点评
+                            </div>
+                        </div>
+                    </div>
+                    <div class="announcement-section">
+                        <h4>⚠️ 重点关注学员</h4>
+                        <div class="announcement-list">
+                            <div class="announcement-item">
+                                <strong>张小明</strong> - 教研备注：最近练习积极性下降，需要鼓励和引导
+                            </div>
+                            <div class="announcement-item">
+                                <strong>李小红</strong> - 运营备注：家长反馈孩子对课程兴趣减弱，需要调整教学方式
+                            </div>
+                            <div class="announcement-item">
+                                <strong>王小华</strong> - 教研备注：进度较快，可以适当增加难度
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 功能模块标签页 -->
+            <div class="module-tabs">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="today-tasks">
+                        📋 今日任务
+                    </button>
+                    <button class="tab-button" data-tab="completed-comments">
+                        ✅ 已点评记录
+                    </button>
+                    <button class="tab-button" data-tab="manual-comment">
+                        ✏️ 手动点评
+                    </button>
+                </div>
+
+                <!-- 今日任务 -->
+                <div class="tab-content">
+                    <div class="tab-pane active" id="today-tasks">
+                        <div class="action-bar">
+                            <button class="btn btn-primary" id="refreshTasks">
+                                🔄 更新今日任务
+                            </button>
+                        </div>
+
+                        <div class="task-list">
+                            <div class="task-header">
+                                <div class="select-all-container">
+                                    <input type="checkbox" id="selectAll" class="task-checkbox">
+                                    <label for="selectAll">全选</label>
+                                </div>
+                                <div class="batch-actions">
+                                    <button class="btn btn-warning" id="pushToResearch" disabled>
+                                        📤 推送教研
+                                    </button>
+                                    <button class="btn btn-success" id="pushToOperation" disabled>
+                                        📤 推送运营
+                                    </button>
+                                    <button class="btn btn-danger" id="batchDelete" disabled>
+                                        🗑️ 批量删除
+                                    </button>
+                                </div>
+                            </div>
+
+                            <table class="task-table">
+                                <thead class="task-table-header">
+                                    <tr>
+                                        <th width="50">选择</th>
+                                        <th width="150">昵称</th>
+                                        <th width="120">本次点评课</th>
+                                        <th>点评内容</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="taskList">
+                                    <!-- 任务项示例 -->
+                                    <tr class="task-item difficult-student" data-student-id="1">
+                                        <td>
+                                            <input type="checkbox" class="task-checkbox" data-student-id="1">
+                                        </td>
+                                        <td>
+                                            <div class="student-info">
+                                                <a href="#" class="student-name" onclick="viewStudentInfo('1')">张小明</a>
+                                                <div class="student-meta">
+                                                    <span class="group-tag">基础班</span>
+                                                    <span>第3课</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="lesson-input" placeholder="课数 (如: 5 或 5,7)" data-student-id="1">
+                                        </td>
+                                        <td>
+                                            <textarea class="comment-input" placeholder="请输入教师点评..." data-student-id="1"></textarea>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="task-item" data-student-id="2">
+                                        <td>
+                                            <input type="checkbox" class="task-checkbox" data-student-id="2">
+                                        </td>
+                                        <td>
+                                            <div class="student-info">
+                                                <a href="#" class="student-name" onclick="viewStudentInfo('2')">李小红</a>
+                                                <div class="student-meta">
+                                                    <span class="group-tag">进阶班</span>
+                                                    <span>第5课</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="lesson-input" placeholder="课数 (如: 5 或 5,7)" data-student-id="2">
+                                        </td>
+                                        <td>
+                                            <textarea class="comment-input" placeholder="请输入教师点评..." data-student-id="2"></textarea>
+                                        </td>
+                                    </tr>
+
+                                    <tr class="task-item" data-student-id="3">
+                                        <td>
+                                            <input type="checkbox" class="task-checkbox" data-student-id="3">
+                                        </td>
+                                        <td>
+                                            <div class="student-info">
+                                                <a href="#" class="student-name" onclick="viewStudentInfo('3')">王小华</a>
+                                                <div class="student-meta">
+                                                    <span class="group-tag">基础班</span>
+                                                    <span>第2课</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <input type="text" class="lesson-input" placeholder="课数 (如: 5 或 5,7)" data-student-id="3">
+                                        </td>
+                                        <td>
+                                            <textarea class="comment-input" placeholder="请输入教师点评..." data-student-id="3"></textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                            <div class="submit-section">
+                                <button class="btn btn-success" id="submitComments">
+                                    ✅ 提交点评
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 已点评记录 -->
+                    <div class="tab-pane" id="completed-comments">
+                        <div class="completed-list">
+                            <table class="completed-table">
+                                <thead class="completed-table-header">
+                                    <tr>
+                                        <th width="150">昵称</th>
+                                        <th width="120">本次点评课</th>
+                                        <th>点评内容</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="completedList">
+                                    <!-- 已点评记录示例 -->
+                                    <tr class="completed-item">
+                                        <td class="completed-student">张小明</td>
+                                        <td class="completed-progress">第5课</td>
+                                        <td class="completed-comment">
+                                            今天的课程表现很好，节拍感有明显提升。手型保持得不错，建议继续加强左手的独立性练习。下节课可以尝试更复杂的节奏型。
+                                        </td>
+                                    </tr>
+                                    <tr class="completed-item">
+                                        <td class="completed-student">李小红</td>
+                                        <td class="completed-progress">第3课</td>
+                                        <td class="completed-comment">
+                                            学习态度认真，但是对新知识的接受需要更多时间。建议放慢教学节奏，多给予鼓励。家长可以在家多陪练基础练习。
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 手动点评 -->
+                    <div class="tab-pane" id="manual-comment">
+                        <div class="manual-search">
+                            <label class="form-label">学员搜索：</label>
+                            <input type="text" class="search-input" id="studentSearch" placeholder="输入学员昵称进行搜索">
+                        </div>
+
+                        <div class="manual-form" id="manualForm">
+                            <h3 style="margin-bottom: 20px; color: #2c3e50;">📝 手动点评</h3>
+                            
+                            <form id="manualCommentForm">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">课数 *</label>
+                                        <input type="text" class="form-input" id="manualLessonNumber" placeholder="例如：5 或 5,7" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">教师评语 *</label>
+                                        <textarea class="form-input form-textarea comment-input" id="manualTeacherComment" placeholder="请输入对学员本次课程的评价和建议..." required></textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="action-bar">
+                                    <button type="submit" class="btn btn-success">
+                                        ✅ 提交点评
+                                    </button>
+                                    <button type="button" class="btn btn-secondary" onclick="cancelManualComment()">
+                                        ❌ 取消
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <div class="empty-state" id="manualEmptyState">
+                            <div class="empty-state-icon">🔍</div>
+                            <p>请输入学员昵称开始搜索</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 推送备注模态框 -->
+    <div id="pushModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="pushModalTitle">推送备注</h2>
+                <span class="close" onclick="closePushModal()">&times;</span>
+            </div>
+            <div class="form-group">
+                <label class="form-label" id="pushModalLabel">备注信息</label>
+                <textarea class="form-input form-textarea" id="pushNote" placeholder="请输入备注信息..."></textarea>
+            </div>
+            <div class="action-bar">
+                <button class="btn btn-primary" onclick="confirmPush()">确认推送</button>
+                <button class="btn btn-secondary" onclick="closePushModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 学员信息模态框 -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>学员信息</h2>
+                <span class="close" onclick="closeStudentModal()">&times;</span>
+            </div>
+            <div id="studentModalContent">
+                <!-- 学员详细信息 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 全局变量
+        let currentPushType = '';
+        let selectedStudents = [];
+        let completedComments = [];
+        
+        // 模拟困难学生数据
+        const difficultStudents = ['1']; // 张小明被标记为困难学生
+
+        // 标签页切换
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const tabId = this.getAttribute('data-tab');
+                
+                // 更新按钮状态
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+                
+                // 更新内容显示
+                document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+
+        // 全选功能
+        document.getElementById('selectAll').addEventListener('change', function() {
+            const checkboxes = document.querySelectorAll('.task-checkbox:not(#selectAll)');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            });
+            updateBatchButtons();
+        });
+
+        // 单个选择框变化
+        document.addEventListener('change', function(e) {
+            if (e.target.classList.contains('task-checkbox') && e.target.id !== 'selectAll') {
+                updateBatchButtons();
+                updateSelectAll();
+            }
+        });
+
+        // 更新批量操作按钮状态
+        function updateBatchButtons() {
+            const checkedBoxes = document.querySelectorAll('.task-checkbox:not(#selectAll):checked');
+            const hasSelection = checkedBoxes.length > 0;
+            
+            document.getElementById('pushToResearch').disabled = !hasSelection;
+            document.getElementById('pushToOperation').disabled = !hasSelection;
+            document.getElementById('batchDelete').disabled = !hasSelection;
+        }
+
+        // 更新全选状态
+        function updateSelectAll() {
+            const allCheckboxes = document.querySelectorAll('.task-checkbox:not(#selectAll)');
+            const checkedBoxes = document.querySelectorAll('.task-checkbox:not(#selectAll):checked');
+            const selectAllCheckbox = document.getElementById('selectAll');
+            
+            if (checkedBoxes.length === 0) {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = false;
+            } else if (checkedBoxes.length === allCheckboxes.length) {
+                selectAllCheckbox.checked = true;
+                selectAllCheckbox.indeterminate = false;
+            } else {
+                selectAllCheckbox.checked = false;
+                selectAllCheckbox.indeterminate = true;
+            }
+        }
+
+        // 推送到教研
+        document.getElementById('pushToResearch').addEventListener('click', function() {
+            currentPushType = 'research';
+            document.getElementById('pushModalTitle').textContent = '推送到教研部门';
+            document.getElementById('pushModalLabel').textContent = '教研备注';
+            document.getElementById('pushNote').placeholder = '请输入需要教研部门关注的事项...';
+            document.getElementById('pushModal').style.display = 'block';
+        });
+
+        // 推送到运营
+        document.getElementById('pushToOperation').addEventListener('click', function() {
+            currentPushType = 'operation';
+            document.getElementById('pushModalTitle').textContent = '推送到运营部门';
+            document.getElementById('pushModalLabel').textContent = '运营备注';
+            document.getElementById('pushNote').placeholder = '请输入需要运营部门关注的事项...';
+            document.getElementById('pushModal').style.display = 'block';
+        });
+
+        // 确认推送
+        function confirmPush() {
+            const note = document.getElementById('pushNote').value;
+            if (!note.trim()) {
+                alert('请输入备注信息');
+                return;
+            }
+            
+            const checkedBoxes = document.querySelectorAll('.task-checkbox:not(#selectAll):checked');
+            const studentIds = Array.from(checkedBoxes).map(cb => cb.getAttribute('data-student-id'));
+            
+            // 这里应该调用API推送数据
+            console.log(`推送到${currentPushType}:`, { studentIds, note });
+            
+            alert(`已成功推送到${currentPushType === 'research' ? '教研' : '运营'}部门`);
+            closePushModal();
+        }
+
+        // 关闭推送模态框
+        function closePushModal() {
+            document.getElementById('pushModal').style.display = 'none';
+            document.getElementById('pushNote').value = '';
+        }
+
+        // 批量删除
+        document.getElementById('batchDelete').addEventListener('click', function() {
+            const checkedBoxes = document.querySelectorAll('.task-checkbox:not(#selectAll):checked');
+            if (checkedBoxes.length === 0) return;
+            
+            if (confirm(`确定要删除选中的 ${checkedBoxes.length} 个任务吗？`)) {
+                checkedBoxes.forEach(checkbox => {
+                    checkbox.closest('.task-item').remove();
+                });
+                updateBatchButtons();
+                updateSelectAll();
+                alert('删除成功');
+            }
+        });
+
+        // 提交点评
+        document.getElementById('submitComments').addEventListener('click', function() {
+            const taskItems = document.querySelectorAll('.task-item');
+            const comments = [];
+            
+            taskItems.forEach(item => {
+                const studentId = item.querySelector('.lesson-input').getAttribute('data-student-id');
+                const studentName = item.querySelector('.student-name').textContent;
+                const lessonNumber = item.querySelector('.lesson-input').value;
+                const comment = item.querySelector('.comment-input').value;
+                
+                if (lessonNumber && comment) {
+                    comments.push({
+                        studentId,
+                        studentName,
+                        lessonNumber,
+                        comment,
+                        timestamp: new Date().toLocaleString()
+                    });
+                }
+            });
+            
+            if (comments.length === 0) {
+                alert('请至少完成一个学员的点评');
+                return;
+            }
+            
+            // 添加到已点评记录
+            completedComments.push(...comments);
+            updateCompletedList();
+            
+            // 清空已提交的输入
+            comments.forEach(comment => {
+                const item = document.querySelector(`[data-student-id="${comment.studentId}"]`).closest('.task-item');
+                item.querySelector('.lesson-input').value = '';
+                item.querySelector('.comment-input').value = '';
+            });
+        });
+
+        // 更新已点评列表
+        function updateCompletedList() {
+            const completedList = document.getElementById('completedList');
+            
+            if (completedComments.length === 0) {
+                completedList.innerHTML = `
+                    <tr>
+                        <td colspan="3">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📝</div>
+                                <p>暂无已点评记录</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            completedList.innerHTML = completedComments.map(comment => `
+                <tr class="completed-item">
+                    <td class="completed-student">${comment.studentName}</td>
+                    <td class="completed-progress">第${comment.lessonNumber}课</td>
+                    <td class="completed-comment">${comment.comment}</td>
+                </tr>
+            `).join('');
+        }
+
+        // 学员搜索功能
+        document.getElementById('studentSearch').addEventListener('input', function() {
+            const searchTerm = this.value.trim();
+            const manualForm = document.getElementById('manualForm');
+            const emptyState = document.getElementById('manualEmptyState');
+            
+            if (searchTerm.length >= 2) {
+                // 模拟搜索结果
+                const mockStudents = [
+                    { id: '1', name: '张小明', group: '基础班', progress: '第3课' },
+                    { id: '2', name: '李小红', group: '进阶班', progress: '第5课' },
+                    { id: '3', name: '王小华', group: '基础班', progress: '第2课' }
+                ];
+                
+                const matchedStudent = mockStudents.find(student => 
+                    student.name.includes(searchTerm)
+                );
+                
+                if (matchedStudent) {
+                    manualForm.style.display = 'block';
+                    emptyState.style.display = 'none';
+                } else {
+                    manualForm.style.display = 'none';
+                    emptyState.style.display = 'block';
+                    emptyState.innerHTML = `
+                        <div class="empty-state-icon">❌</div>
+                        <p>未找到匹配的学员</p>
+                    `;
+                }
+            } else {
+                manualForm.style.display = 'none';
+                emptyState.style.display = 'block';
+                emptyState.innerHTML = `
+                    <div class="empty-state-icon">🔍</div>
+                    <p>请输入学员昵称开始搜索</p>
+                `;
+            }
+        });
+
+        // 手动点评提交
+        document.getElementById('manualCommentForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentName = document.getElementById('studentSearch').value;
+            const lessonNumber = document.getElementById('manualLessonNumber').value;
+            const comment = document.getElementById('manualTeacherComment').value;
+            
+            if (!studentName || !lessonNumber || !comment) {
+                alert('请填写所有必填项');
+                return;
+            }
+            
+            // 添加到已点评记录
+            completedComments.push({
+                studentId: Date.now().toString(),
+                studentName,
+                lessonNumber,
+                comment,
+                timestamp: new Date().toLocaleString()
+            });
+            
+            updateCompletedList();
+            cancelManualComment();
+        });
+
+        // 取消手动点评
+        function cancelManualComment() {
+            document.getElementById('studentSearch').value = '';
+            document.getElementById('manualLessonNumber').value = '';
+            document.getElementById('manualTeacherComment').value = '';
+            document.getElementById('manualForm').style.display = 'none';
+            document.getElementById('manualEmptyState').style.display = 'block';
+        }
+
+        // 查看学员信息
+        function viewStudentInfo(studentId) {
+            // 模拟学员信息
+            const studentInfo = {
+                '1': { name: '张小明', group: '基础班', progress: '第3课', status: '困难学生' },
+                '2': { name: '李小红', group: '进阶班', progress: '第5课', status: '正常学习' },
+                '3': { name: '王小华', group: '基础班', progress: '第2课', status: '正常学习' }
+            };
+            
+            const student = studentInfo[studentId];
+            if (student) {
+                document.getElementById('studentModalContent').innerHTML = `
+                    <div class="form-group">
+                        <label class="form-label">学员昵称</label>
+                        <div>${student.name}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">分组</label>
+                        <div>${student.group}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">当前进度</label>
+                        <div>${student.progress}</div>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">学员状态</label>
+                        <div>${student.status}</div>
+                    </div>
+                `;
+                document.getElementById('studentModal').style.display = 'block';
+            }
+        }
+
+        // 关闭学员信息模态框
+        function closeStudentModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+
+        // 更新今日任务
+        document.getElementById('refreshTasks').addEventListener('click', function() {
+            alert('任务列表已更新');
+            // 这里应该调用API获取最新任务
+        });
+
+        // 点击模态框外部关闭
+        window.onclick = function(event) {
+            const pushModal = document.getElementById('pushModal');
+            const studentModal = document.getElementById('studentModal');
+            
+            if (event.target == pushModal) {
+                closePushModal();
+            }
+            if (event.target == studentModal) {
+                closeStudentModal();
+            }
+        }
+
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('学员点评页面加载完成');
+            updateCompletedList();
+        });
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
+</body>
+</html>
