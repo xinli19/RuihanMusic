@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教研质量监控 - 睿涵音乐后台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 侧边栏样式 */
+        .sidebar {
+            width: 220px;
+            background: #2d5a3d;
+            color: white;
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: width 0.3s ease;
+        }
+        
+        .sidebar.collapsed {
+            width: 60px;
+        }
+        
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+            transition: background 0.3s;
+        }
+        
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-nav {
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            display: block;
+            padding: 12px 20px;
+            color: #b8d4c2;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: #3a6b4a;
+            color: white;
+            border-left-color: #5cb85c;
+        }
+        
+        .nav-item.active {
+            background: #3a6b4a;
+            color: white;
+            border-left-color: #5cb85c;
+        }
+        
+        .sidebar.collapsed .nav-item {
+            padding: 15px 10px;
+            text-align: center;
+        }
+        
+        .sidebar.collapsed .sidebar-header h2 {
+            display: none;
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            flex: 1;
+            margin-left: 220px;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .sidebar.collapsed + .main-content {
+            margin-left: 60px;
+        }
+        
+        .sidebar.collapsed + .main-content {
+            margin-left: 60px;
+        }
+
+        .page-header {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        /* 模块标签页 */
+        .module-tabs {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .tab-header {
+            display: flex;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 20px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6c757d;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .tab-button:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .tab-button.active {
+            color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .tab-button.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #007bff;
+        }
+
+        .tab-content {
+            padding: 20px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        /* 操作栏样式 */
+        .action-bar {
+            margin-bottom: 20px;
+        }
+
+        .primary-actions {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .filter-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #e9ecef;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            color: #6c757d;
+            white-space: nowrap;
+        }
+
+        /* 按钮样式 */
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .btn-primary {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0056b3;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #1e7e34;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-outline {
+            background: white;
+            color: #6c757d;
+            border: 1px solid #dee2e6;
+        }
+
+        .btn-outline:hover {
+            background: #f8f9fa;
+            color: #495057;
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .btn-sm {
+            padding: 4px 8px;
+            font-size: 12px;
+        }
+
+        /* 表单控件 */
+        .form-control {
+            padding: 6px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.15s ease-in-out;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        .form-control-sm {
+            padding: 4px 8px;
+            font-size: 13px;
+        }
+
+        /* 搜索框样式 */
+        .search-box {
+            position: relative;
+            display: inline-block;
+        }
+
+        .search-box input {
+            padding-right: 35px;
+            width: 200px;
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            cursor: pointer;
+        }
+
+        /* 提醒框样式 */
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border: 1px solid transparent;
+        }
+
+        .alert-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        /* 表格样式 */
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .table th {
+            background: #f8f9fa;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #dee2e6;
+            vertical-align: middle;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        /* 学员链接样式 */
+        .student-link {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .student-link:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        /* 标签样式 */
+        .group-tag {
+            display: inline-block;
+            padding: 4px 8px;
+            background: #e3f2fd;
+            color: #1976d2;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .source-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .source-system {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .source-teacher {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .source-manual {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        /* 评论文本样式 */
+        .comment-text {
+            max-width: 200px;
+            word-wrap: break-word;
+            line-height: 1.4;
+        }
+
+        /* 备注输入框样式 */
+        .remark-input {
+            width: 100%;
+            min-height: 60px;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 13px;
+            resize: vertical;
+        }
+
+        .remark-input:focus {
+            outline: none;
+            border-color: #80bdff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
+        }
+
+        /* 空状态样式 */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state p {
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state small {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        /* 加载动画 */
+        .loading {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #007bff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* 搜索学员相关样式 */
+        .search-student-container {
+            margin-bottom: 20px;
+        }
+
+        .search-student-form {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+        }
+
+        .search-form-row {
+            display: flex;
+            gap: 15px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .search-form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .search-form-group label {
+            font-size: 13px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        .search-results-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 10px 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .results-count {
+            color: #6c757d;
+            font-size: 14px;
+        }
+
+        .batch-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-results-table {
+            display: none;
+        }
+
+        .search-results-table.show {
+            display: block;
+        }
+
+        .search-prompt {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-prompt-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.3;
+        }
+
+        .search-prompt h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+            color: #495057;
+        }
+
+        .search-prompt p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .filter-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .primary-actions {
+                flex-direction: column;
+            }
+
+            .btn {
+                justify-content: center;
+            }
+
+            .table-container {
+                overflow-x: auto;
+            }
+
+            .search-box input {
+                width: 100%;
+            }
+
+            .search-form-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>教研中心</h2>
+                <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+            </div>
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item">
+                    <i>📋</i><span>教学任务分配模块</span>
+                </a>
+                <a href="#" class="nav-item active">
+                    <i>🔍</i><span>教学质量控制模块</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <!-- 页面头部 -->
+            <div class="page-header">
+                <h1>教学质量监控</h1>
+                <p>监控教学质量，管理需注意学员名单</p>
+            </div>
+
+            <!-- 模块标签页 -->
+            <div class="module-tabs">
+                <div class="tab-header">
+                    <button class="tab-button active" data-tab="feedback-management">点评记录管理</button>
+                    <button class="tab-button" data-tab="attention-list">需注意学员名单</button>
+                    <button class="tab-button" data-tab="search-student">搜索学员</button>
+                </div>
+
+                <!-- 点评记录管理 -->
+                <div class="tab-content">
+                    <div id="feedback-management" class="tab-pane active">
+                        <!-- 操作栏 -->
+                        <div class="action-bar">
+                            <div class="primary-actions">
+                                <button id="getWeeklyFeedback" class="btn btn-primary">
+                                    📥 获取本周点评
+                                </button>
+                                <button id="addToDiscuss" class="btn btn-success">
+                                    ➕ 加入需讨论名单
+                                </button>
+                                <button class="btn btn-outline">
+                                    📊 生成质量报告
+                                </button>
+                            </div>
+                            
+                            <div class="filter-section">
+                                <div class="filter-row">
+                                    <div class="filter-group">
+                                        <label>搜索:</label>
+                                        <div class="search-box">
+                                            <input type="text" id="commentSearch" class="form-control" placeholder="搜索学员或点评内容...">
+                                            <span class="search-icon" id="searchBtn">🔍</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label>班级:</label>
+                                        <select id="groupFilter" class="form-control">
+                                            <option value="">全部班级</option>
+                                            <option value="基础班">基础班</option>
+                                            <option value="中级班">中级班</option>
+                                            <option value="高级班">高级班</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label>教师:</label>
+                                        <select id="teacherFilter" class="form-control">
+                                            <option value="">全部教师</option>
+                                            <option value="李老师">李老师</option>
+                                            <option value="王老师">王老师</option>
+                                            <option value="黄老师">黄老师</option>
+                                            <option value="钟老师">钟老师</option>
+                                        </select>
+                                    </div>
+                                    
+                                    <div class="filter-group">
+                                        <label>课程范围:</label>
+                                        <input type="number" id="courseFrom" class="form-control form-control-sm" placeholder="从" style="width: 60px;">
+                                        <span>-</span>
+                                        <input type="number" id="courseTo" class="form-control form-control-sm" placeholder="到" style="width: 60px;">
+                                        <button id="applyCourseFilter" class="btn btn-outline btn-sm">应用</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 提醒信息 -->
+                        <div id="weeklyFeedbackAlert" class="alert alert-info" style="display: none;">
+                            📊 本周共获取到 <strong id="feedbackCount">0</strong> 条点评记录，请及时处理需要关注的学员。
+                        </div>
+
+                        <!-- 点评记录表格 -->
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="50">
+                                            <input type="checkbox" id="selectAllFeedback">
+                                        </th>
+                                        <th>学员ID</th>
+                                        <th>学员昵称</th>
+                                        <th>班级</th>
+                                        <th>任课教师</th>
+                                        <th>点评内容</th>
+                                        <th>课程进度</th>
+                                        <th>点评日期</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="feedbackTableBody">
+                                    <tr>
+                                        <td colspan="8">
+                                            <div class="empty-state">
+                                                <div class="empty-state-icon">📋</div>
+                                                <p>暂无点评数据</p>
+                                                <small>点击"获取本周点评"按钮加载数据</small>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 需注意学员名单 -->
+                    <div id="attention-list" class="tab-pane">
+                        <!-- 操作栏 -->
+                        <div class="action-bar">
+                            <div class="primary-actions">
+                                <button id="removeFromList" class="btn btn-warning">
+                                    ➖ 移出名单
+                                </button>
+                                <button id="clearAllList" class="btn btn-danger">
+                                    🗑️ 一键清空
+                                </button>
+                                <button id="exportPDF" class="btn btn-outline">
+                                    📄 导出PDF
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 需注意学员表格 -->
+                        <div class="table-container">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th width="50">
+                                            <input type="checkbox" id="selectAllAttention">
+                                        </th>
+                                        <th>学员昵称</th>
+                                        <th>班级</th>
+                                        <th>课程进度</th>
+                                        <th>来源</th>
+                                        <th>任课教师</th>
+                                        <th>问题描述</th>
+                                        <th>教研备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="attentionTableBody">
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="attention-checkbox" data-student-id="20001">
+                                        </td>
+                                        <td>
+                                            <a href="#" class="student-link" onclick="viewStudentDetail('20001')">小明同学</a>
+                                        </td>
+                                        <td><span class="group-tag">基础班</span></td>
+                                        <td>第3课</td>
+                                        <td><span class="source-badge source-system">系统推送</span></td>
+                                        <td>李老师</td>
+                                        <td class="comment-text">作业完成度不够，需要加强练习</td>
+                                        <td>
+                                            <textarea class="remark-input" placeholder="请填写教研备注..."></textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="attention-checkbox" data-student-id="20002">
+                                        </td>
+                                        <td>
+                                            <a href="#" class="student-link" onclick="viewStudentDetail('20002')">小红同学</a>
+                                        </td>
+                                        <td><span class="group-tag">中级班</span></td>
+                                        <td>第8课</td>
+                                        <td><span class="source-badge source-teacher">教师推送</span></td>
+                                        <td>王老师</td>
+                                        <td class="comment-text">节奏感需要提升，建议多听示范</td>
+                                        <td>
+                                            <textarea class="remark-input" placeholder="请填写教研备注...">已联系家长，建议增加练习时间</textarea>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <input type="checkbox" class="attention-checkbox" data-student-id="20003">
+                                        </td>
+                                        <td>
+                                            <a href="#" class="student-link" onclick="viewStudentDetail('20003')">小李同学</a>
+                                        </td>
+                                        <td><span class="group-tag">高级班</span></td>
+                                        <td>第15课</td>
+                                        <td><span class="source-badge source-manual">教研选择</span></td>
+                                        <td>黄老师</td>
+                                        <td class="comment-text">技巧掌握较好，但表现力有待提升</td>
+                                        <td>
+                                            <textarea class="remark-input" placeholder="请填写教研备注...">需要重点关注情感表达训练</textarea>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 搜索学员 -->
+                    <div id="search-student" class="tab-pane">
+                        <div class="search-student-container">
+                            <!-- 搜索表单 -->
+                            <div class="search-student-form">
+                                <div class="search-form-row">
+                                    <div class="search-form-group">
+                                        <label>学员昵称</label>
+                                        <input type="text" id="studentNickname" class="form-control" placeholder="请输入学员昵称">
+                                    </div>
+                                    <div class="search-form-group">
+                                        <label>学员ID</label>
+                                        <input type="text" id="studentUserId" class="form-control" placeholder="请输入学员ID">
+                                    </div>
+                                    <div class="search-form-group">
+                                        <button id="searchStudentBtn" class="btn btn-primary">
+                                            🔍 搜索学员
+                                        </button>
+                                        <button id="clearStudentSearch" class="btn btn-outline">
+                                            🗑️ 清空搜索
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 搜索结果信息栏 -->
+                            <div id="searchResultsInfo" class="search-results-info" style="display: none;">
+                                <div class="results-count">
+                                    找到 <strong id="studentResultsCount">0</strong> 名学员
+                                </div>
+                                <div class="batch-actions">
+                                    <button id="addSelectedToAttention" class="btn btn-success btn-sm">
+                                        ➕ 批量加入关注名单
+                                    </button>
+                                    <input type="checkbox" id="selectAllStudents" style="margin-left: 15px;">
+                                    <label for="selectAllStudents" style="margin-left: 5px; font-size: 13px;">全选</label>
+                                </div>
+                            </div>
+
+                            <!-- 搜索结果表格 -->
+                            <div id="searchResultsTable" class="search-results-table table-container">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th width="50">
+                                                <input type="checkbox" id="selectAllSearchResults">
+                                            </th>
+                                            <th>学员ID</th>
+                                            <th>学员昵称</th>
+                                            <th>班级</th>
+                                            <th>课程进度</th>
+                                            <th>任课教师</th>
+                                            <th>学习状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="studentSearchTableBody">
+                                        <!-- 搜索结果将在这里动态生成 -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- 搜索提示 -->
+                            <div id="searchPrompt" class="search-prompt">
+                                <div class="search-prompt-icon">🔍</div>
+                                <h3>搜索学员信息</h3>
+                                <p>请在上方输入学员昵称或学员ID进行搜索<br>支持模糊匹配，帮助您快速找到目标学员</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 模拟数据
+        const mockFeedbackData = [
+            {
+                id: 1,
+                userId: 'U20001',
+                nickname: '小明同学',
+                group: '基础班',
+                teacher: '李老师',
+                comment: '作业完成度不够，需要加强练习基本功',
+                course: 3,
+                date: '2024-01-25'
+            },
+            {
+                id: 2,
+                userId: 'U20002',
+                nickname: '小红同学',
+                group: '中级班',
+                teacher: '王老师',
+                comment: '节奏感需要提升，建议多听示范音频',
+                course: 8,
+                date: '2024-01-24'
+            },
+            {
+                id: 3,
+                userId: 'U20003',
+                nickname: '小李同学',
+                group: '高级班',
+                teacher: '黄老师',
+                comment: '技巧掌握较好，但表现力有待提升',
+                course: 15,
+                date: '2024-01-23'
+            },
+            {
+                id: 4,
+                userId: 'U20004',
+                nickname: '小张同学',
+                group: '基础班',
+                teacher: '钟老师',
+                comment: '进步明显，继续保持练习频率',
+                course: 5,
+                date: '2024-01-22'
+            },
+            {
+                id: 5,
+                userId: 'U20005',
+                nickname: '小王同学',
+                group: '中级班',
+                teacher: '李老师',
+                comment: '音准问题需要重点关注',
+                course: 12,
+                date: '2024-01-21'
+            }
+        ];
+
+        // 模拟学员搜索数据
+        const mockStudentData = [
+            {
+                userId: 'U20001',
+                nickname: '小明同学',
+                group: '基础班',
+                course: 3,
+                teacher: '李老师',
+                status: '正常学习'
+            },
+            {
+                userId: 'U20002',
+                nickname: '小红同学',
+                group: '中级班',
+                course: 8,
+                teacher: '王老师',
+                status: '需要关注'
+            },
+            {
+                userId: 'U20003',
+                nickname: '小李同学',
+                group: '高级班',
+                course: 15,
+                teacher: '黄老师',
+                status: '优秀学员'
+            },
+            {
+                userId: 'U20004',
+                nickname: '小张同学',
+                group: '基础班',
+                course: 5,
+                teacher: '钟老师',
+                status: '正常学习'
+            },
+            {
+                userId: 'U20005',
+                nickname: '小王同学',
+                group: '中级班',
+                course: 12,
+                teacher: '李老师',
+                status: '需要关注'
+            },
+            {
+                userId: 'U20006',
+                nickname: '小刘同学',
+                group: '高级班',
+                course: 20,
+                teacher: '黄老师',
+                status: '优秀学员'
+            },
+            {
+                userId: 'U20007',
+                nickname: '小陈同学',
+                group: '基础班',
+                course: 2,
+                teacher: '李老师',
+                status: '新学员'
+            },
+            {
+                userId: 'U20008',
+                nickname: '小林同学',
+                group: '中级班',
+                course: 10,
+                teacher: '王老师',
+                status: '正常学习'
+            }
+        ];
+
+        let currentFeedbackData = [];
+        let selectedFeedbackIds = [];
+        let selectedAttentionIds = [];
+        let currentStudentSearchResults = [];
+        let selectedStudentIds = [];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTabs();
+            initializeEventListeners();
+            initializeStudentSearchListeners();
+        });
+
+        // 标签页切换
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabPanes = document.querySelectorAll('.tab-pane');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetTab = button.getAttribute('data-tab');
+                    
+                    // 更新按钮状态
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // 更新内容显示
+                    tabPanes.forEach(pane => {
+                        pane.classList.remove('active');
+                        if (pane.id === targetTab) {
+                            pane.classList.add('active');
+                        }
+                    });
+                });
+            });
+        }
+
+        // 初始化事件监听器
+        function initializeEventListeners() {
+            // 获取本周点评
+            document.getElementById('getWeeklyFeedback').addEventListener('click', loadWeeklyFeedback);
+            
+            // 搜索功能
+            document.getElementById('searchBtn').addEventListener('click', searchFeedback);
+            document.getElementById('commentSearch').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchFeedback();
+                }
+            });
+            
+            // 筛选功能
+            document.getElementById('groupFilter').addEventListener('change', filterFeedback);
+            document.getElementById('teacherFilter').addEventListener('change', filterFeedback);
+            document.getElementById('applyCourseFilter').addEventListener('click', applyCourseFilter);
+            
+            // 全选功能
+            document.getElementById('selectAllFeedback').addEventListener('change', toggleSelectAllFeedback);
+            document.getElementById('selectAllAttention').addEventListener('change', toggleSelectAllAttention);
+            
+            // 操作按钮
+            document.getElementById('addToDiscuss').addEventListener('click', addToDiscussList);
+            document.getElementById('removeFromList').addEventListener('click', removeFromAttentionList);
+            document.getElementById('clearAllList').addEventListener('click', clearAllAttentionList);
+            document.getElementById('exportPDF').addEventListener('click', exportToPDF);
+        }
+
+        // 初始化学员搜索事件监听器
+        function initializeStudentSearchListeners() {
+            // 搜索学员
+            document.getElementById('searchStudentBtn').addEventListener('click', searchStudents);
+            document.getElementById('studentNickname').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchStudents();
+                }
+            });
+            document.getElementById('studentUserId').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    searchStudents();
+                }
+            });
+            
+            // 清空搜索
+            document.getElementById('clearStudentSearch').addEventListener('click', clearStudentSearch);
+            
+            // 全选学员搜索结果
+            document.getElementById('selectAllSearchResults').addEventListener('change', toggleSelectAllStudents);
+            document.getElementById('selectAllStudents').addEventListener('change', toggleSelectAllStudents);
+            
+            // 批量加入关注名单
+            document.getElementById('addSelectedToAttention').addEventListener('click', addSelectedStudentsToAttention);
+        }
+
+        // 搜索学员功能
+        function searchStudents() {
+            const nickname = document.getElementById('studentNickname').value.trim();
+            const userId = document.getElementById('studentUserId').value.trim();
+            
+            if (!nickname && !userId) {
+                alert('请输入学员昵称或学员ID');
+                return;
+            }
+            
+            const button = document.getElementById('searchStudentBtn');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<span class="loading"></span> 搜索中...';
+            button.disabled = true;
+            
+            // 模拟API调用
+            setTimeout(() => {
+                let results = [...mockStudentData];
+                
+                if (nickname) {
+                    results = results.filter(student => 
+                        student.nickname.toLowerCase().includes(nickname.toLowerCase())
+                    );
+                }
+                
+                if (userId) {
+                    results = results.filter(student => 
+                        student.userId.toLowerCase().includes(userId.toLowerCase())
+                    );
+                }
+                
+                currentStudentSearchResults = results;
+                renderStudentSearchResults(results);
+                
+                // 显示结果信息和表格
+                document.getElementById('searchResultsInfo').style.display = 'flex';
+                document.getElementById('searchResultsTable').classList.add('show');
+                document.getElementById('searchPrompt').style.display = 'none';
+                document.getElementById('studentResultsCount').textContent = results.length;
+                
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 1000);
+        }
+
+        // 渲染学员搜索结果
+        function renderStudentSearchResults(students) {
+            const tbody = document.getElementById('studentSearchTableBody');
+            
+            if (students.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">🔍</div>
+                                <p>未找到匹配的学员</p>
+                                <small>请尝试其他搜索条件</small>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = students.map(student => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="student-search-checkbox" data-student-id="${student.userId}">
+                    </td>
+                    <td>${student.userId}</td>
+                    <td>
+                        <a href="#" class="student-link" onclick="viewStudentDetail('${student.userId}')">${student.nickname}</a>
+                    </td>
+                    <td><span class="group-tag">${student.group}</span></td>
+                    <td>第${student.course}课</td>
+                    <td>${student.teacher}</td>
+                    <td>
+                        <span class="source-badge ${getStatusClass(student.status)}">${student.status}</span>
+                    </td>
+                    <td>
+                        <button class="btn btn-success btn-sm" onclick="addSingleStudentToAttention('${student.userId}', '${student.nickname}')">
+                            ➕ 加入关注
+                        </button>
+                        <button class="btn btn-outline btn-sm" onclick="viewStudentDetail('${student.userId}')">
+                            👁️ 查看详情
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+            
+            // 重新绑定复选框事件
+            bindStudentSearchCheckboxEvents();
+        }
+
+        // 获取状态样式类
+        function getStatusClass(status) {
+            switch(status) {
+                case '优秀学员': return 'source-teacher';
+                case '需要关注': return 'source-manual';
+                case '新学员': return 'source-system';
+                default: return 'source-system';
+            }
+        }
+
+        // 绑定学员搜索复选框事件
+        function bindStudentSearchCheckboxEvents() {
+            const checkboxes = document.querySelectorAll('.student-search-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const studentId = this.getAttribute('data-student-id');
+                    if (this.checked) {
+                        if (!selectedStudentIds.includes(studentId)) {
+                            selectedStudentIds.push(studentId);
+                        }
+                    } else {
+                        selectedStudentIds = selectedStudentIds.filter(id => id !== studentId);
+                    }
+                    updateSelectAllStudentsState();
+                });
+            });
+        }
+
+        // 全选/取消全选学员搜索结果
+        function toggleSelectAllStudents() {
+            const selectAllMain = document.getElementById('selectAllSearchResults');
+            const selectAllSecondary = document.getElementById('selectAllStudents');
+            const checkboxes = document.querySelectorAll('.student-search-checkbox');
+            
+            // 同步两个全选框的状态
+            const isChecked = selectAllMain.checked || selectAllSecondary.checked;
+            selectAllMain.checked = isChecked;
+            selectAllSecondary.checked = isChecked;
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = isChecked;
+                const studentId = checkbox.getAttribute('data-student-id');
+                
+                if (isChecked) {
+                    if (!selectedStudentIds.includes(studentId)) {
+                        selectedStudentIds.push(studentId);
+                    }
+                } else {
+                    selectedStudentIds = selectedStudentIds.filter(id => id !== studentId);
+                }
+            });
+        }
+
+        // 更新全选状态
+        function updateSelectAllStudentsState() {
+            const selectAllMain = document.getElementById('selectAllSearchResults');
+            const selectAllSecondary = document.getElementById('selectAllStudents');
+            const checkboxes = document.querySelectorAll('.student-search-checkbox');
+            const checkedCount = document.querySelectorAll('.student-search-checkbox:checked').length;
+            
+            const allChecked = checkboxes.length > 0 && checkedCount === checkboxes.length;
+            const someChecked = checkedCount > 0 && checkedCount < checkboxes.length;
+            
+            selectAllMain.checked = allChecked;
+            selectAllMain.indeterminate = someChecked;
+            selectAllSecondary.checked = allChecked;
+        }
+
+        // 批量加入关注名单
+        function addSelectedStudentsToAttention() {
+            if (selectedStudentIds.length === 0) {
+                alert('请先选择要加入关注名单的学员');
+                return;
+            }
+            
+            const selectedStudents = currentStudentSearchResults.filter(student => 
+                selectedStudentIds.includes(student.userId)
+            );
+            
+            if (confirm(`确定要将 ${selectedStudents.length} 名学员加入关注名单吗？`)) {
+                alert(`已将 ${selectedStudents.length} 名学员加入关注名单`);
+                
+                // 清空选择
+                selectedStudentIds = [];
+                document.getElementById('selectAllSearchResults').checked = false;
+                document.getElementById('selectAllStudents').checked = false;
+                document.querySelectorAll('.student-search-checkbox').forEach(cb => cb.checked = false);
+            }
+        }
+
+        // 单个学员加入关注名单
+        function addSingleStudentToAttention(studentId, studentName) {
+            if (confirm(`确定要将学员 "${studentName}" 加入关注名单吗？`)) {
+                alert(`已将学员 "${studentName}" 加入关注名单`);
+            }
+        }
+
+        // 清空学员搜索
+        function clearStudentSearch() {
+            document.getElementById('studentNickname').value = '';
+            document.getElementById('studentUserId').value = '';
+            document.getElementById('searchResultsInfo').style.display = 'none';
+            document.getElementById('searchResultsTable').classList.remove('show');
+            document.getElementById('searchPrompt').style.display = 'block';
+            currentStudentSearchResults = [];
+            selectedStudentIds = [];
+        }
+
+        // 加载本周点评数据
+        function loadWeeklyFeedback() {
+            const button = document.getElementById('getWeeklyFeedback');
+            const originalText = button.innerHTML;
+            
+            button.innerHTML = '<span class="loading"></span> 加载中...';
+            button.disabled = true;
+            
+            // 模拟API调用
+            setTimeout(() => {
+                currentFeedbackData = [...mockFeedbackData];
+                renderFeedbackTable(currentFeedbackData);
+                
+                // 显示成功提示
+                const alert = document.getElementById('weeklyFeedbackAlert');
+                document.getElementById('feedbackCount').textContent = currentFeedbackData.length;
+                alert.style.display = 'block';
+                
+                button.innerHTML = originalText;
+                button.disabled = false;
+            }, 1500);
+        }
+
+        // 渲染点评表格
+        function renderFeedbackTable(data) {
+            const tbody = document.getElementById('feedbackTableBody');
+            
+            if (data.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📋</div>
+                                <p>暂无点评数据</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = data.map(item => `
+                <tr>
+                    <td>
+                        <input type="checkbox" class="feedback-checkbox" data-feedback-id="${item.id}">
+                    </td>
+                    <td>${item.userId}</td>
+                    <td>
+                        <a href="#" class="student-link" onclick="viewStudentDetail('${item.userId}')">${item.nickname}</a>
+                    </td>
+                    <td><span class="group-tag">${item.group}</span></td>
+                    <td>${item.teacher}</td>
+                    <td class="comment-text">${item.comment}</td>
+                    <td>第${item.course}课</td>
+                    <td>${item.date}</td>
+                </tr>
+            `).join('');
+            
+            // 重新绑定复选框事件
+            bindFeedbackCheckboxEvents();
+        }
+
+        // 绑定点评复选框事件
+        function bindFeedbackCheckboxEvents() {
+            const checkboxes = document.querySelectorAll('.feedback-checkbox');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    const feedbackId = parseInt(this.getAttribute('data-feedback-id'));
+                    if (this.checked) {
+                        if (!selectedFeedbackIds.includes(feedbackId)) {
+                            selectedFeedbackIds.push(feedbackId);
+                        }
+                    } else {
+                        selectedFeedbackIds = selectedFeedbackIds.filter(id => id !== feedbackId);
+                    }
+                    updateSelectAllFeedbackState();
+                });
+            });
+        }
+
+        // 搜索点评
+        function searchFeedback() {
+            const keyword = document.getElementById('commentSearch').value.trim().toLowerCase();
+            if (!keyword) {
+                renderFeedbackTable(currentFeedbackData);
+                return;
+            }
+            
+            const filteredData = currentFeedbackData.filter(item => 
+                item.nickname.toLowerCase().includes(keyword) || 
+                item.comment.toLowerCase().includes(keyword)
+            );
+            
+            renderFeedbackTable(filteredData);
+        }
+
+        // 筛选点评
+        function filterFeedback() {
+            const groupFilter = document.getElementById('groupFilter').value;
+            const teacherFilter = document.getElementById('teacherFilter').value;
+            
+            let filteredData = [...currentFeedbackData];
+            
+            if (groupFilter) {
+                filteredData = filteredData.filter(item => item.group === groupFilter);
+            }
+            
+            if (teacherFilter) {
+                filteredData = filteredData.filter(item => item.teacher === teacherFilter);
+            }
+            
+            renderFeedbackTable(filteredData);
+        }
+
+        // 应用课程范围筛选
+        function applyCourseFilter() {
+            const courseFrom = parseInt(document.getElementById('courseFrom').value);
+            const courseTo = parseInt(document.getElementById('courseTo').value);
+            
+            let filteredData = [...currentFeedbackData];
+            
+            if (courseFrom && courseTo) {
+                filteredData = filteredData.filter(item => 
+                    item.course >= courseFrom && item.course <= courseTo
+                );
+            } else if (courseFrom) {
+                filteredData = filteredData.filter(item => item.course === courseFrom);
+            }
+            
+            renderFeedbackTable(filteredData);
+        }
+
+        // 全选/取消全选点评
+        function toggleSelectAllFeedback() {
+            const selectAll = document.getElementById('selectAllFeedback');
+            const checkboxes = document.querySelectorAll('.feedback-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+                const feedbackId = parseInt(checkbox.getAttribute('data-feedback-id'));
+                
+                if (selectAll.checked) {
+                    if (!selectedFeedbackIds.includes(feedbackId)) {
+                        selectedFeedbackIds.push(feedbackId);
+                    }
+                } else {
+                    selectedFeedbackIds = selectedFeedbackIds.filter(id => id !== feedbackId);
+                }
+            });
+        }
+
+        // 更新全选状态
+        function updateSelectAllFeedbackState() {
+            const selectAll = document.getElementById('selectAllFeedback');
+            const checkboxes = document.querySelectorAll('.feedback-checkbox');
+            const checkedCount = document.querySelectorAll('.feedback-checkbox:checked').length;
+            
+            selectAll.checked = checkboxes.length > 0 && checkedCount === checkboxes.length;
+            selectAll.indeterminate = checkedCount > 0 && checkedCount < checkboxes.length;
+        }
+
+        // 全选/取消全选需注意学员
+        function toggleSelectAllAttention() {
+            const selectAll = document.getElementById('selectAllAttention');
+            const checkboxes = document.querySelectorAll('.attention-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = selectAll.checked;
+                const studentId = checkbox.getAttribute('data-student-id');
+                
+                if (selectAll.checked) {
+                    if (!selectedAttentionIds.includes(studentId)) {
+                        selectedAttentionIds.push(studentId);
+                    }
+                } else {
+                    selectedAttentionIds = selectedAttentionIds.filter(id => id !== studentId);
+                }
+            });
+        }
+
+        // 加入需讨论名单
+        function addToDiscussList() {
+            if (selectedFeedbackIds.length === 0) {
+                alert('请先选择要加入讨论的点评记录');
+                return;
+            }
+            
+            const selectedItems = currentFeedbackData.filter(item => 
+                selectedFeedbackIds.includes(item.id)
+            );
+            
+            alert(`已将 ${selectedItems.length} 条点评记录加入需讨论名单`);
+            
+            // 清空选择
+            selectedFeedbackIds = [];
+            document.getElementById('selectAllFeedback').checked = false;
+            document.querySelectorAll('.feedback-checkbox').forEach(cb => cb.checked = false);
+        }
+
+        // 从需注意名单中移除
+        function removeFromAttentionList() {
+            if (selectedAttentionIds.length === 0) {
+                alert('请先选择要移除的学员');
+                return;
+            }
+            
+            if (confirm(`确定要从需注意名单中移除 ${selectedAttentionIds.length} 名学员吗？`)) {
+                alert(`已从需注意名单中移除 ${selectedAttentionIds.length} 名学员`);
+                selectedAttentionIds = [];
+            }
+        }
+
+        // 一键清空需注意名单
+        function clearAllAttentionList() {
+            if (confirm('确定要清空整个需注意学员名单吗？此操作不可恢复。')) {
+                alert('已清空需注意学员名单');
+                selectedAttentionIds = [];
+            }
+        }
+
+        // 导出PDF
+        function exportToPDF() {
+            alert('正在生成PDF文件...');
+        }
+
+        // 查看学员详情
+        function viewStudentDetail(studentId) {
+            alert(`查看学员详情：${studentId}`);
+        }
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
+</body>
