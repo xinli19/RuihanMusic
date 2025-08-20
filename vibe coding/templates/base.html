@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}睿涵音乐后台管理系统{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        {% include 'components/sidebar.html' %}
+        
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <!-- 页面头部 -->
+            {% include 'components/header.html' %}
+            
+            <!-- 页面内容 -->
+            <div class="content-wrapper">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- 移除不存在的base.js引用 -->
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

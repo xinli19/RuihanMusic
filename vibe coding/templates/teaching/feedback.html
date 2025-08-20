@@ -1,0 +1,192 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}教师点评 - 睿涵音乐后台{% endblock %}
+
+{% block page_title %}学员点评{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/teaching.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="teaching-container">
+    <!-- 公告栏 -->
+    <div class="announcement-bar">
+        <div class="announcement-content">
+            <span class="announcement-icon">📢</span>
+            <span class="announcement-text">今日需要点评的学员：{{ today_tasks|length }} 人</span>
+        </div>
+    </div>
+    
+    <!-- 模块标签页 -->
+    <div class="module-tabs">
+        <button class="tab-button active" data-tab="todayTasks">今日任务</button>
+        <button class="tab-button" data-tab="completedComments">已点评记录</button>
+        <button class="tab-button" data-tab="manualComment">手动点评</button>
+    </div>
+    
+    <!-- 今日任务标签页 -->
+    <div id="todayTasks" class="tab-pane active">
+        <div class="action-bar">
+            <div class="batch-actions">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="selectAll">
+                    <span class="checkmark"></span>
+                    全选
+                </label>
+                <button id="pushToResearch" class="btn btn-warning" disabled>推送到教研</button>
+                <button id="pushToOperation" class="btn btn-info" disabled>推送到运营</button>
+                <button id="batchDelete" class="btn btn-danger" disabled>批量删除</button>
+            </div>
+            <button id="refreshTasks" class="btn btn-primary">刷新任务</button>
+        </div>
+        
+        <div class="task-list">
+            {% for task in today_tasks %}
+            <div class="task-item">
+                <div class="task-header">
+                    <label class="checkbox-container">
+                        <input type="checkbox" class="task-checkbox" data-student-id="{{ task.student.student_id }}">
+                        <span class="checkmark"></span>
+                    </label>
+                    <div class="student-info">
+                        <span class="student-name">{{ task.student.student_name }}</span>
+                        {% if task.student.alias_name %}
+                            <span class="student-alias">({{ task.student.alias_name }})</span>
+                        {% endif %}
+                        <span class="student-group">{{ task.student.group_name }}</span>
+                        {% if task.is_difficult %}
+                            <span class="difficulty-badge">困难学生</span>
+                        {% endif %}
+                    </div>
+                    <button class="btn-view-info" onclick="viewStudentInfo('{{ task.student.student_id }}')">查看信息</button>
+                </div>
+                
+                <div class="task-content">
+                    <div class="input-group">
+                        <label>课程进度：</label>
+                        <input type="number" class="lesson-input" data-student-id="{{ task.student.student_id }}" placeholder="第几课">
+                    </div>
+                    <div class="input-group">
+                        <label>教师点评：</label>
+                        <textarea class="comment-input" placeholder="请输入点评内容..."></textarea>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div class="empty-state-icon">✅</div>
+                <p>今日暂无待点评任务</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if today_tasks %}
+        <div class="submit-section">
+            <button id="submitComments" class="btn btn-success btn-large">提交点评</button>
+        </div>
+        {% endif %}
+    </div>
+    
+    <!-- 已点评记录标签页 -->
+    <div id="completedComments" class="tab-pane">
+        <div class="completed-section">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>学员昵称</th>
+                        <th>课程进度</th>
+                        <th>教师点评</th>
+                        <th>点评时间</th>
+                    </tr>
+                </thead>
+                <tbody id="completedList">
+                    {% for feedback in completed_feedbacks %}
+                    <tr class="completed-item">
+                        <td class="completed-student">{{ feedback.student.student_name }}</td>
+                        <td class="completed-progress">第{{ feedback.lesson_number }}课</td>
+                        <td class="completed-comment">{{ feedback.teacher_comment }}</td>
+                        <td class="completed-time">{{ feedback.created_at|date:"Y-m-d H:i" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">
+                            <div class="empty-state">
+                                <div class="empty-state-icon">📝</div>
+                                <p>暂无已点评记录</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- 手动点评标签页 -->
+    <div id="manualComment" class="tab-pane">
+        <div class="manual-search">
+            <div class="search-group">
+                <input type="text" id="studentSearch" class="search-input" placeholder="请输入学员昵称搜索...">
+            </div>
+            
+            <div id="manualEmptyState" class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <p>请输入学员昵称开始搜索</p>
+            </div>
+            
+            <form id="manualCommentForm" class="manual-form" style="display: none;">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label class="form-label">课程进度</label>
+                    <input type="number" id="manualLessonNumber" class="form-input" placeholder="第几课" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">教师点评</label>
+                    <textarea id="manualTeacherComment" class="form-textarea" placeholder="请输入点评内容..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">提交点评</button>
+                    <button type="button" class="btn btn-secondary" onclick="cancelManualComment()">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 推送模态框 -->
+<div id="pushModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="pushModalTitle">推送到部门</h2>
+            <span class="close" onclick="closePushModal()">&times;</span>
+        </div>
+        <div class="form-group">
+            <label class="form-label" id="pushModalLabel">备注信息</label>
+            <textarea class="form-input form-textarea" id="pushNote" placeholder="请输入备注信息..."></textarea>
+        </div>
+        <div class="action-bar">
+            <button class="btn btn-primary" onclick="confirmPush()">确认推送</button>
+            <button class="btn btn-secondary" onclick="closePushModal()">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- 学员信息模态框 -->
+<div id="studentModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>学员信息</h2>
+            <span class="close" onclick="closeStudentModal()">&times;</span>
+        </div>
+        <div id="studentModalContent">
+            <!-- 学员详细信息将通过AJAX加载 -->
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/teaching.js' %}"></script>
+{% endblock %}

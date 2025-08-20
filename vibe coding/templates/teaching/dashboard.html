@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}教师点评 - 睿涵音乐后台管理系统{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/teaching.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- 统计卡片 -->
+    <div class="stats-row">
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.pending_tasks }}</div>
+            <div class="stat-label">待处理任务</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.completed_today }}</div>
+            <div class="stat-label">今日已完成</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ stats.total_students }}</div>
+            <div class="stat-label">总学员数</div>
+        </div>
+    </div>
+    
+    <!-- 主要内容区域 -->
+    <div class="main-content-area">
+        <!-- 左侧面板 - 任务列表和操作 -->
+        <div class="left-panel">
+            <!-- 任务列表 -->
+            <div class="panel">
+                <div class="panel-header">
+                    今日待处理任务 
+                    <span class="selected-info">已选择 <span id="selected-count">0</span> 个学员</span>
+                </div>
+                <div class="panel-content">
+                    <div id="task-list">
+                        <div class="loading">正在加载...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 批量操作 -->
+            <div class="panel">
+                <div class="panel-header">批量操作</div>
+                <div class="panel-content">
+                    <div class="batch-actions">
+                        <button class="btn btn-primary" onclick="submitSelectedFeedbacks()">批量点评</button>
+                        <button class="btn btn-warning" onclick="pushToResearch()">推送到教研</button>
+                        <button class="btn btn-info" onclick="pushToOperation()">推送到运营</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 手动点评 -->
+            <div class="panel">
+                <div class="panel-header">手动点评</div>
+                <div class="panel-content">
+                    <form id="manual-feedback-form">
+                        <div class="form-group">
+                            <label>学员姓名：</label>
+                            <input type="text" id="student-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>课程进度：</label>
+                            <input type="text" id="lesson-progress" required>
+                        </div>
+                        <div class="form-group">
+                            <label>教师点评：</label>
+                            <textarea id="teacher-comment" rows="4" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-success">提交点评</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 右侧面板 - 公告和历史记录 -->
+        <div class="right-panel">
+            <!-- 公告信息 -->
+            <div class="panel">
+                <div class="panel-header">教学提示</div>
+                <div class="panel-content">
+                    {% if announcements.teaching_tips %}
+                        {% for tip in announcements.teaching_tips %}
+                            <div class="announcement-item">{{ tip }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">暂无教学提示</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 学员备注 -->
+            <div class="panel">
+                <div class="panel-header">学员备注</div>
+                <div class="panel-content">
+                    {% if announcements.student_notes %}
+                        {% for note in announcements.student_notes %}
+                            <div class="announcement-item">{{ note }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">暂无学员备注</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 最近点评记录 -->
+            <div class="panel">
+                <div class="panel-header">最近点评记录</div>
+                <div class="panel-content">
+                    <div id="recent-feedbacks">
+                        <div class="loading">正在加载...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/teaching.js' %}"></script>
+{% endblock %}
