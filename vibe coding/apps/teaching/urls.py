@@ -9,6 +9,7 @@ urlpatterns = [
     
     # 任务管理
     path('tasks/today/', views.get_today_tasks, name='get_today_tasks'),
+    path('tasks/add/', views.add_to_today_tasks, name='add_to_today_tasks'),
     path('tasks/delete/', views.batch_delete_tasks, name='batch_delete_tasks'),
     
     # 点评功能

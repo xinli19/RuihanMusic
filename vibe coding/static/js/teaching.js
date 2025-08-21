@@ -27,7 +27,7 @@ function renderTaskList(tasks) {
     if (!tbody) return;
 
     if (!tasks || tasks.length === 0) {
-        tbody.innerHTML = '<tr class="empty-row"><td colspan="7" class="empty-state">暂无今日任务</td></tr>';
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="4" class="empty-state">暂无今日任务</td></tr>';
         updateToolbarState();
         return;
     }
@@ -35,18 +35,18 @@ function renderTaskList(tasks) {
     let html = '';
     tasks.forEach(task => {
         const difficultTag = task.is_difficult ? '<span style="color:#d32f2f;font-weight:bold;">[困难]</span>' : '';
-        const researchCell = task.research_note ? `<span title="${task.research_note}">有备注</span>` : '—';
-        const opsCell = task.operation_note ? `<span title="${task.operation_note}">有备注</span>` : '—';
+        const researchCell = task.research_note ? task.research_note : '<span class="placeholder">—</span>';
+        const opsCell = task.ops_note ? task.ops_note : '<span class="placeholder">—</span>';
 
         html += `
-            <tr data-student-id="${task.student_id}">
+            <tr data-student-id="${task.student_id}"${task.is_difficult ? ' class="difficult-row"' : ''}>
+                <td><input type="checkbox" class="row-select"></td>
                 <td>
-                    <input type="checkbox" class="row-select" ${selectedStudents.has(task.student_id) ? 'checked' : ''}>
-                </td>
-                <td>
-                    <a href="javascript:void(0)" class="student-link" data-student-id="${task.student_id}">
-                        ${task.student_name} ${difficultTag}
-                    </a>
+                    <div class="title-row">
+                        <a href="javascript:void(0)" class="student-link" data-student-id="${task.student_id}">
+                            ${difficultTag} ${task.student_name || task.student_id}
+                        </a>
+                    </div>
                     <div class="subtext" style="font-size:12px;color:#666;">分组：${(task.student_groups || []).join(', ')}</div>
                 </td>
                 <td>
@@ -54,11 +54,6 @@ function renderTaskList(tasks) {
                 </td>
                 <td>
                     <textarea class="input-comment form-input form-textarea" placeholder="请填写教师评语"></textarea>
-                </td>
-                <td class="research-note-cell">${researchCell}</td>
-                <td class="ops-note-cell">${opsCell}</td>
-                <td>
-                    <button type="button" class="btn btn-primary btn-detail" data-student-id="${task.student_id}">详情</button>
                 </td>
             </tr>
         `;
@@ -70,12 +65,7 @@ function renderTaskList(tasks) {
     tbody.querySelectorAll('.row-select').forEach(cb => {
         cb.addEventListener('change', onRowSelectChange);
     });
-    tbody.querySelectorAll('.btn-detail').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const studentId = e.currentTarget.getAttribute('data-student-id');
-            showStudentDetail(studentId);
-        });
-    });
+    // 点击昵称查看详情（请求后端并弹模态）
     tbody.querySelectorAll('.student-link').forEach(a => {
         a.addEventListener('click', (e) => {
             const studentId = e.currentTarget.getAttribute('data-student-id');
@@ -325,7 +315,7 @@ function confirmPush() {
     });
 }
 
-// 学员详情（使用模态框）
+// 学员详情（使用模态框，按字段要求渲染）
 function showStudentDetail(studentId) {
     fetch(`/teaching/students/${studentId}/`)
         .then(response => response.json())
@@ -340,7 +330,6 @@ function showStudentDetail(studentId) {
 
             function renderProgress(progress) {
                 if (!progress || progress.length === 0) return '—';
-                // 对象数组：展开 key/value；字符串数组：逗号拼接
                 if (typeof progress[0] === 'object') {
                     return '<ul style="margin-left:16px;">' + progress.map((p) => {
                         const kv = Object.entries(p || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
@@ -350,14 +339,16 @@ function showStudentDetail(studentId) {
                 return Array.isArray(progress) ? progress.join(', ') : String(progress);
             }
 
-            // 最近点评：优先使用仅评论列表，回退到原结构
+            // 最近点评：优先 feedback_comments（仅评论内容），回退 recent_feedbacks
             let feedbackListHtml = '';
             if (Array.isArray(info.feedback_comments) && info.feedback_comments.length > 0) {
-                feedbackListHtml = '<ul style="margin-left:16px;">' + info.feedback_comments.map(c => `<li>${c || ''}</li>`).join('') + '</ul>';
+                feedbackListHtml = '<ul style="margin-left:16px;">' +
+                    info.feedback_comments.map(c => `<li>${c || ''}</li>`).join('') + '</ul>';
             } else if (Array.isArray(info.recent_feedbacks) && info.recent_feedbacks.length > 0) {
-                feedbackListHtml = '<ul style="margin-left:16px;">' + info.recent_feedbacks.map(f =>
-                    `<li>【${f.feedback_time}】第${f.lesson_progress} - ${f.teacher_name}：${f.teacher_comment || ''}</li>`
-                ).join('') + '</ul>';
+                feedbackListHtml = '<ul style="margin-left:16px;">' +
+                    info.recent_feedbacks.map(f =>
+                        `<li>【${f.feedback_time}】第${f.lesson_progress} - ${f.teacher_name}：${f.teacher_comment || ''}</li>`
+                    ).join('') + '</ul>';
             } else {
                 feedbackListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
             }
@@ -365,7 +356,8 @@ function showStudentDetail(studentId) {
             // 回访记录
             let visitListHtml = '';
             if (Array.isArray(info.visit_notes) && info.visit_notes.length > 0) {
-                visitListHtml = '<ul style="margin-left:16px;">' + info.visit_notes.map(n => `<li>${n || ''}</li>`).join('') + '</ul>';
+                visitListHtml = '<ul style="margin-left:16px;">' +
+                    info.visit_notes.map(n => `<li>${n || ''}</li>`).join('') + '</ul>';
             } else {
                 visitListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
             }
@@ -373,13 +365,13 @@ function showStudentDetail(studentId) {
             if (content) {
                 content.innerHTML = `
                     <div><strong>ID：</strong>${info.student_id}</div>
-                    <div><strong>姓名：</strong>${info.student_name || info.name}（${info.nickname || '无别名'}）</div>
+                    <div><strong>姓名：</strong>${info.student_name || info.name}（${info.nickname || info.alias_name || '无别名'}）</div>
                     <div><strong>分组：</strong>${Array.isArray(info.groups) ? info.groups.join(', ') : (info.groups || '')}</div>
                     <div><strong>进度：</strong>${renderProgress(info.progress)}</div>
                     <div><strong>状态：</strong>${info.status || '—'}</div>
                     <div><strong>学习时长：</strong>${info.learning_hours ?? 0} 小时</div>
-                    <div><strong>教研备注：</strong>${info.research_note || '—'}</div>
-                    <div><strong>运营备注：</strong>${info.ops_note || info.operation_note || '—'}</div>
+                    <div><strong>教研备注：</strong>${info.research_note || info.research_notes || '—'}</div>
+                    <div><strong>运营备注：</strong>${info.ops_note || info.operation_notes || '—'}</div>
                     <div style="margin-top:10px;"><strong>最近点评（teacher_comment）：</strong></div>
                     ${feedbackListHtml}
                     <div style="margin-top:10px;"><strong>回访记录（visit_note）：</strong></div>
@@ -388,8 +380,8 @@ function showStudentDetail(studentId) {
             }
             if (modal) modal.style.display = 'block';
         })
-        .catch(error => {
-            alert('网络错误：' + error.message);
+        .catch(err => {
+            alert('网络错误：' + err.message);
         });
 }
 
@@ -439,26 +431,48 @@ function initTeachingModule() {
         else p.classList.remove('active');
     });
 
-    // Tab 切换初始化
-    tabButtons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const target = btn.getAttribute('data-tab');
-            // 激活按钮
-            tabButtons.forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            // 切换面板
-            panes.forEach(p => {
-                if (p.id === target) p.classList.add('active');
-                else p.classList.remove('active');
+    // Tab 切换初始化（移除旧逻辑，统一用该函数控制）
+    (function initTabs() {
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const panes = document.querySelectorAll('.tab-pane');
+        if (!tabButtons.length || !panes.length) return;
+    
+        function activateTab(tabId) {
+            // 切换按钮 active
+            tabButtons.forEach(b => {
+                const isActive = b.getAttribute('data-tab') === tabId;
+                b.classList.toggle('active', isActive);
             });
-            // 今日任务回到时刷新
-            if (target === 'todayTasks') {
+            // 切换面板 active（确保只有一个激活）
+            panes.forEach(p => {
+                const isActive = p.id === tabId;
+                p.classList.toggle('active', isActive);
+            });
+
+            // 根据激活的面板按需加载数据
+            if (tabId === 'todayTasks') {
                 refreshTasks();
-            } else if (target === 'completedComments') {
+            } else if (tabId === 'completedComments') {
                 loadCompletedFeedbacks(1);
             }
+        }
+    
+        // 初始状态：若没有按钮处于 active，则激活第一个
+        let activeBtn = Array.from(tabButtons).find(b => b.classList.contains('active')) || tabButtons[0];
+        if (activeBtn) {
+            activateTab(activeBtn.getAttribute('data-tab'));
+        }
+    
+        // 点击切换
+        tabButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const target = btn.getAttribute('data-tab');
+                if (!target) return;
+                activateTab(target);
+            });
         });
-    });
+    })();
 
     // 绑定全选
     const selectAll = document.getElementById('today-select-all');
@@ -630,3 +644,90 @@ if (document.readyState === 'loading') {
 } else {
     initTeachingModule();
 }
+
+// 搜索并添加到今日任务（今日任务面板顶部）
+(function initTodayAddSearch() {
+    const input = document.getElementById('today-add-search-input');
+    const btn = document.getElementById('today-add-search-btn');
+    const resultBox = document.getElementById('today-add-search-result');
+
+    function renderTodayAddSearchResults(list) {
+        if (!resultBox) return;
+        if (!list || list.length === 0) {
+            resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#666;">未找到匹配学员</div>';
+            return;
+        }
+        const rows = list.map(item => {
+            const displayName = item.student_name || item.alias_name || item.student_id;
+            const groups = (item.groups || []).join(', ');
+            return `
+                <div class="search-item" style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
+                    <div>
+                        <strong>${displayName}</strong>
+                        <span style="color:#888;margin-left:6px;">ID: ${item.student_id}</span>
+                        <span style="color:#888;margin-left:6px;">分组：${groups || '—'}</span>
+                    </div>
+                    <button class="btn btn-sm btn-primary btn-add-today" data-student-id="${item.student_id}">添加到今日任务</button>
+                </div>
+            `;
+        }).join('');
+        resultBox.innerHTML = rows;
+
+        resultBox.querySelectorAll('.btn-add-today').forEach(b => {
+            b.addEventListener('click', async (e) => {
+                const sid = e.currentTarget.getAttribute('data-student-id');
+                await addStudentToToday(sid);
+            });
+        });
+    }
+
+    async function todayAddSearch() {
+        const q = (input && input.value || '').trim();
+        if (!resultBox) return;
+        if (q.length < 2) {
+            resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#666;">请至少输入2个字符</div>';
+            return;
+        }
+        try {
+            const resp = await fetch(`/teaching/students/search/?q=${encodeURIComponent(q)}`);
+            const data = await resp.json();
+            renderTodayAddSearchResults((data && data.students) || []);
+        } catch (err) {
+            resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#c00;">搜索失败，请稍后重试</div>';
+        }
+    }
+
+    // 防抖函数
+    function debounce(fn, delay) {
+        let timer = null;
+        return (...args) => {
+            if (timer) clearTimeout(timer);
+            timer = setTimeout(() => fn.apply(null, args), delay);
+        };
+    }
+
+    // 输入框：300ms 防抖搜索
+    const debouncedSearch = debounce(() => {
+        const q = (input && input.value || '').trim();
+        if (!q) {
+            if (resultBox) resultBox.innerHTML = '';
+            return;
+        }
+        if (q.length >= 2) {
+            todayAddSearch();
+        } else {
+            if (resultBox) resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#666;">请至少输入2个字符</div>';
+        }
+    }, 300);
+
+    if (btn) btn.addEventListener('click', todayAddSearch);
+    if (input) {
+        input.addEventListener('input', debouncedSearch);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                todayAddSearch();
+            }
+        });
+    }
+})();

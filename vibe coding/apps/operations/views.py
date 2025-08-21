@@ -189,56 +189,65 @@ def update_student(request, student_id):
 @login_required
 @role_required(['运营'])
 def get_student_detail(request, student_id):
-    """获取学员详细信息"""
+    """获取学员详细信息（统一结构 + 向后兼容）"""
     try:
         student = get_object_or_404(Student, id=student_id)
-        
-        # 获取历史点评记录
-        feedbacks = student.feedback_set.select_related('teacher').order_by('-created_at')[:10]
-        feedback_data = []
-        for feedback in feedbacks:
-            feedback_data.append({
-                'id': feedback.id,
-                'teacher_name': feedback.teacher.nickname if feedback.teacher else '未知',
-                'course_name': feedback.course_name,
-                'content': feedback.content,
-                'is_featured': feedback.is_featured,
-                'created_at': feedback.created_at.strftime('%Y-%m-%d %H:%M')
+
+        # 最近5条点评（使用 teaching.Feedback）
+        recent_feedbacks = Feedback.objects.filter(student=student).order_by('-reply_time')[:5]
+        feedback_list = []
+        for fb in recent_feedbacks:
+            progress_str = ','.join(map(str, fb.progress))
+            feedback_list.append({
+                'teacher_name': fb.teacher_name,
+                'lesson_progress': progress_str,
+                'teacher_comment': fb.teacher_comment,
+                'feedback_time': fb.reply_time.strftime('%Y-%m-%d %H:%M'),
             })
-        
-        # 获取回访记录
-        visit_records = student.visitrecord_set.order_by('-visit_time')[:5]
-        visit_data = []
-        for visit in visit_records:
-            visit_data.append({
-                'id': visit.id,
-                'visit_time': visit.visit_time.strftime('%Y-%m-%d %H:%M'),
-                'status': visit.status,
-                'notes': visit.notes,
-                'operator': visit.operator.nickname if visit.operator else '未知'
-            })
-        
-        student_data = {
-            'id': student.id,
-            'external_user_id': student.external_user_id,
-            'student_name': student.student_name,  # 修复：nickname -> student_name
-            'alias_name': student.alias_name,      # 修复：remark_name -> alias_name
+        # 仅评论文本（优先用于展示）
+        feedback_comments = [fb.teacher_comment for fb in recent_feedbacks if fb.teacher_comment][:5]
+
+        # 最近5条回访记录（仅文本）
+        visit_notes = list(
+            VisitRecord.objects.filter(student=student)
+            .order_by('-visit_time')
+            .values_list('visit_note', flat=True)[:5]
+        )
+
+        # 兼容别名
+        research_note = student.research_note or getattr(student, 'research_notes', '')
+        ops_note = getattr(student, 'ops_note', '') or getattr(student, 'operation_notes', '')
+
+        # 统一结构
+        student_payload = {
+            # 新结构（9个字段）
+            'student_name': student.student_name,
             'groups': student.groups,
-            'learning_progress': student.learning_progress,
+            'progress': student.progress,  # JSON：字符串数组/对象数组均可
             'status': student.status,
-            'research_notes': student.research_notes,
-            'operation_notes': student.operation_notes,
-            'total_study_time': student.total_study_time,
+            'learning_hours': student.learning_hours,
+            'feedback_comments': feedback_comments,
+            'research_note': research_note,
+            'ops_note': ops_note,
+            'visit_notes': visit_notes,
+
+            # 旧字段（向后兼容）
+            'student_id': student.student_id,
+            'name': student.student_name,
+            'nickname': student.alias_name,
+            'current_progress': student.current_progress,
+            'total_study_time': getattr(student, 'total_study_time', 0.0),
+            'operation_note': ops_note,
+            'recent_feedbacks': feedback_list,
             'created_at': student.created_at.strftime('%Y-%m-%d %H:%M'),
-            'feedbacks': feedback_data,
-            'visit_records': visit_data
         }
-        
+
+        # 同时提供 student 与 data 键，兼容旧前端
         return JsonResponse({
             'success': True,
-            'data': student_data
+            'student': student_payload,
+            'data': student_payload
         })
-        
     except Exception as e:
         return JsonResponse({
             'success': False,

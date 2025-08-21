@@ -77,9 +77,10 @@ function viewStudentDetail(studentId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                showStudentDetailModal(data.data);  // 修复：student -> data
+                const student = data.student || data.data;  // 新旧结构兼容
+                showStudentDetailModal(student);
             } else {
-                showError('获取学员详情失败：' + data.message);  // 修复：error -> message
+                showError('获取学员详情失败：' + (data.message || data.error || '未知错误'));
             }
         })
         .catch(error => {
@@ -184,18 +185,61 @@ function changePage(page) {
 
 // 显示学员详情模态框
 function showStudentDetailModal(student) {
-    const detailHtml = `
-        学员ID：${student.student_id}\n
-        姓名：${student.name}\n
-        别名：${student.nickname || '无'}\n
-        分组：${student.groups.join(', ')}\n
-        当前进度：${student.current_progress}\n
-        状态：${student.status}\n
-        总学习时长：${student.total_study_time}小时\n
-        创建时间：${student.created_at}\n
-        运营备注：${student.operation_note || '无'}
+    // 渲染进度：对象数组 -> k:v 列表；字符串数组 -> 逗号拼接
+    function renderProgressText(progress) {
+        if (!progress || progress.length === 0) return '—';
+        if (typeof progress[0] === 'object') {
+            return '<ul style="margin-left:16px;">' + progress.map((p) => {
+                const kv = Object.entries(p || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
+                return `<li>${kv || '[空]'}</li>`;
+            }).join('') + '</ul>';
+        }
+        return Array.isArray(progress) ? progress.join(', ') : String(progress);
+    }
+
+    // 最近点评（仅 teacher_comment）
+    let feedbackListHtml = '';
+    if (Array.isArray(student.feedback_comments) && student.feedback_comments.length > 0) {
+        feedbackListHtml = '<ul style="margin-left:16px;">' + student.feedback_comments.map(c => `<li>${c || ''}</li>`).join('') + '</ul>';
+    } else if (Array.isArray(student.recent_feedbacks) && student.recent_feedbacks.length > 0) {
+        feedbackListHtml = '<ul style="margin-left:16px;">' + student.recent_feedbacks.map(f =>
+            `<li>【${f.feedback_time}】第${f.lesson_progress} - ${f.teacher_name}：${f.teacher_comment || ''}</li>`
+        ).join('') + '</ul>';
+    } else {
+        feedbackListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
+    }
+
+    // 回访记录（visit_note）
+    let visitListHtml = '';
+    if (Array.isArray(student.visit_notes) && student.visit_notes.length > 0) {
+        visitListHtml = '<ul style="margin-left:16px;">' + student.visit_notes.map(n => `<li>${n || ''}</li>`).join('') + '</ul>';
+    } else {
+        visitListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
+    }
+
+    const modal = document.getElementById('studentDetailModal');
+    const content = document.getElementById('studentDetailModalContent');
+    if (!modal || !content) {
+        alert('模态框元素未找到');
+        return;
+    }
+
+    content.innerHTML = `
+        <div><strong>ID：</strong>${student.student_id || ''}</div>
+        <div><strong>姓名：</strong>${student.student_name || student.name || ''}（${student.nickname || '无别名'}）</div>
+        <div><strong>分组：</strong>${Array.isArray(student.groups) ? student.groups.join(', ') : (student.groups || '')}</div>
+        <div><strong>进度：</strong>${renderProgressText(student.progress)}</div>
+        <div><strong>状态：</strong>${student.status || '—'}</div>
+        <div><strong>学习时长：</strong>${student.learning_hours ?? student.total_study_time ?? 0} 小时</div>
+        <div><strong>教研备注：</strong>${student.research_note || student.research_notes || '—'}</div>
+        <div><strong>运营备注：</strong>${student.ops_note || student.operation_notes || student.operation_note || '—'}</div>
+        <div style="margin-top:10px;"><strong>最近点评（teacher_comment）：</strong></div>
+        ${feedbackListHtml}
+        <div style="margin-top:10px;"><strong>回访记录（visit_note）：</strong></div>
+        ${visitListHtml}
     `;
-    alert(detailHtml);
+
+    modal.style.display = 'block';
 }
 
 // 打开添加学员模态框
@@ -282,6 +326,12 @@ function closeStudentModal() {
     }
 }
 
+// 关闭学员详情模态框
+function closeStudentDetailModal() {
+    const modal = document.getElementById('studentDetailModal');
+    if (modal) modal.style.display = 'none';
+}
+
 // 提交学员表单
 function submitStudentForm(isEdit) {
     const form = document.getElementById('studentForm');
@@ -354,9 +404,13 @@ function exportStudents() {
 
 // 点击模态框外部关闭模态框
 window.onclick = function(event) {
-    const modal = document.getElementById('studentModal');
-    if (event.target === modal) {
+    const editModal = document.getElementById('studentModal');
+    const detailModal = document.getElementById('studentDetailModal');
+    if (event.target === editModal) {
         closeStudentModal();
+    }
+    if (event.target === detailModal) {
+        closeStudentDetailModal();
     }
 };
 

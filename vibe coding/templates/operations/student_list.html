@@ -144,6 +144,22 @@
         </form>
     </div>
 </div>
+
+<!-- 新增：学员详情模态框 -->
+<div id="studentDetailModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>学员详情</h2>
+            <span class="close" onclick="closeStudentDetailModal()">&times;</span>
+        </div>
+        <div id="studentDetailModalContent" class="modal-body">
+            加载中...
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeStudentDetailModal()">关闭</button>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}

@@ -114,11 +114,11 @@
 }
 
 /* 保持原有内容区切换逻辑 */
-.tab-content .tab-pane {
+.tab-pane {
     display: none;
 }
 
-.tab-content .tab-pane.active {
+.tab-pane.active {
     display: block;
 }
 
@@ -430,4 +430,8 @@ tr.submitted {
 .form-textarea {
     min-height: 80px;
     resize: vertical;
+}
+/* 困难学生行高亮 */
+#today-task-table tbody tr.difficult-row {
+    background-color: #ffebee;
 }

@@ -47,43 +47,44 @@
     </div>
     
     <div class="module-tabs">
-        <div class="tab-header">
-            <button class="tab-button active" data-tab="todayTasks">今日任务</button>
-            <button class="tab-button" data-tab="completedComments">已点评记录</button>
-            <button class="tab-button" data-tab="manualComment">手动点评</button>
-        </div>
-        <div class="tab-content">
+        <div class="tabs">
+            <div class="tab-header">
+                <button class="tab-button active" data-tab="todayTasks">今日任务</button>
+                <button class="tab-button" data-tab="completedComments">已完成点评</button>
+            </div>
             <div id="todayTasks" class="tab-pane active">
-                <!-- 批量操作栏 -->
-                <div class="action-bar">
-                    <label><input type="checkbox" id="today-select-all"> 全选</label>
-                    <div class="spacer"></div>
-                    <button class="btn" id="btn-refresh-tasks">更新今日任务</button>
-                    <button class="btn btn-secondary" id="btn-push-research" disabled>批量推送教研</button>
-                    <button class="btn btn-secondary" id="btn-push-ops" disabled>批量推送运营</button>
-                    <button class="btn btn-primary" id="btn-batch-submit" disabled>批量提交点评</button>
-                    <button class="btn btn-danger" id="btn-batch-delete" disabled>批量删除</button>
+                <div class="toolbar" id="today-add-toolbar" style="margin-bottom:10px;">
+                    <input id="today-add-search-input" class="form-input" type="text" placeholder="输入学员昵称/ID 搜索添加到今日任务...">
+                    <button id="today-add-search-btn" class="btn btn-primary" style="margin-left:8px;">搜索</button>
                 </div>
-                <!-- 今日任务表格骨架 -->
+                <div id="today-add-search-result" class="search-result"></div>
+    
+                <!-- 批量操作栏：恢复 -->
+                <div class="action-bar">
+                    <button id="btn-push-research" class="btn btn-secondary" disabled>推送教研</button>
+                    <button id="btn-push-ops" class="btn btn-secondary" disabled>推送运营</button>
+                    <span class="spacer"></span>
+                    <button id="btn-batch-submit" class="btn btn-primary" disabled>批量提交点评</button>
+                    <button id="btn-batch-delete" class="btn btn-danger" disabled>批量删除</button>
+                </div>
+    
                 <table class="task-table" id="today-task-table">
                     <thead>
                         <tr>
-                            <th style="width:40px;"></th>
+                            <th style="width:40px;">
+                                <input type="checkbox" id="today-select-all">
+                            </th>
                             <th>学员昵称</th>
                             <th style="width:220px;">本次进度</th>
                             <th>教师评语</th>
-                            <th style="width:180px;">教研备注</th>
-                            <th style="width:180px;">运营备注</th>
-                            <th style="width:140px;">操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="empty-row"><td colspan="7" class="empty-state">暂无今日任务</td></tr>
+                        <!-- 列表内容由 teaching.js 渲染 -->
                     </tbody>
                 </table>
-                <div class="table-footer-hint">提交成功后保留在列表并标记为“已提交”。</div>
             </div>
-
+            <!-- 已完成点评 -->
             <div id="completedComments" class="tab-pane">
                 <!-- 已点评记录表格骨架 -->
                 <table class="task-table" id="completed-table">
@@ -104,57 +105,6 @@
                 </table>
                 <div class="pagination-bar" id="completed-pagination">
                     <!-- 分页占位，后续由 JS 渲染 -->
-                </div>
-            </div>
-
-            <div id="manualComment" class="tab-pane">
-                <!-- 搜索与结果 -->
-                <div class="search-bar">
-                    <input id="manual-search-input" class="form-input" type="text" placeholder="输入学员昵称/ID搜索...">
-                    <button id="manual-search-btn" class="btn btn-primary">搜索学员</button>
-                </div>
-                <table class="task-table" id="manual-search-result">
-                    <thead>
-                        <tr>
-                            <th style="width:40px;"></th>
-                            <th>学员昵称</th>
-                            <th>分组</th>
-                            <th>状态</th>
-                            <th>当前进度</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="empty-row"><td colspan="5" class="empty-state">请先搜索学员</td></tr>
-                    </tbody>
-                </table>
-                <!-- 手动点评表单 -->
-                <div class="panel">
-                    <div class="panel-header">手动点评表单</div>
-                    <div class="panel-content">
-                        <div class="form-row">
-                            <label class="form-label">选中学员：</label>
-                            <span id="manual-selected-student">未选择</span>
-                        </div>
-                        <div class="form-row">
-                            <label class="form-label" for="manual-progress">本次进度</label>
-                            <input id="manual-progress" class="form-input" type="text" placeholder="如：6.1, 6.2, 7">
-                        </div>
-                        <div class="form-row">
-                            <label class="form-label" for="manual-comment">教师评语</label>
-                            <textarea id="manual-comment" class="form-input form-textarea" placeholder="可选填写"></textarea>
-                        </div>
-                        <div class="form-row">
-                            <label class="form-label" for="manual-push-research">教研备注</label>
-                            <input id="manual-push-research" class="form-input" type="text" placeholder="可选填写"></input>
-                        </div>
-                        <div class="form-row">
-                            <label class="form-label" for="manual-push-ops">运营备注</label>
-                            <input id="manual-push-ops" class="form-input" type="text" placeholder="可选填写"></input>
-                        </div>
-                        <div class="action-bar">
-                            <button id="manual-submit" class="btn btn-primary" disabled>提交点评</button>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -190,5 +140,5 @@
             </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    </div>
+    {% endblock %}
