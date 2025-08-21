@@ -117,16 +117,18 @@
             <div id="opsTaskManagement" class="tab-pane">
                 <div class="toolbar">
                     <div class="search-section">
-                        <input type="text" id="ops-task-search" class="search-input" placeholder="搜索学员昵称/备注名...">
-                        <button type="button" class="btn btn-primary" onclick="loadOpsTasks(1, document.getElementById('ops-task-search').value.trim())">搜索</button>
+                        <input type="text" id="ops-student-search" class="search-input" placeholder="搜索学员昵称/备注名...">
+                        <button type="button" class="btn btn-primary" id="ops-student-search-btn">搜索</button>
                     </div>
                     <div class="actions-section">
-                        <button class="btn btn-success" id="ops-add-manual" onclick="/* 预留：手动添加学员 */">手动添加学员</button>
-                        <button class="btn btn-primary" id="ops-batch-complete" disabled>批量完成</button>
                         <button class="btn btn-danger" id="ops-batch-delete" disabled>批量删除</button>
                         <button class="btn btn-info" id="ops-export" disabled>导出列表</button>
                     </div>
                 </div>
+
+                <!-- 学员搜索结果（在此渲染可“手动增加任务”的学员列表） -->
+                <div id="ops-student-results" class="table-container" style="margin-top:8px;"></div>
+
                 <div id="ops-task-list" class="table-container">
                     <div class="empty-state">
                         <div class="empty-state-icon">🗂️</div>

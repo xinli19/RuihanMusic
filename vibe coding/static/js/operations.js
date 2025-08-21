@@ -508,27 +508,18 @@ function initOperationsTabs() {
             loadOpsTasks(1);
             hasLoadedOpsTasks = true;
 
-            // 仅初始化一次事件绑定
-            const searchInput = document.getElementById('ops-task-search');
-            if (searchInput) {
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        loadOpsTasks(1, searchInput.value.trim());
-                    }
-                });
-            }
-            const btnComplete = document.getElementById('ops-batch-complete');
-            if (btnComplete) {
-                btnComplete.addEventListener('click', () => batchUpdateOpsTasks('已关闭')); // 批量完成 = 已关闭
-            }
+            // 删除“批量完成”绑定（不再存在）
+            // const btnComplete = document.getElementById('ops-batch-complete');
+            // if (btnComplete) { ... }
+
+            // 仅保留“批量删除”与“导出列表”
             const btnDelete = document.getElementById('ops-batch-delete');
             if (btnDelete) {
-                btnDelete.addEventListener('click', () => batchUpdateOpsTasks('已关闭')); // 暂无删除接口，等同关闭
+                btnDelete.addEventListener('click', () => batchUpdateOpsTasks('已关闭')); // 暂无物理删除，等同关闭
             }
             const btnExport = document.getElementById('ops-export');
             if (btnExport) {
                 btnExport.addEventListener('click', () => {
-                    // 简单导出：导出选中 ID
                     const ids = getSelectedTaskIds();
                     if (ids.length === 0) return;
                     const blob = new Blob([ids.join('\n')], { type: 'text/plain;charset=utf-8' });
@@ -538,6 +529,22 @@ function initOperationsTabs() {
                     a.download = `ops_tasks_${Date.now()}.txt`;
                     a.click();
                     URL.revokeObjectURL(url);
+                });
+            }
+
+            // 新增：学员搜索绑定（Enter 或点击按钮触发）
+            const opsSearchInput = document.getElementById('ops-student-search');
+            const opsSearchBtn = document.getElementById('ops-student-search-btn');
+            if (opsSearchInput) {
+                opsSearchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        opsSearchStudents(opsSearchInput.value.trim());
+                    }
+                });
+            }
+            if (opsSearchBtn && opsSearchInput) {
+                opsSearchBtn.addEventListener('click', () => {
+                    opsSearchStudents(opsSearchInput.value.trim());
                 });
             }
         } else if (targetId === 'visitRecords' && !hasLoadedVisits) {
@@ -630,7 +637,6 @@ function loadOpsTasks(page = 1, search = '', status = '') {
 }
 
 function renderOpsTasks(tasks) {
-    // ... existing code ...
     let html = `
         <table class="table">
             <thead>
@@ -644,7 +650,8 @@ function renderOpsTasks(tasks) {
                     <th>来源</th>
                     <th>指派人</th>
                     <th>创建时间</th>
-                    <th>备注</th>
+                    <th>回访备注</th>
+                    <th>操作</th>
                 </tr>
             </thead>
             <tbody>
@@ -657,13 +664,21 @@ function renderOpsTasks(tasks) {
                 <td><input type="checkbox" class="ops-task-select" data-id="${t.id}"></td>
                 <td><a href="javascript:void(0)" onclick="viewStudentDetail('${t.student_id}')">${t.student_nickname || t.student_id}</a></td>
                 <td>${groups || '—'}</td>
-                <td>${t.status || '—'}</td>
+                <td>
+                    <select id="ops-status-${t.id}" class="form-input" style="min-width:100px;">
+                        <option value="待办" ${t.status==='待办'?'selected':''}>待办</option>
+                        <option value="已联系" ${t.status==='已联系'?'selected':''}>已联系</option>
+                        <option value="未回复" ${t.status==='未回复'?'selected':''}>未回复</option>
+                        <option value="已关闭" ${t.status==='已关闭'?'selected':''}>已关闭</option>
+                    </select>
+                </td>
                 <td>${progress}</td>
                 <td>${t.visit_count ?? 0}</td>
                 <td>${t.source || '—'}</td>
                 <td>${t.assigned_by || '—'}</td>
                 <td>${t.created_at || '—'}</td>
-                <td>${t.notes || '—'}</td>
+                <td><input id="ops-note-${t.id}" type="text" class="form-input" placeholder="填写回访备注" value="${t.notes || ''}" /></td>
+                <td><button class="btn btn-primary" onclick="saveOpsTaskEdit(${t.id})">保存</button></td>
             </tr>
         `;
     });
@@ -875,11 +890,10 @@ function initOpsTaskSelection() {
 
 function updateOpsToolbarState() {
     const count = selectedOpsTaskIds.size;
-    const btnComplete = document.getElementById('ops-batch-complete');
+    // 移除“批量完成”的控制
     const btnDelete = document.getElementById('ops-batch-delete');
     const btnExport = document.getElementById('ops-export');
 
-    if (btnComplete) btnComplete.disabled = count === 0;
     if (btnDelete) btnDelete.disabled = count === 0;
     if (btnExport) btnExport.disabled = count === 0;
 }
@@ -906,8 +920,119 @@ async function batchUpdateOpsTasks(newStatusCN) {
         }));
         showSuccess('批量更新成功');
         selectedOpsTaskIds.clear();
-        loadOpsTasks(1, document.getElementById('ops-task-search')?.value?.trim() || '');
+        // 刷新列表（默认不显示已关闭任务，关闭后自动从列表消失）
+        loadOpsTasks(1);
     } catch (e) {
         showError('批量更新失败：' + e.message);
+    }
+}
+
+// 新增：行内保存（状态 + 回访备注）
+// 插入位置建议：紧跟在 saveOpsTaskEdit 后面
+async function saveOpsTaskEdit(taskId) {
+    const statusEl = document.getElementById(`ops-status-${taskId}`);
+    const noteEl = document.getElementById(`ops-note-${taskId}`);
+    if (!statusEl || !noteEl) return;
+    const status = statusEl.value;
+    const notes = noteEl.value.trim();
+
+    try {
+        const res = await fetch(`/operations/tasks/${taskId}/update/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ status, notes })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || '更新失败');
+        showSuccess('保存成功');
+        // 刷新列表，若状态为已关闭，会自动消失
+        loadOpsTasks(1);
+    } catch (e) {
+        showError('保存失败：' + e.message);
+    }
+}
+
+// 新增：在“运营任务管理”Tab内搜索学员（基于 /operations/students/api/?search=）
+async function opsSearchStudents(query) {
+    const container = document.getElementById('ops-student-results');
+    if (!container) return;
+    const q = (query || '').trim();
+    if (!q) {
+        container.innerHTML = '';
+        return;
+    }
+    try {
+        const params = new URLSearchParams({ page: 1, search: q });
+        const res = await fetch(`/operations/students/api/?${params.toString()}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || '搜索失败');
+        const students = Array.isArray(data.data) ? data.data.slice(0, 10) : [];
+        renderOpsStudentSearchResults(students);
+    } catch (e) {
+        container.innerHTML = `<div class="operations-empty-state">搜索失败：${e.message}</div>`;
+    }
+}
+
+// 新增：渲染学员搜索结果，提供“手动增加任务”按钮
+function renderOpsStudentSearchResults(students) {
+    const container = document.getElementById('ops-student-results');
+    if (!container) return;
+    if (!students || students.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <p>未找到匹配的学员</p>
+            </div>
+        `;
+        return;
+    }
+    let html = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>学员昵称</th>
+                    <th>ID</th>
+                    <th>分组</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+    students.forEach(s => {
+        const groups = Array.isArray(s.groups) ? s.groups.join(', ') : (s.groups || '');
+        html += `
+            <tr>
+                <td>${s.name || s.student_name || s.student_nickname || '—'}</td>
+                <td>${s.student_id || s.id || '—'}</td>
+                <td>${groups || '—'}</td>
+                <td><button class="btn btn-success" onclick="addOpsTaskForStudent('${s.id}')">手动增加任务</button></td>
+            </tr>
+        `;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// 新增：调用后端接口将学员加入运营任务
+async function addOpsTaskForStudent(studentId) {
+    try {
+        const res = await fetch('/operations/tasks/manual/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ student_id: studentId })
+        });
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || '添加失败');
+        showSuccess('已添加到运营任务');
+        // 新任务创建为待办；列表默认不含已关闭任务，因此直接刷新
+        loadOpsTasks(1);
+    } catch (e) {
+        showError('添加失败：' + e.message);
     }
 }

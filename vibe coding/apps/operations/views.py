@@ -383,6 +383,8 @@ def get_ops_tasks(request):
         
         # 基础查询（移除无效的 assigned_by）
         tasks = OpsTask.objects.select_related('student').all()
+        # 默认排除“已关闭”的任务
+        tasks = tasks.exclude(task_status='closed')
         
         # 状态筛选：兼容中文或枚举值
         if status_filter:
@@ -450,30 +452,65 @@ def get_ops_tasks(request):
 @require_http_methods(["POST"])
 @csrf_exempt
 def update_task_status(request, task_id):
-    """更新任务状态"""
+    """更新任务状态（支持行内备注），如状态变更为已关闭，前端会刷新列表自动移除"""
     try:
         task = get_object_or_404(OpsTask, id=task_id)
         data = json.loads(request.body)
         
-        new_status = data.get('status')
-        if new_status not in ['待办', '已联系', '未回复', '已关闭']:
+        new_status_cn = data.get('status')
+        if new_status_cn not in ['待办', '已联系', '未回复', '已关闭']:
             return JsonResponse({
                 'success': False,
                 'message': '无效的状态值'
             })
+        notes = (data.get('notes') or '').strip()
         
-        task.status = new_status
+        # 映射中文 -> 枚举
+        status_map = {
+            '待办': 'pending',
+            '已联系': 'contacted',
+            '未回复': 'no_reply',
+            '已关闭': 'closed',
+        }
+        code = status_map[new_status_cn]
+        
+        # 更新任务状态
+        task.task_status = code
+        
+        # 若携带备注，则写入回访记录，并自增任务回访次数
+        if notes:
+            # 生成唯一记录ID
+            record_id = f"VR{int(datetime.now().timestamp()*1000)}"
+            # 学员与老师信息
+            student = task.student
+            teacher_name = getattr(student, 'assigned_teacher_name', None)
+            if callable(teacher_name):
+                teacher_name = student.assigned_teacher_name
+            teacher_name = teacher_name or '未分配'
+            
+            task.visit_count = (task.visit_count or 0) + 1
+            
+            VisitRecord.objects.create(
+                record_id=record_id,
+                student=student,
+                student_name=student.student_name,
+                visit_status=code,                  # 与任务状态保持一致
+                visit_count=task.visit_count,       # 累计回访次数
+                teacher_name=teacher_name,
+                visit_note=notes
+            )
+        
         task.save()
         
         return JsonResponse({
             'success': True,
-            'message': '任务状态更新成功'
+            'message': '任务更新成功'
         })
         
     except Exception as e:
         return JsonResponse({
             'success': False,
-            'message': f'更新任务状态失败: {str(e)}'
+            'message': f'更新任务失败: {str(e)}'
         })
 
 
@@ -597,7 +634,7 @@ def add_manual_task(request):
         student_id = data.get('student_id')
         student = get_object_or_404(Student, id=student_id)
         
-        # 检查是否已存在未关闭的任务（使用 task_status）
+        # 检查是否已存在未完成的运营任务
         existing_task = OpsTask.objects.filter(
             student=student,
             task_status__in=['pending', 'contacted', 'no_reply']
