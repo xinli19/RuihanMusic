@@ -14,7 +14,7 @@
 - 数据库：SQLite（开发环境，强烈建议不提交到仓库）
 - 前端：Django 模板 + 原生 JavaScript + CSS（不依赖前端框架）
 - 静态资源组织：static/js、static/css
-- 模板：templates 下分模块组织（教学模块位于 templates/teaching）
+- 模板：templates 下分模块组织
 
 建议 Python 3.x；依赖详见项目根目录 requirements.txt。
 
@@ -54,7 +54,7 @@ python manage.py createsuperuser
 python manage.py runserver
 ```
 
-访问浏览器输出的本地地址（通常 http://127.0.0.1:8000/），登录后台或直接进入教学模块（学员点评页）进行验证。
+访问浏览器输出的本地地址（通常 http://127.0.0.1:8000/）， 登录后台或直接进入教学模块（学员点评页）进行验证。
 
 ### 可选：写入示例数据（通过 Django shell）
 
@@ -70,25 +70,7 @@ from scripts.seed_teaching_test_data import run; run()
 
 完成后刷新教学页面即可看到“今日任务”数据。
 
-## 目录结构（选摘）
 
-- manage.py
-- config/
-  - settings.py（Django 配置）
-  - urls.py（路由入口）
-- apps/
-  - teaching/（教学模块：urls、views、models 等）
-  - research/（教研模块：含 TeachingTask 模型）
-  - students/（学员模块：含 Student 模型）
-  - accounts/（用户体系）
-- templates/
-  - teaching/feedback.html（学员点评页）
-- static/
-  - js/teaching.js（教学模块前端逻辑）
-  - css/teaching.css（教学模块样式）
-- scripts/
-  - seed_teaching_test_data.py（开发示例数据脚本）
-- requirements.txt
 
 
 
