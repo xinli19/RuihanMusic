@@ -4,31 +4,16 @@
 let selectedStudents = new Set();
 let allTasks = [];
 
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    refreshTasks();
-    loadRecentFeedbacks();
-    
-    // 手动点评表单提交
-    const manualForm = document.getElementById('manual-feedback-form');
-    if (manualForm) {
-        manualForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            submitManualFeedback();
-        });
-    }
-});
-
 // 刷新任务列表
 function refreshTasks() {
     fetch('/teaching/tasks/today/')
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                allTasks = data.tasks;
-                renderTaskList(data.tasks);
+                allTasks = data.tasks || [];
+                renderTaskList(allTasks);
             } else {
-                showError('加载任务失败：' + data.error);
+                showError('加载任务失败：' + (data.error || '未知错误'));
             }
         })
         .catch(error => {
@@ -36,270 +21,356 @@ function refreshTasks() {
         });
 }
 
-// 渲染任务列表
+// 渲染今日任务为表格
 function renderTaskList(tasks) {
-    const taskList = document.getElementById('task-list');
-    
-    if (tasks.length === 0) {
-        taskList.innerHTML = '<div class="empty-state">暂无待处理任务</div>';
+    const tbody = document.querySelector('#today-task-table tbody');
+    if (!tbody) return;
+
+    if (!tasks || tasks.length === 0) {
+        tbody.innerHTML = '<tr class="empty-row"><td colspan="7" class="empty-state">暂无今日任务</td></tr>';
+        updateToolbarState();
         return;
     }
-    
+
     let html = '';
     tasks.forEach(task => {
-        const isSelected = selectedStudents.has(task.student_id);
-        const difficultyBadge = task.is_difficult ? '<span style="color: red; font-weight: bold;">[困难学员]</span>' : '';
-        
+        const difficultTag = task.is_difficult ? '<span style="color:#d32f2f;font-weight:bold;">[困难]</span>' : '';
+        const researchCell = task.research_note ? `<span title="${task.research_note}">有备注</span>` : '—';
+        const opsCell = task.operation_note ? `<span title="${task.operation_note}">有备注</span>` : '—';
+
         html += `
-            <div class="task-item" data-student-id="${task.student_id}">
-                <div class="task-info">
-                    <div class="student-name">
-                        <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="toggleStudent('${task.student_id}')">
-                        ${task.student_name} ${difficultyBadge}
-                    </div>
-                    <div class="task-details">
-                        分组：${task.student_groups.join(', ')} | 进度：${task.current_progress}
-                    </div>
-                    ${task.research_note ? `<div class="task-details">教研备注：${task.research_note}</div>` : ''}
-                    ${task.operation_note ? `<div class="task-details">运营备注：${task.operation_note}</div>` : ''}
-                </div>
-                <div class="task-actions">
-                    <button class="btn btn-primary" onclick="showStudentDetail('${task.student_id}')">详情</button>
-                </div>
-            </div>
+            <tr data-student-id="${task.student_id}">
+                <td>
+                    <input type="checkbox" class="row-select" ${selectedStudents.has(task.student_id) ? 'checked' : ''}>
+                </td>
+                <td>
+                    <a href="javascript:void(0)" class="student-link" data-student-id="${task.student_id}">
+                        ${task.student_name} ${difficultTag}
+                    </a>
+                    <div class="subtext" style="font-size:12px;color:#666;">分组：${(task.student_groups || []).join(', ')}</div>
+                </td>
+                <td>
+                    <input type="text" class="input-progress form-input" placeholder="如：6.1, 6.2">
+                </td>
+                <td>
+                    <textarea class="input-comment form-input form-textarea" placeholder="请填写教师评语"></textarea>
+                </td>
+                <td class="research-note-cell">${researchCell}</td>
+                <td class="ops-note-cell">${opsCell}</td>
+                <td>
+                    <button type="button" class="btn btn-primary btn-detail" data-student-id="${task.student_id}">详情</button>
+                </td>
+            </tr>
         `;
     });
-    
-    taskList.innerHTML = html;
+
+    tbody.innerHTML = html;
+
+    // 行内事件绑定
+    tbody.querySelectorAll('.row-select').forEach(cb => {
+        cb.addEventListener('change', onRowSelectChange);
+    });
+    tbody.querySelectorAll('.btn-detail').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const studentId = e.currentTarget.getAttribute('data-student-id');
+            showStudentDetail(studentId);
+        });
+    });
+    tbody.querySelectorAll('.student-link').forEach(a => {
+        a.addEventListener('click', (e) => {
+            const studentId = e.currentTarget.getAttribute('data-student-id');
+            showStudentDetail(studentId);
+        });
+    });
+
+    updateToolbarState();
 }
 
-// 切换学员选择状态
-function toggleStudent(studentId) {
-    if (selectedStudents.has(studentId)) {
-        selectedStudents.delete(studentId);
-    } else {
+// 单行选择变化
+function onRowSelectChange(e) {
+    const tr = e.target.closest('tr');
+    const studentId = tr ? tr.getAttribute('data-student-id') : null;
+    if (!studentId) return;
+    if (e.target.checked) {
         selectedStudents.add(studentId);
+    } else {
+        selectedStudents.delete(studentId);
     }
-    updateSelectedCount();
+    updateToolbarState();
 }
 
-// 更新选中数量显示
-function updateSelectedCount() {
-    const countElement = document.getElementById('selected-count');
-    if (countElement) {
-        countElement.textContent = selectedStudents.size;
+// 全选变化
+function onSelectAllChange(e) {
+    const checked = e.target.checked;
+    const rows = document.querySelectorAll('#today-task-table tbody tr');
+    rows.forEach(row => {
+        const cb = row.querySelector('.row-select');
+        if (cb) {
+            cb.checked = checked;
+            const sid = row.getAttribute('data-student-id');
+            if (checked) {
+                selectedStudents.add(sid);
+            } else {
+                selectedStudents.delete(sid);
+            }
+        }
+    });
+    updateToolbarState();
+}
+
+// 更新工具栏按钮状态
+function updateToolbarState() {
+    const count = selectedStudents.size;
+    const canOperate = count > 0;
+
+    const btns = [
+        document.getElementById('btn-push-research'),
+        document.getElementById('btn-push-ops'),
+        document.getElementById('btn-batch-submit'),
+        document.getElementById('btn-batch-delete'),
+    ];
+    btns.forEach(btn => {
+        if (btn) btn.disabled = !canOperate;
+    });
+
+    // 同步全选勾选态（当全部选中时，自动勾上）
+    const selectAll = document.getElementById('today-select-all');
+    if (selectAll) {
+        const rows = document.querySelectorAll('#today-task-table tbody tr');
+        const totalRows = Array.from(rows).filter(r => r.querySelector('.row-select')).length;
+        selectAll.checked = (totalRows > 0 && count === totalRows);
     }
+}
+
+// 获取当前选中的学员ID列表
+function getSelectedStudentIds() {
+    return Array.from(selectedStudents);
+}
+
+// 读取某行的输入（进度、评语）
+function getRowInputs(studentId) {
+    const row = document.querySelector(`#today-task-table tbody tr[data-student-id="${studentId}"]`);
+    if (!row) return { progress: '', comment: '' };
+    const progressInput = row.querySelector('.input-progress');
+    const commentInput = row.querySelector('.input-comment');
+    return {
+        progress: (progressInput ? progressInput.value.trim() : ''),
+        comment: (commentInput ? commentInput.value.trim() : '')
+    };
 }
 
 // 批量提交点评
 function submitSelectedFeedbacks() {
-    if (selectedStudents.size === 0) {
-        alert('请先选择要点评的学员');
+    const ids = getSelectedStudentIds();
+    if (ids.length === 0) {
+        alert('请先选择要提交点评的学员');
         return;
     }
-    
-    // 这里可以打开一个模态框来输入点评信息
-    // 简化版本：直接提示用户使用手动点评
-    alert('请使用手动点评功能为选中的学员逐一添加点评');
-}
 
-// 提交手动点评
-function submitManualFeedback() {
-    const studentName = document.getElementById('student-name').value.trim();
-    const lessonProgress = document.getElementById('lesson-progress').value.trim();
-    const teacherComment = document.getElementById('teacher-comment').value.trim();
-    
-    if (!studentName || !lessonProgress || !teacherComment) {
-        alert('请填写所有必填项');
-        return;
+    // 校验每行必填
+    const feedbacks = [];
+    for (const sid of ids) {
+        const { progress, comment } = getRowInputs(sid);
+        if (!progress || !comment) {
+            alert('存在未填写「本次进度」或「教师评语」的选中行，请补充后再提交');
+            return;
+        }
+        feedbacks.push({
+            student_id: sid,
+            lesson_progress: progress,
+            teacher_comment: comment
+        });
     }
-    
-    const data = {
-        student_name: studentName,
-        lesson_progress: lessonProgress,
-        teacher_comment: teacherComment
-    };
-    
-    fetch('/teaching/feedback/manual/', {
+
+    fetch('/teaching/feedback/submit/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({ feedbacks })
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert('手动点评提交成功');
-            document.getElementById('manual-feedback-form').reset();
-            refreshTasks();
-            loadRecentFeedbacks();
+            // 标记为已提交：禁用输入、样式标识、但不移除行
+            ids.forEach(sid => {
+                const row = document.querySelector(`#today-task-table tbody tr[data-student-id="${sid}"]`);
+                if (!row) return;
+                row.classList.add('submitted');
+                const cb = row.querySelector('.row-select');
+                if (cb) cb.checked = false;
+                const progressInput = row.querySelector('.input-progress');
+                const commentInput = row.querySelector('.input-comment');
+                if (progressInput) progressInput.disabled = true;
+                if (commentInput) commentInput.disabled = true;
+            });
+            selectedStudents.clear();
+            updateToolbarState();
+            alert(data.message || '提交成功');
         } else {
-            alert('提交失败：' + data.error);
+            alert('提交失败：' + (data.error || '未知错误'));
         }
     })
-    .catch(error => {
-        alert('网络错误：' + error.message);
+    .catch(err => {
+        alert('网络错误：' + err.message);
     });
 }
 
-// 推送到教研
-function pushToResearch() {
-    if (selectedStudents.size === 0) {
+// 批量删除任务
+function batchDeleteTasks() {
+    const ids = getSelectedStudentIds();
+    if (ids.length === 0) {
+        alert('请先选择要删除的任务');
+        return;
+    }
+    if (!confirm(`确定删除 ${ids.length} 个任务吗？`)) return;
+
+    fetch('/teaching/tasks/delete/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({ student_ids: ids })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            // 删除对应行
+            ids.forEach(sid => {
+                const row = document.querySelector(`#today-task-table tbody tr[data-student-id="${sid}"]`);
+                if (row) row.remove();
+            });
+            selectedStudents.clear();
+
+            // 若为空，显示空态
+            const tbody = document.querySelector('#today-task-table tbody');
+            if (tbody && tbody.children.length === 0) {
+                tbody.innerHTML = '<tr class="empty-row"><td colspan="7" class="empty-state">暂无今日任务</td></tr>';
+            }
+            updateToolbarState();
+            alert(data.message || '删除成功');
+        } else {
+            alert('删除失败：' + (data.error || '未知错误'));
+        }
+    })
+    .catch(err => {
+        alert('网络错误：' + err.message);
+    });
+}
+
+// 使用模态框批量推送
+let currentPushType = null; // 'research' | 'operation'
+function openPushModal(type) {
+    const ids = getSelectedStudentIds();
+    if (ids.length === 0) {
         alert('请先选择要推送的学员');
         return;
     }
-    
-    const note = prompt('请输入教研备注：');
-    if (!note) return;
-    
-    const data = {
-        student_ids: Array.from(selectedStudents),
-        research_note: note
-    };
-    
-    fetch('/teaching/push/research/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert(data.message);
-            selectedStudents.clear();
-            updateSelectedCount();
-        } else {
-            alert('推送失败：' + data.error);
-        }
-    })
-    .catch(error => {
-        alert('网络错误：' + error.message);
-    });
+    currentPushType = type;
+    const modal = document.getElementById('pushModal');
+    const title = document.getElementById('pushModalTitle');
+    const note = document.getElementById('pushNote');
+
+    if (title) title.textContent = type === 'research' ? '推送至教研部门' : '推送至运营部门';
+    if (note) note.value = '';
+    if (modal) modal.style.display = 'block';
 }
 
-// 推送到运营
-function pushToOperation() {
-    if (selectedStudents.size === 0) {
+function closePushModal() {
+    const modal = document.getElementById('pushModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function confirmPush() {
+    const ids = getSelectedStudentIds();
+    if (ids.length === 0) {
         alert('请先选择要推送的学员');
         return;
     }
-    
-    const note = prompt('请输入运营备注：');
-    if (!note) return;
-    
-    const data = {
-        student_ids: Array.from(selectedStudents),
-        operation_note: note
-    };
-    
-    fetch('/teaching/push/operation/', {
+    const noteInput = document.getElementById('pushNote');
+    const note = noteInput ? noteInput.value.trim() : '';
+    if (!note) {
+        alert('请输入备注信息');
+        return;
+    }
+
+    const url = currentPushType === 'research' ? '/teaching/push/research/' : '/teaching/push/operation/';
+    const payload = currentPushType === 'research'
+        ? { student_ids: ids, research_note: note }
+        : { student_ids: ids, operation_note: note };
+
+    fetch(url, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
             'X-CSRFToken': getCookie('csrftoken')
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify(payload)
     })
-    .then(response => response.json())
+    .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert(data.message);
+            closePushModal();
             selectedStudents.clear();
-            updateSelectedCount();
+            updateToolbarState();
+            alert(data.message || '推送成功');
         } else {
-            alert('推送失败：' + data.error);
+            alert('推送失败：' + (data.error || '未知错误'));
         }
     })
-    .catch(error => {
-        alert('网络错误：' + error.message);
+    .catch(err => {
+        alert('网络错误：' + err.message);
     });
 }
 
-// 显示学员详情
+// 学员详情（使用模态框）
 function showStudentDetail(studentId) {
     fetch(`/teaching/students/${studentId}/`)
         .then(response => response.json())
         .then(data => {
-            if (data.success) {
-                const student = data.student;
-                let detailHtml = `
-                    学员ID：${student.student_id}\n
-                    姓名：${student.name}\n
-                    别名：${student.nickname || '无'}\n
-                    分组：${student.groups.join(', ')}\n
-                    当前进度：${student.current_progress}\n
-                    状态：${student.status}\n
-                    总学习时长：${student.total_study_time}小时\n
-                    教研备注：${student.research_note || '无'}\n
-                    运营备注：${student.operation_note || '无'}
-                `;
-                alert(detailHtml);
-            } else {
-                alert('获取学员详情失败：' + data.error);
+            if (!data.success) {
+                alert('获取学员详情失败：' + (data.error || '未知错误'));
+                return;
             }
+            const info = data.student;
+            const content = document.getElementById('studentModalContent');
+            const modal = document.getElementById('studentModal');
+            if (content) {
+                const feedbackList = (info.recent_feedbacks || []).map(f => `
+                    <li>【${f.feedback_time}】第${f.lesson_progress} - ${f.teacher_name}：${f.teacher_comment || ''}</li>
+                `).join('');
+                content.innerHTML = `
+                    <div><strong>ID：</strong>${info.student_id}</div>
+                    <div><strong>姓名：</strong>${info.name}（${info.nickname || '无别名'}）</div>
+                    <div><strong>分组：</strong>${(info.groups || []).join(', ')}</div>
+                    <div><strong>当前进度：</strong>${info.current_progress || '—'}</div>
+                    <div><strong>状态：</strong>${info.status || '—'}</div>
+                    <div><strong>总学习时长：</strong>${info.total_study_time || 0} 小时</div>
+                    <div><strong>教研备注：</strong>${info.research_note || '—'}</div>
+                    <div><strong>运营备注：</strong>${info.operation_note || '—'}</div>
+                    <div style="margin-top:10px;"><strong>最近点评：</strong></div>
+                    <ul style="margin-left:16px;">${feedbackList || '<li>暂无</li>'}</ul>
+                `;
+            }
+            if (modal) modal.style.display = 'block';
         })
         .catch(error => {
             alert('网络错误：' + error.message);
         });
 }
 
-// 加载最近点评记录
-function loadRecentFeedbacks() {
-    fetch('/teaching/feedback/completed/?page=1')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                renderRecentFeedbacks(data.feedbacks.slice(0, 5)); // 只显示最近5条
-            } else {
-                const container = document.getElementById('recent-feedbacks');
-                if (container) {
-                    container.innerHTML = '<div class="empty-state">加载失败</div>';
-                }
-            }
-        })
-        .catch(error => {
-            const container = document.getElementById('recent-feedbacks');
-            if (container) {
-                container.innerHTML = '<div class="empty-state">网络错误</div>';
-            }
-        });
+function closeStudentModal() {
+    const modal = document.getElementById('studentModal');
+    if (modal) modal.style.display = 'none';
 }
 
-// 渲染最近点评记录
-function renderRecentFeedbacks(feedbacks) {
-    const container = document.getElementById('recent-feedbacks');
-    if (!container) return;
-    
-    if (feedbacks.length === 0) {
-        container.innerHTML = '<div class="empty-state">暂无点评记录</div>';
-        return;
-    }
-    
-    let html = '';
-    feedbacks.forEach(feedback => {
-        html += `
-            <div class="announcement-item">
-                <div style="font-weight: bold;">${feedback.student_name}</div>
-                <div style="font-size: 12px; color: #666;">${feedback.lesson_progress} - ${feedback.feedback_time}</div>
-                <div style="margin-top: 5px;">${feedback.teacher_comment}</div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
+// 兼容旧函数名（按钮未直接使用时也能正常工作）
+function pushToResearch() { openPushModal('research'); }
+function pushToOperation() { openPushModal('operation'); }
 
-// 显示错误信息
-function showError(message) {
-    alert('错误：' + message);
-}
-
-// 获取CSRF Token
+// 用于CSRF
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -313,4 +384,141 @@ function getCookie(name) {
         }
     }
     return cookieValue;
+}
+
+// 统一的初始化函数（无论 DOM 是否已就绪都能执行）
+function initTeachingModule() {
+    console.log('[teaching.js] init');
+
+    // 先做一次状态归一化：若没有 active 或存在多个 active，只保留一个
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const panes = document.querySelectorAll('.tab-pane');
+    let activeBtn = document.querySelector('.tab-button.active');
+    if (!activeBtn && tabButtons.length > 0) {
+        activeBtn = tabButtons[0];
+        activeBtn.classList.add('active');
+    }
+    let targetId = activeBtn ? activeBtn.getAttribute('data-tab') : null;
+    if (!targetId && panes.length > 0) {
+        targetId = panes[0].id;
+    }
+    panes.forEach(p => {
+        if (p.id === targetId) p.classList.add('active');
+        else p.classList.remove('active');
+    });
+
+    // Tab 切换初始化
+    tabButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.getAttribute('data-tab');
+            // 激活按钮
+            tabButtons.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            // 切换面板
+            panes.forEach(p => {
+                if (p.id === target) p.classList.add('active');
+                else p.classList.remove('active');
+            });
+            // 今日任务回到时刷新
+            if (target === 'todayTasks') {
+                refreshTasks();
+            } else if (target === 'completedComments') {
+                loadCompletedFeedbacks(1);
+            }
+        });
+    });
+
+    // 绑定全选
+    const selectAll = document.getElementById('today-select-all');
+    if (selectAll) {
+        selectAll.addEventListener('change', onSelectAllChange);
+    }
+
+    // 批量操作按钮
+    const btnPushResearch = document.getElementById('btn-push-research');
+    if (btnPushResearch) {
+        btnPushResearch.addEventListener('click', () => openPushModal('research'));
+    }
+    const btnPushOps = document.getElementById('btn-push-ops');
+    if (btnPushOps) {
+        btnPushOps.addEventListener('click', () => openPushModal('operation'));
+    }
+    const btnBatchSubmit = document.getElementById('btn-batch-submit');
+    if (btnBatchSubmit) {
+        btnBatchSubmit.addEventListener('click', submitSelectedFeedbacks);
+    }
+    const btnBatchDelete = document.getElementById('btn-batch-delete');
+    if (btnBatchDelete) {
+        btnBatchDelete.addEventListener('click', batchDeleteTasks);
+    }
+
+    // 加载“已点评记录”
+    function loadCompletedFeedbacks(page = 1) {
+        fetch(`/teaching/feedback/completed/?page=${page}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    showError('加载已点评记录失败：' + (data.error || '未知错误'));
+                    return;
+                }
+                renderCompletedFeedbacks(data);
+            })
+            .catch(err => showError('网络错误：' + err.message));
+    }
+
+    // 渲染“已点评记录”
+    function renderCompletedFeedbacks(data) {
+        const tbody = document.querySelector('#completed-table tbody');
+        const pager = document.getElementById('completed-pagination');
+        if (!tbody) return;
+    
+        const list = data.feedbacks || [];
+        if (list.length === 0) {
+            tbody.innerHTML = '<tr class="empty-row"><td colspan="7" class="empty-state">暂无记录</td></tr>';
+        } else {
+            const rows = list.map(item => {
+                const progressText = Array.isArray(item.progress) ? item.progress.join(', ') : (item.progress || '');
+                return `
+                    <tr>
+                        <td>${item.reply_time || ''}</td>
+                        <td>${item.student_name || ''}</td>
+                        <td>${progressText}</td>
+                        <td>${item.teacher_name || ''}</td>
+                        <td>${item.teacher_comment || ''}</td>
+                        <td>${item.push_research ? '<span title="'+item.push_research+'">有备注</span>' : '—'}</td>
+                        <td>${item.push_ops ? '<span title="'+item.push_ops+'">有备注</span>' : '—'}</td>
+                    </tr>
+                `;
+            }).join('');
+            tbody.innerHTML = rows;
+        }
+    
+        if (pager) {
+            const prevDisabled = !data.has_previous;
+            const nextDisabled = !data.has_next;
+            pager.innerHTML = `
+                <button class="btn btn-secondary" data-page="${data.current_page - 1}" ${prevDisabled ? 'disabled' : ''}>上一页</button>
+                <span style="margin:0 8px;">第 ${data.current_page} / ${data.total_pages} 页</span>
+                <button class="btn btn-secondary" data-page="${data.current_page + 1}" ${nextDisabled ? 'disabled' : ''}>下一页</button>
+            `;
+            pager.querySelectorAll('button[data-page]').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const p = parseInt(e.currentTarget.getAttribute('data-page'), 10);
+                    if (!isNaN(p)) loadCompletedFeedbacks(p);
+                });
+            });
+        }
+    }
+
+    // 移除旧版本中对 loadRecentFeedbacks / 手动点评表单的绑定，按新骨架处理
+}
+
+// 在脚本解析时立即打点，确认 teaching.js 被正确加载
+console.log('[teaching.js] loaded');
+
+// 如果 DOM 还在加载，监听 DOMContentLoaded；否则立即初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTeachingModule);
+} else {
+    initTeachingModule();
 }

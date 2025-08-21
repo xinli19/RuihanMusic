@@ -65,7 +65,152 @@
 .panel-content {
     padding: 20px;
 }
+/* Tabs + 表格 + 模态框样式补充 */
+.teaching-container {
+    padding: 20px;
+}
 
+.module-tabs .tab-header {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.tab-button {
+    padding: 8px 14px;
+    border: 1px solid #c8e6c9;
+    background: #fff;
+    border-radius: 6px;
+    cursor: pointer;
+    color: #2d5a27;
+    transition: all 0.2s ease;
+}
+
+.tab-button:hover {
+    background: #f1f8e9;
+}
+
+.tab-button.active {
+    background: #4caf50;
+    color: #fff;
+    border-color: #4caf50;
+}
+
+.tab-content .tab-pane {
+    display: none;
+}
+
+.tab-content .tab-pane.active {
+    display: block;
+}
+
+.action-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.action-bar .spacer {
+    flex: 1;
+}
+
+/* 表格样式 */
+.task-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+}
+
+.task-table thead th {
+    background: #f1f8e9;
+    color: #2d5a27;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 1px solid #e0e0e0;
+    font-weight: 600;
+}
+
+.task-table tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #f1f8e9;
+    vertical-align: top;
+}
+
+.task-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.task-table .form-input {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid #c8e6c9;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.task-table .form-textarea {
+    min-height: 70px;
+    resize: vertical;
+}
+
+.table-footer-hint {
+    margin-top: 10px;
+    font-size: 12px;
+    color: #666;
+}
+
+.subtext {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+tr.submitted {
+    background: #f9fff9;
+    opacity: 0.8;
+}
+
+/* 模态框 */
+.modal {
+    display: none; /* JS 控制显示 */
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 2000;
+}
+
+.modal .modal-content {
+    width: min(640px, 92vw);
+    margin: 10vh auto;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    padding: 16px 20px;
+}
+
+.modal .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.modal .close {
+    cursor: pointer;
+    font-size: 20px;
+    color: #666;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #2d5a27;
+}
 .task-list {
     max-height: 400px;
     overflow-y: auto;
@@ -195,4 +340,76 @@
     text-align: center;
     padding: 20px;
     color: #666;
+}
+/* 加强优先级，防止被其它样式覆盖 */
+.module-tabs .tab-content .tab-pane { 
+    display: none !important; 
+}
+.module-tabs .tab-content .tab-pane.active { 
+    display: block !important; 
+}
+
+/* 手动点评模块样式 */
+.search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.search-bar .form-input {
+    flex: 1;
+    min-width: 300px;
+}
+
+.student-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.student-row:hover {
+    background-color: #f5f5f5;
+}
+
+.student-row.selected {
+    background-color: #e8f5e9;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.status-badge.status-difficult {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-badge.status-active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+#manual-selected-student {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+#manual-selected-student.selected {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+.form-row {
+    margin-bottom: 16px;
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: vertical;
 }

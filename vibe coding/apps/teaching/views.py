@@ -7,6 +7,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 import json
+import time
 
 from apps.accounts.models import User
 from apps.students.models import Student
@@ -37,17 +38,17 @@ def teacher_dashboard(request):
         ).values_list('value', flat=True)  # 修复：config_value -> value
     }
     
-    # 获取今日任务统计
+    # 获取今日任务统计（按 assigned_at 口径，状态包含待处理与进行中）
     today_tasks = TeachingTask.objects.filter(
-        teacher=request.user,  # 修复：assigned_teacher -> teacher
-        status='pending',      # 修复：task_status -> status
-        created_at__date=timezone.now().date()
+        teacher=request.user,
+        status__in=['pending', 'in_progress'],
+        assigned_at__date=timezone.now().date()
     ).count()
     
-    # 获取已完成点评统计
+    # 获取已完成点评统计（按 reply_time 日期）
     completed_feedbacks = Feedback.objects.filter(
         teacher=request.user,
-        created_at__date=timezone.now().date()
+        reply_time__date=timezone.now().date()
     ).count()
     
     context = {
@@ -56,7 +57,7 @@ def teacher_dashboard(request):
         'completed_feedbacks': completed_feedbacks,
     }
     
-    return render(request, 'teaching/dashboard.html', context)
+    return render(request, 'teaching/feedback.html', context)
 
 
 @login_required
@@ -70,7 +71,7 @@ def get_today_tasks(request):
     tasks = TeachingTask.objects.filter(
         teacher=request.user,  # 修复：assigned_teacher -> teacher
         status__in=['pending', 'in_progress']  # 修复：task_status -> status
-    ).select_related('student').order_by('-created_at')
+    ).select_related('student').order_by('-assigned_at')
     
     task_list = []
     for task in tasks:
@@ -81,9 +82,9 @@ def get_today_tasks(request):
             'student_name': student.student_name,  # 修复：nickname or name -> student_name
             'student_groups': student.groups,
             'current_progress': student.current_progress,
-            'is_difficult': student.status == 'difficult',
+            'is_difficult': student.is_difficult,  # 修复：原先是 status == 'difficult'
             'research_note': student.research_note,
-            'operation_note': student.operation_note,
+            'operation_note': getattr(student, 'ops_note', ''),  # 修复：原先是 operation_note
         })
     
     return JsonResponse({
@@ -123,36 +124,34 @@ def submit_feedback(request):
             except Student.DoesNotExist:
                 continue
             
-            # 处理学习进度（支持"5"或"5,7"格式）
+            # 处理学习进度（支持 "5" 或 "5,7"）
             try:
                 if ',' in lesson_progress:
-                    progress_list = [int(x.strip()) for x in lesson_progress.split(',')]
+                    progress_list = [x.strip() for x in lesson_progress.split(',') if x.strip()]
                 else:
-                    progress_list = [int(lesson_progress.strip())]
-            except ValueError:
+                    progress_list = [lesson_progress.strip()]
+            except Exception:
                 continue
             
-            # 创建点评记录
+            # 创建点评记录（使用 Feedback 模型字段）
             feedback = Feedback.objects.create(
-                feedback_time=timezone.now(),
-                student_id=student_id,
+                user_id=student.student_id,
                 student=student,
-                student_nickname=student.student_name,  # 修复：nickname or name -> student_name
-                learning_progress=progress_list,
+                student_name=student.student_name,
                 teacher_name=request.user.real_name or request.user.username,
                 teacher=request.user,
                 teacher_comment=teacher_comment
             )
-            
-            created_feedbacks.append(feedback)
+            feedback.progress = progress_list
+            feedback.save()
             
             # 更新相关教学任务状态
             TeachingTask.objects.filter(
                 student=student,
-                teacher=request.user,  # 修复：assigned_teacher -> teacher
-                status__in=['pending', 'in_progress']  # 修复：task_status -> status
+                teacher=request.user,
+                status__in=['pending', 'in_progress']
             ).update(
-                status='completed',  # 修复：task_status -> status
+                status='completed',
                 completed_at=timezone.now()
             )
         
@@ -196,23 +195,23 @@ def manual_feedback(request):
         # 处理学习进度
         try:
             if ',' in lesson_progress:
-                progress_list = [int(x.strip()) for x in lesson_progress.split(',')]
+                progress_list = [x.strip() for x in lesson_progress.split(',') if x.strip()]
             else:
-                progress_list = [int(lesson_progress.strip())]
-        except ValueError:
+                progress_list = [lesson_progress.strip()]
+        except Exception:
             return JsonResponse({'error': '课程进度格式错误'}, status=400)
         
-        # 创建点评记录
+        # 创建点评记录（使用 Feedback 模型字段）
         feedback = Feedback.objects.create(
-            feedback_time=timezone.now(),
-            student_id=student.student_id,
+            user_id=student.student_id,
             student=student,
-            student_nickname=student.student_name,  # 修复：nickname or name -> student_name
-            learning_progress=progress_list,
+            student_name=student.student_name,
             teacher_name=request.user.real_name or request.user.username,
             teacher=request.user,
             teacher_comment=teacher_comment
         )
+        feedback.progress = progress_list
+        feedback.save()
         
         return JsonResponse({
             'success': True,
@@ -236,24 +235,23 @@ def get_completed_feedbacks(request):
     # 获取当前教师的点评记录
     feedbacks = Feedback.objects.filter(
         teacher=request.user
-    ).order_by('-created_at')
+    ).order_by('-reply_time')
     
-    # 分页
     page = request.GET.get('page', 1)
     paginator = Paginator(feedbacks, 20)
     page_obj = paginator.get_page(page)
     
     feedback_list = []
     for feedback in page_obj:
-        # 格式化学习进度
-        progress_str = ','.join(map(str, feedback.learning_progress))
-        
         feedback_list.append({
             'id': feedback.id,
-            'student_name': feedback.student_nickname,
-            'lesson_progress': f'第{progress_str}课',
+            'reply_time': feedback.reply_time.strftime('%Y-%m-%d %H:%M'),
+            'student_name': feedback.student_name,
+            'progress': feedback.progress,  # 原始列表
+            'teacher_name': feedback.teacher_name,
             'teacher_comment': feedback.teacher_comment,
-            'feedback_time': feedback.feedback_time.strftime('%Y-%m-%d %H:%M'),
+            'push_research': feedback.push_research,
+            'push_ops': feedback.push_ops,
         })
     
     return JsonResponse({
@@ -322,13 +320,11 @@ def push_to_research(request):
         # 更新点评记录的教研备注
         updated_count = Feedback.objects.filter(
             teacher=request.user,
-            student_id__in=student_ids,
-            push_research_note__isnull=True
+            student__student_id__in=student_ids,  # 修复：通过外键字段匹配业务学号
+            push_research=''
         ).update(
-            push_research_note=research_note,
-            updated_at=timezone.now()
+            push_research=research_note
         )
-        
         return JsonResponse({
             'success': True,
             'message': f'成功推送{updated_count}条记录到教研部门'
@@ -359,21 +355,21 @@ def push_to_operation(request):
         # 更新点评记录的运营备注
         updated_count = Feedback.objects.filter(
             teacher=request.user,
-            student_id__in=student_ids,
-            push_operation_note__isnull=True
+            student__student_id__in=student_ids,  # 修复：通过外键字段匹配业务学号
+            push_ops=''
         ).update(
-            push_operation_note=operation_note,
-            updated_at=timezone.now()
+            push_ops=operation_note
         )
         
-        # 创建运营任务
-        for student_id in student_ids:
+        # 创建运营任务（避免冲突，生成简单唯一ID）
+        for sid in student_ids:
             try:
-                student = Student.objects.get(student_id=student_id)
+                student = Student.objects.get(student_id=sid)
                 OpsTask.objects.create(
+                    task_id=f"OPS-{sid}-{int(time.time()*1000)}",
                     student=student,
-                    student_nickname=student.student_name,  # 修复：nickname or name -> student_name
-                    push_source='teaching',
+                    student_name=student.student_name,
+                    source='teacher',
                     task_status='pending'
                 )
             except Student.DoesNotExist:
@@ -407,14 +403,13 @@ def batch_delete_tasks(request):
         
         # 删除教学任务（只能删除自己的任务）
         deleted_count = TeachingTask.objects.filter(
-            teacher=request.user,  # 修复：assigned_teacher -> teacher
-            student_id__in=student_ids,
-            status__in=['pending', 'in_progress']  # 修复：task_status -> status
+            teacher=request.user,
+            student__student_id__in=student_ids,
+            status__in=['pending', 'in_progress']
         ).update(
-            status='cancelled',  # 修复：task_status -> status
+            status='cancelled',
             updated_at=timezone.now()
         )
-        
         return JsonResponse({
             'success': True,
             'message': f'成功删除{deleted_count}个任务'
@@ -439,16 +434,16 @@ def get_student_detail(request, student_id):
         # 获取该学员的最近点评记录
         recent_feedbacks = Feedback.objects.filter(
             student=student
-        ).order_by('-created_at')[:5]
+        ).order_by('-reply_time')[:5]
         
         feedback_list = []
         for feedback in recent_feedbacks:
-            progress_str = ','.join(map(str, feedback.learning_progress))
+            progress_str = ','.join(map(str, feedback.progress))
             feedback_list.append({
                 'teacher_name': feedback.teacher_name,
-                'lesson_progress': f'第{progress_str}课',
+                'lesson_progress': progress_str,
                 'teacher_comment': feedback.teacher_comment,
-                'feedback_time': feedback.feedback_time.strftime('%Y-%m-%d %H:%M'),
+                'feedback_time': feedback.reply_time.strftime('%Y-%m-%d %H:%M'),
             })
         
         return JsonResponse({
