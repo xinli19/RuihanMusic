@@ -27,7 +27,7 @@
         <!-- 教师统计信息 -->
         <div class="teacher-stats">
             <h3>教师任务统计</h3>
-            <div class="stats-grid" id="stats-grid">
+            <div class="stats-grid" id="statsGrid">
                 <!-- 统计信息将通过JavaScript动态更新 -->
             </div>
         </div>
@@ -37,7 +37,7 @@
             <h3>1. 选择分配老师</h3>
             <div class="teacher-buttons">
                 {% for teacher in teachers %}
-                <button class="teacher-btn" data-teacher="{{ teacher.real_name|default:teacher.username }}" data-teacher-id="{{ teacher.id }}">{{ teacher.real_name|default:teacher.username }}</button>
+                <button class="teacher-btn" data-teacher="{{ teacher.id }}" data-teacher-name="{{ teacher.real_name|default:teacher.username }}">{{ teacher.real_name|default:teacher.username }}</button>
                 {% endfor %}
             </div>
         </div>
@@ -46,23 +46,28 @@
         <div class="student-assignment">
             <div class="assignment-header">
                 <h3>2. 添加学员并分配任务</h3>
-                <span id="selected-teacher-display" style="color: #3498db; font-weight: 500;">请先选择老师</span>
+                <span id="selectedTeacherDisplay" style="color: #3498db; font-weight: 500;">请先选择老师</span>
             </div>
             
             <div class="student-input-section">
-                <input type="text" class="student-input" id="student-search" placeholder="输入学员姓名进行搜索..." autocomplete="off">
-                <div class="student-suggestions" id="student-suggestions"></div>
+                <input type="text" class="student-input" id="studentInput" placeholder="输入学员姓名进行搜索..." autocomplete="off">
+                <div class="student-suggestions" id="studentSuggestions"></div>
             </div>
             
-            <div class="selected-students" id="selected-students">
+            <div class="selected-students" id="selectedStudents">
                 <div style="padding: 20px; text-align: center; color: #999;">暂无选择的学员</div>
+            </div>
+            
+            <div class="task-note-section">
+                <label for="taskRemarks">任务备注：</label>
+                <textarea id="taskRemarks" class="task-remarks" placeholder="请输入任务备注信息..."></textarea>
             </div>
         </div>
         
         <!-- 操作按钮 -->
         <div class="action-buttons">
-            <button class="btn btn-primary" onclick="confirmAssignment()">确认分配</button>
-            <button class="btn btn-warning" onclick="finishAssignment()">分配结束</button>
+            <button class="btn btn-primary" onclick="saveAssignment()">保存分配</button>
+            <button class="btn btn-warning" onclick="clearAssignment()">清空分配</button>
             <button class="btn btn-secondary" onclick="exportResults()">导出结果</button>
         </div>
     </div>
@@ -71,7 +76,7 @@
     <div id="history-tab" class="tab-content">
         <div class="history-selection">
             <h3>选择历史分配记录</h3>
-            <div class="history-list" id="history-list">
+            <div class="history-list" id="historyList">
                 <div style="padding: 20px; text-align: center; color: #999;">正在加载历史记录...</div>
             </div>
             <div class="history-actions">
@@ -91,21 +96,64 @@
             </div>
         </div>
         
-        <div class="records-list" id="records-list">
+        <div class="records-list" id="recordsList">
             <div class="no-records">暂无分配记录</div>
         </div>
     </div>
 </div>
 
 <!-- 学员详情模态框 -->
-<div id="student-detail-modal" class="modal">
+<div id="studentDetailModal" class="modal">
     <div class="modal-content">
         <div class="modal-header">
             <h3>学员详情</h3>
-            <span class="close" onclick="closeModal('student-detail-modal')">&times;</span>
+            <span class="close" onclick="closeModal('studentDetailModal')">&times;</span>
         </div>
-        <div class="student-detail" id="student-detail-content">
+        <div class="student-detail" id="studentDetailContent">
             <!-- 学员详情内容将在这里动态加载 -->
+            <div class="detail-section">
+                <h4>基本信息</h4>
+                <div class="detail-item">
+                    <label>学员姓名：</label>
+                    <span id="detailStudentName"></span>
+                </div>
+                <div class="detail-item">
+                    <label>学员ID：</label>
+                    <span id="detailStudentId"></span>
+                </div>
+                <div class="detail-item">
+                    <label>学员状态：</label>
+                    <span id="detailStudentStatus"></span>
+                </div>
+                <div class="detail-item">
+                    <label>学习状态：</label>
+                    <span id="detailLearningStatus"></span>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h4>学习进度</h4>
+                <div class="detail-item">
+                    <label>累计学习时长：</label>
+                    <span id="detailStudyTime"></span>
+                </div>
+                <div class="detail-item">
+                    <label>课程进度：</label>
+                    <span id="detailCourseProgress"></span>
+                </div>
+            </div>
+            
+            <div class="detail-section">
+                <h4>备注信息</h4>
+                <div class="detail-item">
+                    <label>教研备注：</label>
+                    <div id="detailResearchNote"></div>
+                </div>
+                <div class="detail-item">
+                    <label>运营备注：</label>
+                    <div id="detailOperationNote"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -120,10 +168,12 @@ window.djangoData = {
         searchStudents: '{% url "research:search_students" %}',
         createTask: '{% url "research:create_task_assignment" %}',
         taskHistory: '{% url "research:task_history" %}',
+        taskHistoryApi: '{% url "research:get_task_history_api" %}',
         exportResults: '{% url "research:export_assignment_results" %}',
         getTaskDetail: '{% url "research:get_task_detail" task_id=0 %}',
         useHistory: '{% url "research:use_history_assignment" task_id=0 %}',
-        getTeacherStats: '{% url "research:get_teacher_stats" %}'
+        getTeacherStats: '{% url "research:get_teacher_stats" %}',
+        studentDetail: '{% url "research:student_detail" student_id=0 %}'
     }
 };
 </script>

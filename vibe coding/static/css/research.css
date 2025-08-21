@@ -1,4 +1,4 @@
-/* 教研模块专用样式 */
+/* 教研模块专用样式 - 现代绿色调主题 */
 
 /* 功能选择区域 */
 .function-tabs {
@@ -11,7 +11,7 @@
 
 .function-tabs h3 {
     margin-bottom: 15px;
-    color: #2c3e50;
+    color: #2d5a27;
     font-size: 18px;
 }
 
@@ -23,9 +23,9 @@
 
 .tab-btn {
     padding: 12px 24px;
-    border: 2px solid #3498db;
+    border: 2px solid #4caf50;
     background: white;
-    color: #3498db;
+    color: #4caf50;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
@@ -34,12 +34,12 @@
 }
 
 .tab-btn:hover {
-    background: #3498db;
+    background: #4caf50;
     color: white;
 }
 
 .tab-btn.active {
-    background: #3498db;
+    background: #4caf50;
     color: white;
 }
 
@@ -62,7 +62,7 @@
 
 .teacher-stats h3 {
     margin-bottom: 10px;
-    color: #2c3e50;
+    color: #2d5a27;
     font-size: 16px;
 }
 
@@ -73,17 +73,17 @@
 }
 
 .stat-card {
-    background: #f8f9fa;
+    background: #f1f8e9;
     padding: 8px 12px;
     border-radius: 6px;
-    border-left: 4px solid #3498db;
+    border-left: 4px solid #4caf50;
     min-width: 80px;
     text-align: center;
 }
 
 .stat-teacher {
     font-weight: 500;
-    color: #2c3e50;
+    color: #2d5a27;
     margin-bottom: 2px;
     font-size: 14px;
 }
@@ -91,7 +91,7 @@
 .stat-count {
     font-size: 18px;
     font-weight: 600;
-    color: #3498db;
+    color: #4caf50;
 }
 
 .teacher-selection {
@@ -104,7 +104,7 @@
 
 .teacher-selection h3 {
     margin-bottom: 15px;
-    color: #2c3e50;
+    color: #2d5a27;
     font-size: 18px;
 }
 
@@ -116,9 +116,9 @@
 
 .teacher-btn {
     padding: 12px 20px;
-    border: 2px solid #3498db;
+    border: 2px solid #4caf50;
     background: white;
-    color: #3498db;
+    color: #4caf50;
     border-radius: 6px;
     cursor: pointer;
     font-size: 14px;
@@ -127,12 +127,12 @@
 }
 
 .teacher-btn:hover {
-    background: #3498db;
+    background: #4caf50;
     color: white;
 }
 
 .teacher-btn.active {
-    background: #3498db;
+    background: #4caf50;
     color: white;
 }
 
@@ -153,7 +153,7 @@
 }
 
 .assignment-header h3 {
-    color: #2c3e50;
+    color: #2d5a27;
     font-size: 18px;
 }
 
@@ -164,16 +164,22 @@
 .student-input {
     width: 100%;
     padding: 12px 15px;
-    border: 1px solid #ddd;
+    border: 1px solid #c8e6c9;
     border-radius: 6px;
     font-size: 14px;
     margin-bottom: 10px;
+    transition: border-color 0.3s;
+}
+
+.student-input:focus {
+    outline: none;
+    border-color: #4caf50;
 }
 
 .student-suggestions {
     max-height: 200px;
     overflow-y: auto;
-    border: 1px solid #ddd;
+    border: 1px solid #c8e6c9;
     border-radius: 6px;
     background: white;
     display: none;
@@ -182,11 +188,11 @@
 .suggestion-item {
     padding: 10px 15px;
     cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f1f8e9;
 }
 
 .suggestion-item:hover {
-    background: #f8f9fa;
+    background: #f1f8e9;
 }
 
 .suggestion-item:last-child {
@@ -195,7 +201,7 @@
 
 /* 已选学员列表 */
 .selected-students {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #c8e6c9;
     border-radius: 6px;
     max-height: 400px;
     overflow-y: auto;
@@ -205,7 +211,7 @@
     display: flex;
     align-items: center;
     padding: 15px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f1f8e9;
     gap: 15px;
 }
 
@@ -216,35 +222,41 @@
 .student-name {
     min-width: 120px;
     font-weight: 500;
-    color: #2c3e50;
+    color: #2d5a27;
     cursor: pointer;
     text-decoration: underline;
 }
 
 .student-name:hover {
-    color: #3498db;
+    color: #4caf50;
 }
 
 .task-remark {
     flex: 1;
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #c8e6c9;
     border-radius: 4px;
     font-size: 14px;
 }
 
+.task-remark:focus {
+    outline: none;
+    border-color: #4caf50;
+}
+
 .remove-btn {
-    background: #e74c3c;
+    background: #f44336;
     color: white;
     border: none;
     padding: 6px 10px;
     border-radius: 4px;
     cursor: pointer;
     font-size: 12px;
+    transition: background 0.3s;
 }
 
 .remove-btn:hover {
-    background: #c0392b;
+    background: #d32f2f;
 }
 
 /* 历史记录选择区域 */
@@ -258,31 +270,31 @@
 
 .history-selection h3 {
     margin-bottom: 15px;
-    color: #2c3e50;
+    color: #2d5a27;
     font-size: 18px;
 }
 
 .history-list {
     max-height: 400px;
     overflow-y: auto;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #c8e6c9;
     border-radius: 6px;
 }
 
 .history-item {
     padding: 15px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f1f8e9;
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .history-item:hover {
-    background: #f8f9fa;
+    background: #f1f8e9;
 }
 
 .history-item.selected {
-    background: #e3f2fd;
-    border-left: 4px solid #3498db;
+    background: #e8f5e8;
+    border-left: 4px solid #4caf50;
 }
 
 .history-item:last-child {
@@ -291,7 +303,7 @@
 
 .history-teacher {
     font-weight: 600;
-    color: #3498db;
+    color: #4caf50;
     margin-bottom: 8px;
     font-size: 16px;
 }
@@ -310,7 +322,7 @@
 
 .history-student-tag {
     display: inline-block;
-    background: #3498db;
+    background: #4caf50;
     color: white;
     padding: 2px 6px;
     border-radius: 10px;
@@ -326,7 +338,7 @@
 }
 
 .btn-edit {
-    background: #f39c12;
+    background: #ff9800;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -337,11 +349,11 @@
 }
 
 .btn-edit:hover {
-    background: #e67e22;
+    background: #f57c00;
 }
 
 .btn-use {
-    background: #27ae60;
+    background: #4caf50;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -352,7 +364,7 @@
 }
 
 .btn-use:hover {
-    background: #229954;
+    background: #388e3c;
 }
 
 /* 操作按钮区域 */
@@ -376,7 +388,7 @@
 }
 
 .assignment-records h3 {
-    color: #2c3e50;
+    color: #2d5a27;
     margin-bottom: 15px;
     font-size: 18px;
 }
@@ -395,7 +407,7 @@
 }
 
 .btn-clear {
-    background: #e74c3c;
+    background: #f44336;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -406,7 +418,7 @@
 }
 
 .btn-clear:hover {
-    background: #c0392b;
+    background: #d32f2f;
 }
 
 .records-list {
@@ -422,8 +434,8 @@
 }
 
 .record-item {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
+    background: #f1f8e9;
+    border: 1px solid #c8e6c9;
     border-radius: 6px;
     padding: 15px;
     margin-bottom: 15px;
@@ -431,7 +443,7 @@
 }
 
 .record-item:hover {
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.2);
 }
 
 .record-header {
@@ -443,7 +455,7 @@
 
 .record-teacher {
     font-weight: 600;
-    color: #3498db;
+    color: #4caf50;
     font-size: 16px;
 }
 
@@ -458,14 +470,14 @@
 
 .record-students-label {
     font-weight: 500;
-    color: #2c3e50;
+    color: #2d5a27;
     margin-bottom: 5px;
     font-size: 14px;
 }
 
 .student-item-record {
     display: inline-block;
-    background: #3498db;
+    background: #4caf50;
     color: white;
     padding: 4px 8px;
     border-radius: 12px;
@@ -484,17 +496,17 @@
 
 .delete-btn:hover {
     opacity: 1;
-    color: #e74c3c;
+    color: #f44336;
 }
 
 .record-remarks {
-    border-top: 1px solid #e9ecef;
+    border-top: 1px solid #c8e6c9;
     padding-top: 10px;
 }
 
 .record-remarks-label {
     font-weight: 500;
-    color: #2c3e50;
+    color: #2d5a27;
     margin-bottom: 5px;
     font-size: 14px;
 }
@@ -528,7 +540,7 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 1px solid #e0e0e0;
+    border-bottom: 1px solid #c8e6c9;
 }
 
 .close {
@@ -552,7 +564,7 @@
 
 .detail-label {
     font-weight: 500;
-    color: #555;
+    color: #2d5a27;
     display: inline-block;
     width: 100px;
 }
@@ -567,15 +579,15 @@
 }
 
 .status-pending {
-    background: #f39c12;
+    background: #ff9800;
 }
 
 .status-assigned {
-    background: #27ae60;
+    background: #4caf50;
 }
 
 .status-completed {
-    background: #3498db;
+    background: #2196f3;
 }
 
 /* 响应式设计 */

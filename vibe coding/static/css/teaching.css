@@ -1,4 +1,4 @@
-/* 睿涵音乐后台管理系统 - 教学模块样式 */
+/* 睿涵音乐后台管理系统 - 教学模块样式 - 现代绿色调主题 */
 
 .dashboard-container {
     padding: 20px;
@@ -17,18 +17,20 @@
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     text-align: center;
+    border-left: 4px solid #4caf50;
 }
 
 .stat-number {
     font-size: 2em;
     font-weight: bold;
-    color: #667eea;
+    color: #4caf50;
     margin-bottom: 5px;
 }
 
 .stat-label {
-    color: #666;
+    color: #2d5a27;
     font-size: 14px;
+    font-weight: 500;
 }
 
 .main-content-area {
@@ -53,9 +55,11 @@
 
 .panel-header {
     padding: 15px 20px;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid #c8e6c9;
     font-weight: bold;
-    color: #333;
+    color: #2d5a27;
+    background: #f1f8e9;
+    border-radius: 8px 8px 0 0;
 }
 
 .panel-content {
@@ -69,10 +73,15 @@
 
 .task-item {
     padding: 15px;
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid #f1f8e9;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: background 0.3s;
+}
+
+.task-item:hover {
+    background: #f1f8e9;
 }
 
 .task-item:last-child {
@@ -85,7 +94,7 @@
 
 .student-name {
     font-weight: bold;
-    color: #333;
+    color: #2d5a27;
     margin-bottom: 5px;
 }
 
@@ -107,25 +116,34 @@
     font-size: 12px;
     text-decoration: none;
     display: inline-block;
+    transition: all 0.3s;
 }
 
 .btn-primary {
-    background: #667eea;
+    background: #4caf50;
     color: white;
+}
+
+.btn-primary:hover {
+    background: #388e3c;
 }
 
 .btn-success {
-    background: #28a745;
+    background: #66bb6a;
     color: white;
 }
 
-.btn-warning {
-    background: #ffc107;
-    color: #212529;
+.btn-success:hover {
+    background: #4caf50;
 }
 
-.btn:hover {
-    opacity: 0.8;
+.btn-warning {
+    background: #ff9800;
+    color: white;
+}
+
+.btn-warning:hover {
+    background: #f57c00;
 }
 
 .feedback-form {
@@ -140,27 +158,29 @@
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
-    color: #333;
+    color: #2d5a27;
 }
 
 .form-control {
     width: 100%;
     padding: 8px 12px;
-    border: 1px solid #ddd;
+    border: 1px solid #c8e6c9;
     border-radius: 4px;
     font-size: 14px;
     box-sizing: border-box;
+    transition: border-color 0.3s;
 }
 
 .form-control:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #4caf50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
 .announcement-item {
     padding: 10px;
-    background: #f8f9fa;
-    border-left: 4px solid #667eea;
+    background: #f1f8e9;
+    border-left: 4px solid #4caf50;
     margin-bottom: 10px;
     border-radius: 0 4px 4px 0;
 }

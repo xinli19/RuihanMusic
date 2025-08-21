@@ -4,6 +4,7 @@
 let selectedTeacher = null;
 let selectedStudents = [];
 let assignmentHistory = [];
+let selectedHistoryId = null;
 
 // DOM加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
@@ -160,7 +161,7 @@ function saveAssignment() {
     const formData = {
         teacher_id: selectedTeacher,
         student_ids: selectedStudents.map(s => s.id),
-        remarks: document.getElementById('taskRemarks').value || ''
+        task_note: document.getElementById('taskRemarks').value || ''
     };
     
     fetch('/research/tasks/create/', {
@@ -175,8 +176,8 @@ function saveAssignment() {
     .then(data => {
         if (data.success) {
             alert('分配方案已保存');
-            loadAssignmentHistory(); // 重新加载历史记录
-            clearAssignment(); // 清空当前分配
+            loadAssignmentHistory();
+            clearAssignment();
         } else {
             alert('保存失败: ' + data.message);
         }
@@ -212,16 +213,16 @@ function updateTeacherStats() {
 }
 
 // 显示学员建议列表
-// 修复 displayStudentSuggestions 函数（第228行）
+// 修复displayStudentSuggestions函数 - 使用正确的字段名
 function displayStudentSuggestions(students) {
-    const suggestions = document.getElementById('student-suggestions');
+    const suggestions = document.getElementById('studentSuggestions');
     suggestions.innerHTML = '';
     
     students.forEach(student => {
         const item = document.createElement('div');
         item.className = 'suggestion-item';
         item.innerHTML = `
-            <strong>${student.name || student.student_name}</strong> - ${student.status} - ${student.learning_status}
+            <strong>${student.student_name}</strong> - ${student.status} - ${student.learning_status}
         `;
         item.addEventListener('click', () => addStudent(student));
         suggestions.appendChild(item);
@@ -230,7 +231,7 @@ function displayStudentSuggestions(students) {
     suggestions.style.display = 'block';
 }
 
-// 同时需要修复其他可能使用这些字段的地方
+// 修复addStudent函数 - 使用正确的字段名
 function addStudent(student) {
     // 检查是否已经添加过该学员
     if (selectedStudents.find(s => s.id === student.id)) {
@@ -241,7 +242,7 @@ function addStudent(student) {
     // 添加学员到选择列表（使用正确的字段名）
     selectedStudents.push({
         id: student.id,
-        name: student.student_name || student.name,
+        name: student.student_name,
         student_id: student.student_id,
         status: student.status,
         learning_status: student.learning_status,
@@ -249,13 +250,13 @@ function addStudent(student) {
     });
     
     updateSelectedStudentsList();
-    document.getElementById('student-input').value = '';
-    document.getElementById('student-suggestions').style.display = 'none';
+    document.getElementById('studentInput').value = '';
+    document.getElementById('studentSuggestions').style.display = 'none';
 }
 
-// 更新已选学员列表显示
+// 修复updateSelectedStudentsList函数 - 使用正确的容器ID
 function updateSelectedStudentsList() {
-    const container = document.getElementById('selected-students'); // 修复：使用正确的ID
+    const container = document.getElementById('selectedStudents');
     
     if (!container) {
         console.error('Selected students container not found');
@@ -282,36 +283,9 @@ function updateSelectedStudentsList() {
     });
 }
 
-// 移除学员
-function removeStudent(index) {
-    selectedStudents.splice(index, 1);
-    updateSelectedStudentsList();
-}
-
-// 更新学员备注
-function updateStudentRemark(index, remark) {
-    selectedStudents[index].remark = remark;
-}
-
-// 显示学员详情
-function showStudentDetail(studentId) {
-    // 这里应该调用后端API获取学员详情
-    // 暂时显示模拟数据
-    const modal = document.getElementById('studentDetailModal');
-    if (modal) {
-        modal.style.display = 'block';
-    }
-}
-
-// 初始化历史记录选择
-function initializeHistorySelection() {
-    // 历史记录相关功能
-}
-
-// 显示分配历史
-// 修复 displayAssignmentHistory 函数中的容器ID
+// 修复displayAssignmentHistory函数 - 使用正确的字段名
 function displayAssignmentHistory() {
-    const historyList = document.getElementById('history-list');
+    const historyList = document.getElementById('historyList');
     if (!historyList) {
         console.error('History list container not found');
         return;
@@ -326,6 +300,11 @@ function displayAssignmentHistory() {
     assignmentHistory.forEach(record => {
         const item = document.createElement('div');
         item.className = 'history-item';
+        item.dataset.recordId = record.id;
+        // 如果当前记录是选中记录，恢复高亮
+        if (String(selectedHistoryId) === String(record.id)) {
+            item.classList.add('selected');
+        }
         item.innerHTML = `
             <div class="history-teacher">${record.teacher_name}</div>
             <div class="history-date">${record.created_at}</div>
@@ -347,64 +326,95 @@ function displayAssignmentHistory() {
     });
 }
 
-// 添加状态文本转换函数
+// 状态文本工具函数（兼容数字/字符串）
 function getStatusText(status) {
-    const statusMap = {
-        'pending': '待处理',
-        'in_progress': '进行中',
-        'completed': '已完成',
-        'cancelled': '已取消'
-    };
-    return statusMap[status] || status;
+    const s = String(status).toLowerCase();
+    switch (s) {
+        case 'pending':
+        case '0':
+            return '待分配';
+        case 'assigned':
+        case '1':
+            return '已分配';
+        case 'completed':
+        case '2':
+            return '已完成';
+        default:
+            return '未知';
+    }
 }
 
-// 选择历史记录
-function selectHistoryRecord(recordId) {
-    const items = document.querySelectorAll('.history-item');
-    items.forEach(item => item.classList.remove('selected'));
+// 修复saveAssignment函数 - 使用正确的字段名
+function saveAssignment() {
+    if (!selectedTeacher || selectedStudents.length === 0) {
+        alert('请完善分配信息');
+        return;
+    }
     
-    event.currentTarget.classList.add('selected');
+    const formData = {
+        teacher_id: selectedTeacher,
+        student_ids: selectedStudents.map(s => s.id),
+        task_note: document.getElementById('taskRemarks').value || ''
+    };
+    
+    fetch('/research/tasks/create/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('分配方案已保存');
+            loadAssignmentHistory();
+            clearAssignment();
+        } else {
+            alert('保存失败: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('保存错误:', error);
+        alert('保存时发生错误');
+    });
 }
 
-// 使用历史记录
-// 删除第361-394行的重复函数定义
-// 只保留第119-151行的正确版本
-
-// 删除这个重复的函数：
-// function useHistoryRecord(recordId) {
-//     const record = assignmentHistory.find(r => r.id === recordId);
-//     if (!record) {
-//         alert('未找到历史记录');
-//         return;
-//     }
-//     
-//     // 根据历史记录设置当前分配
-//     // 找到对应的教师按钮并选中
-//     const teacherButtons = document.querySelectorAll('.teacher-btn');
-//     teacherButtons.forEach(btn => {
-//         if (btn.textContent.includes(record.teacher_name)) {
-//             btn.click(); // 触发教师选择
-//         }
-//     });
-//     
-//     // 添加学员到当前选择列表
-//     const student = {
-//         id: record.student_id,
-//         student_name: record.student_name,
-//         student_id: record.student_id
-//     };
-//     
-//     // 检查学员是否已经在选择列表中
-//     if (!selectedStudents.find(s => s.id === student.id)) {
-//         selectedStudents.push(student);
-//         updateSelectedStudentsList();
-//     }
-//     
-//     // 切换到分配标签页
-//     document.querySelector('[data-tab="assignment"]').click();
-//     
-//     alert('已应用历史分配记录');
-// }
+// 修复useHistoryRecord函数 - 使用正确的字段名
+function useHistoryRecord(recordId) {
+    fetch(`/research/tasks/use-history/${recordId}/`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // 切换到手动分配标签页
+                document.querySelector('[data-tab="manual"]').click();
+                
+                // 设置教师
+                selectedTeacher = data.data.teacher_id;
+                const teacherBtn = document.querySelector(`[data-teacher="${data.data.teacher_id}"]`);
+                if (teacherBtn) {
+                    document.querySelectorAll('.teacher-btn').forEach(btn => btn.classList.remove('active'));
+                    teacherBtn.classList.add('active');
+                }
+                
+                // 设置学员列表
+                selectedStudents = data.data.students;
+                updateSelectedStudentsList();
+                
+                // 设置备注
+                document.getElementById('taskRemarks').value = data.data.task_note || '';
+                
+                alert(`已应用 ${data.data.teacher_name} 的历史分配方案`);
+            } else {
+                alert('应用历史记录失败: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('应用历史记录错误:', error);
+            alert('应用历史记录时发生错误');
+        });
+}
 
 // 编辑历史记录
 function editHistoryRecord(recordId) {
@@ -450,8 +460,195 @@ function saveAssignment() {
         return;
     }
     
-    // 这里应该调用后端API保存分配方案
-    alert('分配方案已保存');
+    const formData = {
+        teacher_id: selectedTeacher,
+        student_ids: selectedStudents.map(s => s.id),
+        task_note: document.getElementById('taskRemarks').value || ''
+    };
+    
+    fetch('/research/tasks/create/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('分配方案已保存');
+            loadAssignmentHistory();
+            clearAssignment();
+        } else {
+            alert('保存失败: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('保存错误:', error);
+        alert('保存时发生错误');
+    });
+}
+
+// 预览分配结果
+function previewAssignment() {
+    if (!selectedTeacher || selectedStudents.length === 0) {
+        alert('请完善分配信息');
+        return;
+    }
+    
+    const preview = `
+        教师: ${selectedTeacher}
+        学员数量: ${selectedStudents.length}
+        学员列表: ${selectedStudents.map(s => s.name).join(', ')}
+    `;
+    
+    alert(preview);
+}
+
+// 清空当前分配
+function clearAssignment() {
+    selectedTeacher = null;
+    selectedStudents = [];
+    
+    // 清除教师选择
+    document.querySelectorAll('.teacher-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    // 清空学员列表
+    updateSelectedStudentsList();
+    
+    alert('已清空当前分配');
+}
+
+// 模态框控制
+function openAssignModal() {
+    document.getElementById('assignModal').style.display = 'block';
+}
+
+function closeAssignModal() {
+    document.getElementById('assignModal').style.display = 'none';
+}
+
+// 关闭模态框（点击外部）
+window.onclick = function(event) {
+    const modal = document.getElementById('assignModal');
+    if (event.target === modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// 表单提交处理
+function handleAssignForm(event) {
+    event.preventDefault();
+    
+    const formData = new FormData(event.target);
+    
+    // 这里应该调用后端API提交表单
+    console.log('表单数据:', Object.fromEntries(formData));
+    
+    closeAssignModal();
+    alert('任务创建成功');
+}
+
+// 初始化历史记录选择（避免未定义报错，并设置加载占位）
+function initializeHistorySelection() {
+    const historyList = document.getElementById('historyList');
+    if (historyList) {
+        historyList.innerHTML = '<div class="loading">正在加载历史记录…</div>';
+    }
+}
+
+// 选择历史记录并高亮
+function selectHistoryRecord(recordId) {
+    selectedHistoryId = recordId;
+    const items = document.querySelectorAll('.history-item');
+    items.forEach(item => {
+        if (item.dataset.recordId === String(recordId)) {
+            item.classList.add('selected');
+        } else {
+            item.classList.remove('selected');
+        }
+    });
+}
+
+// 编辑当前选中的历史记录（供HTML按钮 onclick 调用）
+function editSelectedHistory() {
+    if (!selectedHistoryId) {
+        alert('请先选择一条历史记录');
+        return;
+    }
+    editHistoryRecord(selectedHistoryId);
+}
+
+// 更新教师统计信息
+function updateTeacherStats() {
+    // 这里应该调用后端API获取教师统计信息
+    // 暂时显示模拟数据
+}
+
+// 批量分配功能
+function batchAssign() {
+    if (!selectedTeacher) {
+        alert('请先选择教师');
+        return;
+    }
+    
+    if (selectedStudents.length === 0) {
+        alert('请先选择学员');
+        return;
+    }
+    
+    // 这里应该调用后端API进行批量分配
+    const assignmentData = {
+        teacher: selectedTeacher,
+        students: selectedStudents
+    };
+    
+    console.log('批量分配数据:', assignmentData);
+    alert(`成功为 ${selectedTeacher} 分配 ${selectedStudents.length} 名学员`);
+    
+    // 清空选择
+    selectedStudents = [];
+    updateSelectedStudentsList();
+}
+
+// 保存分配方案
+function saveAssignment() {
+    if (!selectedTeacher || selectedStudents.length === 0) {
+        alert('请完善分配信息');
+        return;
+    }
+    
+    const formData = {
+        teacher_id: selectedTeacher,
+        student_ids: selectedStudents.map(s => s.id),
+        task_note: document.getElementById('taskRemarks').value || ''
+    };
+    
+    fetch('/research/tasks/create/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('分配方案已保存');
+            loadAssignmentHistory();
+            clearAssignment();
+        } else {
+            alert('保存失败: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('保存错误:', error);
+        alert('保存时发生错误');
+    });
 }
 
 // 预览分配结果

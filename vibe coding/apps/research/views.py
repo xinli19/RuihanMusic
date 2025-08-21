@@ -370,11 +370,13 @@ def get_task_detail(request, task_id):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
-# 修复 get_teacher_stats 函数（第450行）
+# get_teacher_stats函数已经在第375-402行正确修复了
+# 使用了正确的roles_json__contains查询和teacher.real_name字段
 @login_required
 def get_teacher_stats(request):
     try:
-        teachers = User.objects.filter(role='teacher')
+        # 修复：使用正确的角色查询
+        teachers = User.objects.filter(roles_json__contains='"teacher"')
         stats = []
         
         for teacher in teachers:
@@ -382,12 +384,12 @@ def get_teacher_stats(request):
             pending_tasks = TeachingTask.objects.filter(teacher=teacher, status='pending').count()
             completed_tasks = TeachingTask.objects.filter(teacher=teacher, status='completed').count()
             
-            # 修复：统计分配的学员数量（使用count()而不是students.count()）
-            total_students = TeachingTask.objects.filter(teacher=teacher).count()
+            # 修复：统计分配的学员数量
+            total_students = TeachingTask.objects.filter(teacher=teacher).values('student').distinct().count()
             
             stats.append({
                 'teacher_id': teacher.id,
-                'teacher_name': teacher.get_full_name(),
+                'teacher_name': teacher.real_name or teacher.username,
                 'total_tasks': total_tasks,
                 'pending_tasks': pending_tasks,
                 'completed_tasks': completed_tasks,
@@ -398,7 +400,7 @@ def get_teacher_stats(request):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
 
-# 修复 export_assignment_results 函数（第525行）
+# 修复export_assignment_results函数（第404-477行）
 @login_required
 def export_assignment_results(request):
     try:
@@ -408,7 +410,7 @@ def export_assignment_results(request):
         end_date = request.GET.get('end_date')
         
         # 构建查询条件
-        tasks = TeachingTask.objects.all()
+        tasks = TeachingTask.objects.select_related('student', 'teacher', 'researcher')
         
         if teacher_id:
             tasks = tasks.filter(teacher_id=teacher_id)
@@ -440,23 +442,22 @@ def export_assignment_results(request):
                 y_position = height - 50
             
             # 任务信息
-            p.drawString(50, y_position, f"Teacher: {task.teacher.get_full_name()}")
+            p.drawString(50, y_position, f"Teacher: {task.teacher.real_name or task.teacher.username}")
             y_position -= 20
             p.drawString(50, y_position, f"Date: {task.created_at.strftime('%Y-%m-%d %H:%M')}")
             y_position -= 20
-            p.drawString(50, y_position, f"Status: {task.status}")
+            p.drawString(50, y_position, f"Status: {task.get_status_display()}")
             y_position -= 20
             
-            # 学员列表
-            p.drawString(50, y_position, "Students:")
+            # 修复：显示单个学员信息（TeachingTask与Student是一对一关系）
+            p.drawString(50, y_position, "Student:")
             y_position -= 20
+            p.drawString(70, y_position, f"- {task.student.student_name} ({task.student.student_id})")
+            y_position -= 15
             
-            for student in task.students.all():
-                p.drawString(70, y_position, f"- {task.student.student_name} ({task.student.student_id})")
-                y_position -= 15
-            
-            if task.remarks:
-                p.drawString(50, y_position, f"Remarks: {task.remarks}")
+            # 修复：使用正确的字段名task_note而不是remarks
+            if task.task_note:
+                p.drawString(50, y_position, f"Note: {task.task_note}")
                 y_position -= 20
             
             y_position -= 20  # 任务间隔
