@@ -381,19 +381,25 @@ def get_ops_tasks(request):
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 20))
         
-        # 基础查询
-        tasks = OpsTask.objects.select_related('student', 'assigned_by').all()
+        # 基础查询（移除无效的 assigned_by）
+        tasks = OpsTask.objects.select_related('student').all()
         
-        # 状态筛选
+        # 状态筛选：兼容中文或枚举值
         if status_filter:
-            tasks = tasks.filter(status=status_filter)
+            status_map = {
+                '待办': 'pending',
+                '已联系': 'contacted',
+                '未回复': 'no_reply',
+                '已关闭': 'closed',
+            }
+            code = status_map.get(status_filter, status_filter)
+            tasks = tasks.filter(task_status=code)
         
-        # 搜索功能
+        # 搜索功能（检索学员昵称/备注名）
         if search_term:
             tasks = tasks.filter(
-                Q(student__student_name__icontains=search_term) |  # 修复：nickname -> student_name
-                Q(student__alias_name__icontains=search_term) |   # 修复：remark_name -> alias_name
-                Q(notes__icontains=search_term)
+                Q(student__student_name__icontains=search_term) |
+                Q(student__alias_name__icontains=search_term)
             )
         
         # 排序
@@ -406,22 +412,19 @@ def get_ops_tasks(request):
         # 构建返回数据
         tasks_data = []
         for task in page_obj:
-            # 获取回访次数
-            visit_count = task.student.visitrecord_set.count()
-            
             tasks_data.append({
                 'id': task.id,
                 'student_id': task.student.id,
-                'student_nickname': task.student.student_name,  # 修复：nickname -> student_name
+                'student_nickname': task.student.student_name,
                 'student_groups': task.student.groups,
                 'student_status': task.student.status,
                 'student_progress': task.student.learning_progress,
-                'visit_count': visit_count,
-                'source': task.source,
-                'status': task.status,
-                'notes': task.notes,
-                'assigned_by': task.assigned_by.nickname if task.assigned_by else '系统',
-                'created_at': task.created_at.strftime('%Y-%m-%d %H:%M')
+                'visit_count': task.visit_count,
+                'source': task.get_source_display() if hasattr(task, 'get_source_display') else task.source,
+                'status': task.get_task_status_display() if hasattr(task, 'get_task_status_display') else task.task_status,
+                'notes': '',
+                'assigned_by': '系统',
+                'created_at': task.created_at.strftime('%Y-%m-%d %H:%M'),
             })
         
         return JsonResponse({
@@ -435,7 +438,6 @@ def get_ops_tasks(request):
                 'has_previous': page_obj.has_previous()
             }
         })
-        
     except Exception as e:
         return JsonResponse({
             'success': False,
@@ -519,19 +521,26 @@ def get_visit_records(request):
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 20))
         
-        # 基础查询
-        records = VisitRecord.objects.select_related('student', 'operator').all()
+        # 基础查询（去掉无效的 operator）
+        records = VisitRecord.objects.select_related('student').all()
         
-        # 状态筛选
+        # 状态筛选：兼容中文或枚举值
         if status_filter:
-            records = records.filter(status=status_filter)
+            status_map = {
+                '待办': 'pending',
+                '已联系': 'contacted',
+                '未回复': 'no_reply',
+                '已关闭': 'closed',
+            }
+            code = status_map.get(status_filter, status_filter)
+            records = records.filter(visit_status=code)
         
-        # 搜索功能
+        # 搜索功能（使用存在的字段）
         if search_term:
             records = records.filter(
-                Q(student__student_name__icontains=search_term) |  # 修复：nickname -> student_name
-                Q(student__alias_name__icontains=search_term) |   # 修复：remark_name -> alias_name
-                Q(notes__icontains=search_term)
+                Q(student__student_name__icontains=search_term) |
+                Q(student__alias_name__icontains=search_term) |
+                Q(visit_note__icontains=search_term)
             )
         
         # 排序
@@ -544,20 +553,17 @@ def get_visit_records(request):
         # 构建返回数据
         records_data = []
         for record in page_obj:
-            # 计算该学员的回访次数
-            visit_count = VisitRecord.objects.filter(student=record.student).count()
-            
             records_data.append({
                 'id': record.id,
                 'student_id': record.student.id,
-                'student_nickname': record.student.student_name,  # 修复：nickname -> student_name
+                'student_nickname': record.student.student_name,
                 'visit_time': record.visit_time.strftime('%Y-%m-%d %H:%M'),
-                'status': record.status,
-                'visit_count': visit_count,
-                'teacher_name': getattr(record.student, 'current_teacher', '未分配'),
-                'notes': record.notes,
-                'operator': record.operator.nickname if record.operator else '未知',
-                'created_at': record.created_at.strftime('%Y-%m-%d %H:%M')
+                'status': getattr(record, 'get_visit_status_display', lambda: record.visit_status)(),
+                'visit_count': record.visit_count,
+                'teacher_name': record.teacher_name,
+                'operator': '—',  # 模型无 operator 字段，兜底
+                'notes': record.visit_note,
+                'created_at': record.created_at.strftime('%Y-%m-%d %H:%M'),
             })
         
         return JsonResponse({
@@ -591,10 +597,10 @@ def add_manual_task(request):
         student_id = data.get('student_id')
         student = get_object_or_404(Student, id=student_id)
         
-        # 检查是否已存在未关闭的任务
+        # 检查是否已存在未关闭的任务（使用 task_status）
         existing_task = OpsTask.objects.filter(
             student=student,
-            status__in=['待办', '已联系', '未回复']
+            task_status__in=['pending', 'contacted', 'no_reply']
         ).first()
         
         if existing_task:
@@ -603,12 +609,13 @@ def add_manual_task(request):
                 'message': '该学员已存在未完成的运营任务'
             })
         
+        # 创建任务，使用现有字段
         task = OpsTask.objects.create(
             student=student,
-            source='手动添加',
-            status='待办',
-            notes=data.get('notes', ''),
-            assigned_by=request.user
+            student_name=student.student_name,
+            source='manual',          # 使用枚举值
+            task_status='pending',    # 使用枚举值
+            visit_count=0
         )
         
         return JsonResponse({
