@@ -21,7 +21,10 @@ async function addStudentToToday(studentId) {
       const inputEl = document.getElementById("today-add-search-input");
       const resultBox = document.getElementById("today-add-search-result");
       if (inputEl) inputEl.value = "";
-      if (resultBox) resultBox.innerHTML = "";
+      if (resultBox) {
+        resultBox.innerHTML = "";
+        resultBox.style.display = "none"; // 隐藏白框
+      }
 
       // 刷新今日任务列表
       if (typeof refreshTasks === "function") {
@@ -683,6 +686,9 @@ if (document.readyState === 'loading') {
 
     function renderTodayAddSearchResults(list) {
         if (!resultBox) return;
+        // 有发起搜索（无论是否有结果）都显示容器
+        resultBox.style.display = 'block';
+
         if (!list || list.length === 0) {
             resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#666;">未找到匹配学员</div>';
             return;
@@ -714,8 +720,10 @@ if (document.readyState === 'loading') {
     async function todayAddSearch() {
         const q = (input && input.value || '').trim();
         if (!resultBox) return;
-        if (q.length < 2) {
-            resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#666;">请至少输入2个字符</div>';
+        // 改为：小于1（即为空）才隐藏
+        if (q.length < 1) {
+            resultBox.innerHTML = '';
+            resultBox.style.display = 'none';
             return;
         }
         try {
@@ -723,6 +731,8 @@ if (document.readyState === 'loading') {
             const data = await resp.json();
             renderTodayAddSearchResults((data && data.students) || []);
         } catch (err) {
+            // 搜索失败也显示容器提示
+            resultBox.style.display = 'block';
             resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#c00;">搜索失败，请稍后重试</div>';
         }
     }
@@ -736,18 +746,18 @@ if (document.readyState === 'loading') {
         };
     }
 
-    // 输入框：300ms 防抖搜索
+    // 输入框：300ms 防抖搜索（非空就搜索，空则隐藏）
     const debouncedSearch = debounce(() => {
         const q = (input && input.value || '').trim();
         if (!q) {
-            if (resultBox) resultBox.innerHTML = '';
+            if (resultBox) {
+                resultBox.innerHTML = '';
+                resultBox.style.display = 'none'; // 输入清空时隐藏
+            }
             return;
         }
-        if (q.length >= 2) {
-            todayAddSearch();
-        } else {
-            if (resultBox) resultBox.innerHTML = '<div class="empty-state" style="padding:8px;color:#666;">请至少输入2个字符</div>';
-        }
+        // 只要有1个字符就搜索
+        todayAddSearch();
     }, 300);
 
     if (btn) btn.addEventListener('click', todayAddSearch);

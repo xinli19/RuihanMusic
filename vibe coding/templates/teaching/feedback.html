@@ -19,7 +19,7 @@
     <div class="announcement-board">
         <div class="announcement-header">公告栏</div>
         <div class="announcement-content">
-            <div class="announcement-section">
+            <div class="announcement-section section-research">
                 <h4>教研备注/任务备注</h4>
                 <div class="announcement-list">
                     {% if announcements.notes_from_research %}
@@ -31,7 +31,7 @@
                     {% endif %}
                 </div>
             </div>
-            <div class="announcement-section">
+            <div class="announcement-section section-ops">
                 <h4>运营备注</h4>
                 <div class="announcement-list">
                     {% if announcements.notes_from_ops %}
@@ -53,11 +53,16 @@
                 <button class="tab-button" data-tab="completedComments">已完成点评</button>
             </div>
             <div id="todayTasks" class="tab-pane active">
-                <div class="toolbar" id="today-add-toolbar" style="margin-bottom:10px;">
-                    <input id="today-add-search-input" class="form-input" type="text" placeholder="输入学员昵称/ID 搜索添加到今日任务...">
-                    <button id="today-add-search-btn" class="btn btn-primary" style="margin-left:8px;">搜索</button>
+                <div class="toolbar" id="today-add-toolbar">
+                    <div class="search-section">
+                        <input id="today-add-search-input" class="search-input" type="text" placeholder="输入学员昵称/ID 搜索添加到今日任务...">
+                        <button type="button" class="btn btn-primary" id="today-add-search-btn">搜索</button>
+                    </div>
+                    <div class="actions-section">
+                        <!-- 预留：如需添加右侧按钮放这里 -->
+                    </div>
                 </div>
-                <div id="today-add-search-result" class="search-result"></div>
+                <div id="today-add-search-result" class="table-container"></div>
     
                 <!-- 批量操作栏：恢复 -->
                 <div class="action-bar">

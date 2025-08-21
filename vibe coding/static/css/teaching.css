@@ -340,14 +340,238 @@ tr.submitted {
     box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
 }
 
-.announcement-item {
-    padding: 10px;
-    background: #f1f8e9;
-    border-left: 4px solid #4caf50;
-    margin-bottom: 10px;
-    border-radius: 0 4px 4px 0;
+/* 公告栏并排与样式优化 */
+.announcement-board {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    margin-bottom: 16px;
+    border: 1px solid #e0e0e0;
 }
 
+.announcement-header {
+    padding: 12px 16px;
+    font-weight: 700;
+    color: #2d5a27;
+    background: #f1f8e9;
+    border-bottom: 1px solid #e0e0e0;
+    border-radius: 8px 8px 0 0;
+}
+
+.announcement-content {
+    display: flex;
+    gap: 16px;
+    padding: 16px;
+}
+
+.announcement-section {
+    flex: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fafafa;
+    overflow: hidden;
+}
+
+.announcement-section h4 {
+    margin: 0;
+    padding: 10px 12px;
+    font-size: 14px;         /* 标题略小 */
+    font-weight: 700;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* 区域配色：教研（绿）、运营（蓝） */
+.section-research h4 {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+.section-ops h4 {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.announcement-list {
+    padding: 12px;
+}
+
+/* 覆盖默认公告项样式：小号字体 + 卡片化 + 区分色条 */
+.announcement-section .announcement-item {
+    font-size: 12px;        /* 小一号字体 */
+    line-height: 1.5;
+    padding: 10px 12px;
+    background: #fff;       /* 卡片白底 */
+    border-left: 4px solid #4caf50;  /* 默认左色条（教研绿） */
+    border-radius: 0 4px 4px 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+    margin-bottom: 10px;
+}
+
+/* 运营区的色条改为蓝色 */
+.section-ops .announcement-item {
+    border-left-color: #42a5f5;
+}
+
+/* 响应式：小屏改为上下排列 */
+@media (max-width: 900px) {
+    .announcement-content {
+        flex-direction: column;
+    }
+}
+.empty-state {
+    text-align: center;
+    color: #666;
+    padding: 40px 20px;
+}
+
+.loading {
+    text-align: center;
+    padding: 20px;
+    color: #666;
+}
+/* 加强优先级，防止被其它样式覆盖 */
+.module-tabs .tab-content .tab-pane { 
+    display: none !important; 
+}
+.module-tabs .tab-content .tab-pane.active { 
+    display: block !important; 
+}
+
+/* 手动点评模块样式 */
+.search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.search-bar .form-input {
+    flex: 1;
+    min-width: 300px;
+}
+
+.student-row {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.student-row:hover {
+    background-color: #f5f5f5;
+}
+
+.student-row.selected {
+    background-color: #e8f5e9;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+}
+
+.status-badge.status-difficult {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+.status-badge.status-active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+#manual-selected-student {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 4px;
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+#manual-selected-student.selected {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+    font-weight: 500;
+}
+
+.form-row {
+    margin-bottom: 16px;
+}
+
+.form-textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+/* 困难学生行高亮 */
+#today-task-table tbody tr.difficult-row {
+    background-color: #ffebee;
+}
+/* 在此之后追加：教学模块 - 搜索工具栏样式，和运营模块保持一致 */
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.search-section {
+    flex: 1;
+    margin-right: 20px;
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.actions-section {
+    display: flex;
+    gap: 10px;
+}
+
+/* 统一搜索输入外观 */
+.search-input {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+.search-input:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+/* 结果容器采用卡片风格 */
+.table-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+    padding: 10px 15px;
+}
+/* 默认隐藏今日任务搜索结果容器（无搜索时不出现白框） */
+#today-add-search-result {
+    display: none;
+}
+
+/* 响应式与运营一致 */
+@media (max-width: 768px) {
+    .toolbar {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .search-section {
+        margin-right: 0;
+        width: 100%;
+    }
+    .actions-section {
+        width: 100%;
+        justify-content: center;
+    }
+}
 .empty-state {
     text-align: center;
     color: #666;
