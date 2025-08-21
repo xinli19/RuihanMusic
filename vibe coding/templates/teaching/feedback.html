@@ -20,26 +20,26 @@
         <div class="announcement-header">公告栏</div>
         <div class="announcement-content">
             <div class="announcement-section">
-                <h4>教学提示</h4>
+                <h4>教研备注/任务备注</h4>
                 <div class="announcement-list">
-                    {% if announcements.teaching_tips %}
-                        {% for tip in announcements.teaching_tips %}
+                    {% if announcements.notes_from_research %}
+                        {% for tip in announcements.notes_from_research %}
                             <div class="announcement-item">{{ tip }}</div>
                         {% endfor %}
                     {% else %}
-                        <div class="announcement-item">暂无教学提示</div>
+                        <div class="announcement-item">暂无教研备注/任务备注</div>
                     {% endif %}
                 </div>
             </div>
             <div class="announcement-section">
-                <h4>重点关注学员</h4>
+                <h4>运营备注</h4>
                 <div class="announcement-list">
-                    {% if announcements.student_notes %}
-                        {% for note in announcements.student_notes %}
+                    {% if announcements.notes_from_ops %}
+                        {% for note in announcements.notes_from_ops %}
                             <div class="announcement-item">{{ note }}</div>
                         {% endfor %}
                     {% else %}
-                        <div class="announcement-item">暂无重点关注学员</div>
+                        <div class="announcement-item">暂无运营备注</div>
                     {% endif %}
                 </div>
             </div>
@@ -70,15 +70,14 @@
                         <tr>
                             <th style="width:40px;"></th>
                             <th>学员昵称</th>
-                            <th style="width:220px;">本次进度（progress）</th>
-                            <th>教师评语（teacher_comment）</th>
-                            <th style="width:180px;">推送教研（push_research）</th>
-                            <th style="width:180px;">推送运营（push_ops）</th>
+                            <th style="width:220px;">本次进度</th>
+                            <th>教师评语</th>
+                            <th style="width:180px;">教研备注</th>
+                            <th style="width:180px;">运营备注</th>
                             <th style="width:140px;">操作</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <!-- 数据加载前的占位空态；后续由 JS 渲染 -->
                         <tr class="empty-row"><td colspan="7" class="empty-state">暂无今日任务</td></tr>
                     </tbody>
                 </table>
@@ -90,11 +89,11 @@
                 <table class="task-table" id="completed-table">
                     <thead>
                         <tr>
-                            <th style="width:160px;">时间（reply_time）</th>
-                            <th>学员昵称（student_name）</th>
-                            <th>进度（progress）</th>
-                            <th style="width:120px;">老师（teacher_name）</th>
-                            <th>评语（teacher_comment）</th>
+                            <th style="width:160px;">时间</th>
+                            <th>学员昵称</th>
+                            <th>进度</th>
+                            <th style="width:120px;">老师</th>
+                            <th>评语</th>
                             <th style="width:140px;">推送教研</th>
                             <th style="width:140px;">推送运营</th>
                         </tr>
@@ -118,10 +117,10 @@
                     <thead>
                         <tr>
                             <th style="width:40px;"></th>
-                            <th>学员昵称（student_name）</th>
-                            <th>分组（groups）</th>
-                            <th>状态（status）</th>
-                            <th>当前进度（progress）</th>
+                            <th>学员昵称</th>
+                            <th>分组</th>
+                            <th>状态</th>
+                            <th>当前进度</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -137,19 +136,19 @@
                             <span id="manual-selected-student">未选择</span>
                         </div>
                         <div class="form-row">
-                            <label class="form-label" for="manual-progress">本次进度（progress）</label>
-                            <input id="manual-progress" class="form-input" type="text" placeholder='如：6.1, 6.2, 7'>
+                            <label class="form-label" for="manual-progress">本次进度</label>
+                            <input id="manual-progress" class="form-input" type="text" placeholder="如：6.1, 6.2, 7">
                         </div>
                         <div class="form-row">
-                            <label class="form-label" for="manual-comment">教师评语（teacher_comment）</label>
+                            <label class="form-label" for="manual-comment">教师评语</label>
                             <textarea id="manual-comment" class="form-input form-textarea" placeholder="可选填写"></textarea>
                         </div>
                         <div class="form-row">
-                            <label class="form-label" for="manual-push-research">推送教研（push_research）</label>
+                            <label class="form-label" for="manual-push-research">教研备注</label>
                             <input id="manual-push-research" class="form-input" type="text" placeholder="可选填写"></input>
                         </div>
                         <div class="form-row">
-                            <label class="form-label" for="manual-push-ops">推送运营（push_ops）</label>
+                            <label class="form-label" for="manual-push-ops">运营备注</label>
                             <input id="manual-push-ops" class="form-input" type="text" placeholder="可选填写"></input>
                         </div>
                         <div class="action-bar">

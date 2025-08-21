@@ -72,30 +72,48 @@
 
 .module-tabs .tab-header {
     display: flex;
-    gap: 10px;
-    margin-bottom: 16px;
+    gap: 24px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #e0e0e0; /* 新增：底部分割线 */
 }
 
+/* 将按钮风格改为“页签”风格 */
 .tab-button {
-    padding: 8px 14px;
-    border: 1px solid #c8e6c9;
-    background: #fff;
-    border-radius: 6px;
-    cursor: pointer;
+    appearance: none;
+    background: transparent;         /* 透明背景 */
+    border: none;                    /* 去掉边框 */
+    padding: 10px 4px;               /* 上下留白 */
     color: #2d5a27;
-    transition: all 0.2s ease;
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    border-radius: 0;                /* 去圆角 */
 }
 
+/* hover 仅改变文字颜色 */
 .tab-button:hover {
-    background: #f1f8e9;
+    color: #388e3c;
+    background: transparent;
 }
 
+/* 激活态：底部强调线 + 深色文字 */
 .tab-button.active {
-    background: #4caf50;
-    color: #fff;
-    border-color: #4caf50;
+    color: #2d5a27;
+    background: transparent;
 }
 
+.tab-button.active::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;
+    height: 3px;
+    background: #4caf50;            /* 绿色下划线 */
+    border-radius: 2px 2px 0 0;
+}
+
+/* 保持原有内容区切换逻辑 */
 .tab-content .tab-pane {
     display: none;
 }

@@ -337,21 +337,53 @@ function showStudentDetail(studentId) {
             const info = data.student;
             const content = document.getElementById('studentModalContent');
             const modal = document.getElementById('studentModal');
+
+            function renderProgress(progress) {
+                if (!progress || progress.length === 0) return '—';
+                // 对象数组：展开 key/value；字符串数组：逗号拼接
+                if (typeof progress[0] === 'object') {
+                    return '<ul style="margin-left:16px;">' + progress.map((p) => {
+                        const kv = Object.entries(p || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
+                        return `<li>${kv || '[空]'}</li>`;
+                    }).join('') + '</ul>';
+                }
+                return Array.isArray(progress) ? progress.join(', ') : String(progress);
+            }
+
+            // 最近点评：优先使用仅评论列表，回退到原结构
+            let feedbackListHtml = '';
+            if (Array.isArray(info.feedback_comments) && info.feedback_comments.length > 0) {
+                feedbackListHtml = '<ul style="margin-left:16px;">' + info.feedback_comments.map(c => `<li>${c || ''}</li>`).join('') + '</ul>';
+            } else if (Array.isArray(info.recent_feedbacks) && info.recent_feedbacks.length > 0) {
+                feedbackListHtml = '<ul style="margin-left:16px;">' + info.recent_feedbacks.map(f =>
+                    `<li>【${f.feedback_time}】第${f.lesson_progress} - ${f.teacher_name}：${f.teacher_comment || ''}</li>`
+                ).join('') + '</ul>';
+            } else {
+                feedbackListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
+            }
+
+            // 回访记录
+            let visitListHtml = '';
+            if (Array.isArray(info.visit_notes) && info.visit_notes.length > 0) {
+                visitListHtml = '<ul style="margin-left:16px;">' + info.visit_notes.map(n => `<li>${n || ''}</li>`).join('') + '</ul>';
+            } else {
+                visitListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
+            }
+
             if (content) {
-                const feedbackList = (info.recent_feedbacks || []).map(f => `
-                    <li>【${f.feedback_time}】第${f.lesson_progress} - ${f.teacher_name}：${f.teacher_comment || ''}</li>
-                `).join('');
                 content.innerHTML = `
                     <div><strong>ID：</strong>${info.student_id}</div>
-                    <div><strong>姓名：</strong>${info.name}（${info.nickname || '无别名'}）</div>
-                    <div><strong>分组：</strong>${(info.groups || []).join(', ')}</div>
-                    <div><strong>当前进度：</strong>${info.current_progress || '—'}</div>
+                    <div><strong>姓名：</strong>${info.student_name || info.name}（${info.nickname || '无别名'}）</div>
+                    <div><strong>分组：</strong>${Array.isArray(info.groups) ? info.groups.join(', ') : (info.groups || '')}</div>
+                    <div><strong>进度：</strong>${renderProgress(info.progress)}</div>
                     <div><strong>状态：</strong>${info.status || '—'}</div>
-                    <div><strong>总学习时长：</strong>${info.total_study_time || 0} 小时</div>
+                    <div><strong>学习时长：</strong>${info.learning_hours ?? 0} 小时</div>
                     <div><strong>教研备注：</strong>${info.research_note || '—'}</div>
-                    <div><strong>运营备注：</strong>${info.operation_note || '—'}</div>
-                    <div style="margin-top:10px;"><strong>最近点评：</strong></div>
-                    <ul style="margin-left:16px;">${feedbackList || '<li>暂无</li>'}</ul>
+                    <div><strong>运营备注：</strong>${info.ops_note || info.operation_note || '—'}</div>
+                    <div style="margin-top:10px;"><strong>最近点评（teacher_comment）：</strong></div>
+                    ${feedbackListHtml}
+                    <div style="margin-top:10px;"><strong>回访记录（visit_note）：</strong></div>
+                    ${visitListHtml}
                 `;
             }
             if (modal) modal.style.display = 'block';
@@ -511,6 +543,82 @@ function initTeachingModule() {
     }
 
     // 移除旧版本中对 loadRecentFeedbacks / 手动点评表单的绑定，按新骨架处理
+    // 手动点评 - 搜索与结果渲染、选择
+    const manualSearchInput = document.getElementById('manual-search-input');
+    const manualSearchBtn = document.getElementById('manual-search-btn');
+    const manualResultTbody = document.querySelector('#manual-search-result tbody');
+    const manualSelectedSpan = document.getElementById('manual-selected-student');
+    const manualSubmitBtn = document.getElementById('manual-submit');
+    let manualSelected = null;
+
+    function renderManualSearchResults(list) {
+        if (!manualResultTbody) return;
+        if (!list || list.length === 0) {
+            manualResultTbody.innerHTML = '<tr class="empty-row"><td colspan="5" class="empty-state">未找到匹配学员</td></tr>';
+            return;
+        }
+        const rows = list.map(item => {
+            const groupsText = Array.isArray(item.groups) ? item.groups.join(', ') : (item.groups || '');
+            return `
+                <tr data-student-id="${item.student_id}" data-student-name="${item.student_name}">
+                    <td style="width:40px;">
+                        <input type="radio" name="manual-select" class="manual-select" data-student-id="${item.student_id}" data-student-name="${item.student_name}">
+                    </td>
+                    <td>${item.student_name || ''}</td>
+                    <td>${groupsText}</td>
+                    <td>${item.status || ''}</td>
+                    <td>${item.current_progress || '—'}</td>
+                </tr>
+            `;
+        }).join('');
+        manualResultTbody.innerHTML = rows;
+
+        // 绑定选择事件
+        manualResultTbody.querySelectorAll('.manual-select').forEach(r => {
+            r.addEventListener('change', (e) => {
+                const sid = e.target.getAttribute('data-student-id');
+                const sname = e.target.getAttribute('data-student-name');
+                manualSelected = { student_id: sid, student_name: sname };
+                if (manualSelectedSpan) {
+                    manualSelectedSpan.textContent = `${sname}（ID: ${sid}）`;
+                }
+                if (manualSubmitBtn) {
+                    manualSubmitBtn.disabled = false; // 选择后允许提交
+                }
+            });
+        });
+    }
+
+    function manualSearch() {
+        if (!manualSearchInput) return;
+        const q = manualSearchInput.value.trim();
+        if (q.length < 2) {
+            renderManualSearchResults([]);
+            return;
+        }
+        fetch(`/teaching/students/search/?q=${encodeURIComponent(q)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    showError('搜索学员失败：' + (data.error || '未知错误'));
+                    return;
+                }
+                renderManualSearchResults(data.students || []);
+            })
+            .catch(err => showError('网络错误：' + err.message));
+    }
+
+    if (manualSearchBtn) {
+        manualSearchBtn.addEventListener('click', manualSearch);
+    }
+    if (manualSearchInput) {
+        manualSearchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                manualSearch();
+            }
+        });
+    }
 }
 
 // 在脚本解析时立即打点，确认 teaching.js 被正确加载

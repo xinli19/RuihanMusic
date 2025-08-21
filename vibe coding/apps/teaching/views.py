@@ -13,7 +13,7 @@ from apps.accounts.models import User
 from apps.students.models import Student
 from apps.teaching.models import Feedback
 from apps.research.models import TeachingTask
-from apps.operations.models import OpsTask
+from apps.operations.models import OpsTask, VisitRecord
 from apps.common.models import SystemConfig
 
 
@@ -28,21 +28,52 @@ def teacher_dashboard(request):
     if not has_teacher_permission(request.user):
         return render(request, 'common/permission_denied.html')
     
-    # 获取公告信息
+    # 获取公告信息：来源于本次任务学生的教研/运营备注，以及教研分配时的任务备注
+    today_tasks_qs = TeachingTask.objects.filter(
+        teacher=request.user,
+        status__in=['pending', 'in_progress']
+    ).select_related('student').order_by('-assigned_at')
+    
+    notes_from_research = []
+    notes_from_ops = []
+    seen_research = set()
+    seen_ops = set()
+
+    for task in today_tasks_qs:
+        s = task.student
+
+        # 学员教研备注（兼容 research_notes 与 research_note）
+        s_research = getattr(s, 'research_notes', None) or getattr(s, 'research_note', '')
+        if s_research:
+            msg = f"{s.student_name}：{s_research}".strip()
+            if msg not in seen_research:
+                notes_from_research.append(msg)
+                seen_research.add(msg)
+
+        # 教研任务备注（task_note）
+        if getattr(task, 'task_note', None):
+            msg = f"【任务备注】{s.student_name}：{task.task_note}".strip()
+            if msg not in seen_research:
+                notes_from_research.append(msg)
+                seen_research.add(msg)
+
+        # 学员运营备注（兼容 operation_notes 与 ops_note）
+        s_ops = getattr(s, 'operation_notes', None) or getattr(s, 'ops_note', '')
+        if s_ops:
+            msg = f"{s.student_name}：{s_ops}".strip()
+            if msg not in seen_ops:
+                notes_from_ops.append(msg)
+                seen_ops.add(msg)
+
     announcements = {
-        'teaching_tips': SystemConfig.objects.filter(
-            key__startswith='teaching_tip_'  # 修复：config_key -> key
-        ).values_list('value', flat=True),  # 修复：config_value -> value
-        'student_notes': SystemConfig.objects.filter(
-            key__startswith='student_note_'  # 修复：config_key -> key
-        ).values_list('value', flat=True)  # 修复：config_value -> value
+        'notes_from_research': notes_from_research,
+        'notes_from_ops': notes_from_ops,
     }
     
     # 获取今日任务统计（按 assigned_at 口径，状态包含待处理与进行中）
     today_tasks = TeachingTask.objects.filter(
         teacher=request.user,
-        status__in=['pending', 'in_progress'],
-        assigned_at__date=timezone.now().date()
+        status__in=['pending', 'in_progress']
     ).count()
     
     # 获取已完成点评统计（按 reply_time 日期）
@@ -134,6 +165,7 @@ def submit_feedback(request):
                 continue
             
             # 创建点评记录（使用 Feedback 模型字段）
+            #do we have to put teacher_name in the feedback model?
             feedback = Feedback.objects.create(
                 user_id=student.student_id,
                 student=student,
@@ -282,7 +314,7 @@ def search_students(request):
     # 搜索学员
     students = Student.objects.filter(
         Q(student_name__icontains=query) | Q(alias_name__icontains=query)  # 修复：name/nickname -> student_name/alias_name
-    ).filter(status__in=['active', 'difficult'])[:10]
+    ).filter(status__in=['active', 'joined'])[:10]  # 修复：移除不存在的 'difficult' 状态，允许 active/joined
     
     student_list = []
     for student in students:
@@ -431,7 +463,7 @@ def get_student_detail(request, student_id):
     try:
         student = get_object_or_404(Student, student_id=student_id)
         
-        # 获取该学员的最近点评记录
+        # 获取该学员的最近点评记录（上5次）
         recent_feedbacks = Feedback.objects.filter(
             student=student
         ).order_by('-reply_time')[:5]
@@ -446,18 +478,41 @@ def get_student_detail(request, student_id):
                 'feedback_time': feedback.reply_time.strftime('%Y-%m-%d %H:%M'),
             })
         
+        # 只取 teacher_comment（最近5条）
+        feedback_comments = [fb.teacher_comment for fb in recent_feedbacks if fb.teacher_comment][:5]
+        
+        # 最近回访记录（取最近5条 visit_note）
+        visit_notes = list(
+            VisitRecord.objects.filter(student=student)
+            .order_by('-visit_time')
+            .values_list('visit_note', flat=True)[:5]
+        )
+        
+        # 兼容别名字段
+        research_note = student.research_note or getattr(student, 'research_notes', '')
+        ops_note = getattr(student, 'ops_note', '') or getattr(student, 'operation_notes', '')
+        
         return JsonResponse({
             'success': True,
             'student': {
-                'student_id': student.student_id,
-                'name': student.student_name,      # 修复：name -> student_name
-                'nickname': student.alias_name,    # 修复：nickname -> alias_name
+                # 新结构（本次需求的9个字段）
+                'student_name': student.student_name,
                 'groups': student.groups,
-                'current_progress': student.current_progress,
+                'progress': student.progress,  # 返回JSON（数组/对象数组均可）
                 'status': student.status,
-                'total_study_time': student.total_study_time,
-                'research_note': student.research_note,
-                'operation_note': student.operation_note,
+                'learning_hours': student.learning_hours,
+                'feedback_comments': feedback_comments,
+                'research_note': research_note,
+                'ops_note': ops_note,
+                'visit_notes': visit_notes,
+                
+                # 保留旧字段键名，保证向后兼容
+                'student_id': student.student_id,
+                'name': student.student_name,
+                'nickname': student.alias_name,
+                'current_progress': student.current_progress,
+                'total_study_time': getattr(student, 'total_study_time', 0.0),
+                'operation_note': ops_note,
                 'recent_feedbacks': feedback_list,
             }
         })

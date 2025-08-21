@@ -79,6 +79,33 @@
         
         <!-- 右侧面板 - 公告和历史记录 -->
         <div class="right-panel">
+            <!-- 教研备注/任务备注 -->
+            <div class="panel">
+                <div class="panel-header">教研备注/任务备注</div>
+                <div class="panel-content">
+                    {% if announcements.notes_from_research %}
+                        {% for tip in announcements.notes_from_research %}
+                            <div class="announcement-item">{{ tip }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">暂无教研备注/任务备注</div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- 运营备注 -->
+            <div class="panel">
+                <div class="panel-header">运营备注</div>
+                <div class="panel-content">
+                    {% if announcements.notes_from_ops %}
+                        {% for note in announcements.notes_from_ops %}
+                            <div class="announcement-item">{{ note }}</div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-state">暂无运营备注</div>
+                    {% endif %}
+                </div>
+            </div>
             <!-- 公告信息 -->
             <div class="panel">
                 <div class="panel-header">教学提示</div>
