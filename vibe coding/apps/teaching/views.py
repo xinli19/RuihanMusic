@@ -128,51 +128,55 @@ def get_today_tasks(request):
 @require_http_methods(["POST"])
 @csrf_exempt
 def add_to_today_tasks(request):
-    """将学生加入当前教师的今日任务（若已存在待处理/进行中任务则复用最新一条）"""
+    """添加单个学员到当前教师的今日任务"""
     if not has_teacher_permission(request.user):
         return JsonResponse({'error': '权限不足'}, status=403)
     try:
-        data = json.loads(request.body)
-        student_id = data.get('student_id', '').strip()
+        data = json.loads(request.body or '{}')
+        student_id = data.get('student_id')
         if not student_id:
             return JsonResponse({'error': '缺少 student_id'}, status=400)
-        
-        student = get_object_or_404(Student, student_id=student_id)
-        
-        # 如果该学生已有待处理/进行中任务，则不重复创建
-        qs = TeachingTask.objects.filter(
-            teacher=request.user,
+
+        # 获取学员
+        student = Student.objects.filter(student_id=student_id).first()
+        if not student:
+            return JsonResponse({'error': '学员不存在'}, status=404)
+
+        # 避免重复：该教师对该学员的待处理/进行中任务已存在则直接返回
+        existing = TeachingTask.objects.filter(
             student=student,
+            teacher=request.user,
             status__in=['pending', 'in_progress']
-        ).order_by('-assigned_at')
-        if qs.exists():
-            task = qs.first()
-            created = False
-        else:
-            task = TeachingTask.objects.create(
-                task_id=f"TASK-{student_id}-{int(time.time()*1000)}",
-                student=student,
-                teacher=request.user,
-                researcher=request.user,   # 由教师自行加入，记录为当前用户
-                task_note='',
-                status='pending'
-            )
-            created = True
-        
-        return JsonResponse({
-            'success': True,
-            'created': created,
-            'task': {
-                'task_id': task.task_id,
-                'student_id': student.student_id,
-                'student_name': student.student_name,
-                'student_groups': student.groups,
-                'current_progress': student.current_progress,
-                'is_difficult': student.is_difficult,
-                'research_note': getattr(student, 'research_note', '') or getattr(student, 'research_notes', ''),
-                'operation_note': getattr(student, 'ops_note', '') or getattr(student, 'operation_notes', ''),
-            }
-        })
+        ).first()
+        if existing:
+            return JsonResponse({'success': True, 'message': '该学员已在今日任务中'})
+
+        # 选择一个教研（默认取第一个具有 researcher 角色的用户）
+        researcher = User.objects.filter(roles_json__contains='"researcher"').order_by('id').first()
+        if not researcher:
+            return JsonResponse({'error': '缺少教研角色用户，请先创建“教研”角色账号'}, status=400)
+
+        # 创建教学任务
+        task = TeachingTask.objects.create(
+            task_id=f"TASK-{student.student_id}-{int(time.time()*1000)}",
+            student=student,
+            teacher=request.user,
+            researcher=researcher,
+            task_note=(data.get('task_note', '').strip() if isinstance(data.get('task_note', ''), str) else '')
+        )
+
+        # 返回给前端的简要任务信息（便于前端后续可直接插入或刷新）
+        task_obj = {
+            'task_id': task.task_id,
+            'student_id': student.student_id,
+            'student_name': student.student_name,
+            'student_groups': student.groups,
+            'current_progress': student.current_progress,
+            'is_difficult': student.is_difficult,
+            'research_note': getattr(student, 'research_note', ''),
+            'ops_note': getattr(student, 'ops_note', ''),
+        }
+        return JsonResponse({'success': True, 'message': '已添加到今日任务', 'task': task_obj})
     except json.JSONDecodeError:
         return JsonResponse({'error': '数据格式错误'}, status=400)
     except Exception as e:

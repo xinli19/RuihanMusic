@@ -731,3 +731,29 @@ if (document.readyState === 'loading') {
         });
     }
 })();
+
+// 新增：添加学员到今日任务
+async function addStudentToToday(studentId) {
+    try {
+        const resp = await fetch('/teaching/tasks/add/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ student_id: studentId })
+        });
+        const data = await resp.json();
+        if (data.success) {
+            alert(data.message || '已添加到今日任务');
+            // 刷新今日任务列表
+            if (typeof refreshTasks === 'function') {
+                refreshTasks();
+            }
+        } else {
+            alert('添加失败：' + (data.error || '未知错误'));
+        }
+    } catch (err) {
+        alert('网络错误：' + err.message);
+    }
+}
