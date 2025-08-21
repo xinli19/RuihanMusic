@@ -1,0 +1,13 @@
+vibe coding/db.sqlite3
+vibe coding/db.sqlite3.backup
+# SQLite 数据库与备份
+db.sqlite3
+db.sqlite3.backup
+
+# 日志目录
+logs/
+
+# Python 缓存与虚拟环境（可选）
+__pycache__/
+*.py[cod]
+.venv/
