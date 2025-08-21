@@ -3,7 +3,37 @@
 // 全局变量
 let selectedStudents = new Set();
 let allTasks = [];
+async function addStudentToToday(studentId) {
+  try {
+    const resp = await fetch("/teaching/tasks/add/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify({ student_id: studentId }),
+    });
+    const data = await resp.json();
+    if (data.success) {
+      alert(data.message || "已添加到今日任务");
 
+      // UX 优化：清空顶部搜索框和结果列表
+      const inputEl = document.getElementById("today-add-search-input");
+      const resultBox = document.getElementById("today-add-search-result");
+      if (inputEl) inputEl.value = "";
+      if (resultBox) resultBox.innerHTML = "";
+
+      // 刷新今日任务列表
+      if (typeof refreshTasks === "function") {
+        refreshTasks();
+      }
+    } else {
+      alert("添加失败：" + (data.error || "未知错误"));
+    }
+  } catch (err) {
+    alert("网络错误：" + err.message);
+  }
+}
 // 刷新任务列表
 function refreshTasks() {
     fetch('/teaching/tasks/today/')
@@ -732,28 +762,7 @@ if (document.readyState === 'loading') {
     }
 })();
 
-// 新增：添加学员到今日任务
-async function addStudentToToday(studentId) {
-    try {
-        const resp = await fetch('/teaching/tasks/add/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ student_id: studentId })
-        });
-        const data = await resp.json();
-        if (data.success) {
-            alert(data.message || '已添加到今日任务');
-            // 刷新今日任务列表
-            if (typeof refreshTasks === 'function') {
-                refreshTasks();
-            }
-        } else {
-            alert('添加失败：' + (data.error || '未知错误'));
-        }
-    } catch (err) {
-        alert('网络错误：' + err.message);
-    }
-}
+// 新增/更新：添加学员到今日任务（成功后清空搜索输入和结果）
+
+
+// ... existing code ...
