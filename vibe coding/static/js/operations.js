@@ -37,6 +37,36 @@ function formatArrayText(val) {
   return String(val);
 }
 
+function computeNotes(student) {
+  const researchNote = student.research_note || "—";
+  const opsNote = student.ops_note || "—";
+  return { researchNote, opsNote };
+}
+
+// 列表渲染辅助：根据学员对象生成表格行（可复用）
+function renderStudentRow(student) {
+  const id = student.id || student.student_id || "—";
+  const nickname = student.student_name || student.name || "—";
+  const alias = student.alias_name || "—";
+  const groups = Array.isArray(student.groups) ? student.groups.join(", ") : (student.groups || "—");
+  const createdAt = student.created_at || "—";
+  const researchNote = student.research_note || "—";
+  const opsNote = student.ops_note || "—";
+  return `
+        <tr>
+            <td>${nickname}</td>
+            <td>${id}</td>
+            <td>${alias}</td>
+            <td>${groups}</td>
+            <td>${createdAt}</td>
+            <td title="教研备注：${researchNote}&#10;运营备注：${opsNote}">
+                <button class="btn btn-warning js-edit-stu" data-id="${student.id}" style="margin-left:6px;">编辑</button>
+                <button class="btn btn-success js-add-task" data-id="${student.id}" style="margin-left:6px;">手动增加任务</button>
+            </td>
+        </tr>
+    `;
+}
+
 // -------------------- Tab 初始化 --------------------
 function initTabs() {
   const header = document.querySelector(".tab-header");
@@ -283,13 +313,10 @@ function showStudentDetailModal(student) {
           student.learning_hours ?? student.total_study_time ?? 0
         } 小时</div>
         <div><strong>教研备注：</strong>${
-          student.research_note || student.research_notes || "—"
+          student.research_note || "—"
         }</div>
         <div><strong>运营备注：</strong>${
-          student.ops_note ||
-          student.operation_notes ||
-          student.operation_note ||
-          "—"
+          student.ops_note || "—"
         }</div>
         <div style="margin-top:10px;"><strong>最近点评：</strong></div>
         ${feedbackListHtml}
@@ -1041,13 +1068,10 @@ async function loadVisitStudentPanel(studentId, studentNameHint = "") {
                   student.learning_hours ?? student.total_study_time ?? 0
                 } 小时</div>
                 <div><strong>教研备注：</strong>${
-                  student.research_note || student.research_notes || "—"
+                  student.research_note || "—"
                 }</div>
                 <div><strong>运营备注：</strong>${
-                  student.ops_note ||
-                  student.operation_notes ||
-                  student.operation_note ||
-                  "—"
+                  student.ops_note || "—"
                 }</div>
             </div>
         </div>
@@ -1108,8 +1132,8 @@ function showStudentDetailDrawer(student) {
         return Array.isArray(p) ? p.join(", ") : String(p);
     })();
 
-    const researchNote = student.research_note || student.research_notes || "—";
-    const opsNote = student.ops_note || student.operation_notes || student.operation_note || "—";
+    const researchNote = student.research_note || "—";
+    const opsNote = student.ops_note || "—";
     const status = student.status || "—";
     const hours = student.learning_hours ?? student.total_study_time ?? 0;
 

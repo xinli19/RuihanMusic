@@ -9,7 +9,7 @@ urlpatterns = [
     path('students/api/', views.get_students_list, name='get_students_list'),
     path('students/create/', views.create_student, name='create_student'),
     path('students/<str:student_id>/', views.get_student_detail, name='get_student_detail'),
-    path('students/<str:student_id>/update/', views.update_student, name='update_student'),
+    path('students/<str:student_id>/update/', views.update_student_info, name='update_student'),
     path('students/batch-import/', views.batch_import_students, name='batch_import_students'),
     
     # 任务管理

@@ -7,7 +7,6 @@ from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
 import json
 import uuid
 from reportlab.pdfgen import canvas
@@ -274,7 +273,7 @@ def feedback_monitoring(request):
                     'real_name': feedback.teacher.real_name,
                 },
                 'teacher_comment': feedback.teacher_comment,
-                'reply_time': feedback.reply_time.isoformat(),
+                'reply_time': timezone.localtime(feedback.reply_time).isoformat(),
             })
         
         return JsonResponse({
@@ -299,11 +298,26 @@ def student_search(request):
         # 与前端最小长度校验保持一致：1 个字符即可
         return JsonResponse({'success': True, 'students': []})
     
-    students_qs = Student.objects.filter(
-        Q(student_name__icontains=query) |
-        Q(student_id__icontains=query) |
-        Q(alias_name__icontains=query)
-    ).order_by('student_name')[:50]
+    # 优化：select_related('assigned_teacher') 消除 N+1，并仅加载必要字段
+    students_qs = (
+        Student.objects
+        .filter(
+            Q(student_name__icontains=query) |
+            Q(student_id__icontains=query) |
+            Q(alias_name__icontains=query)
+        )
+        .select_related('assigned_teacher')
+        .only(
+            'id',
+            'student_id',
+            'student_name',
+            'groups_json',
+            'learning_progress',
+            'learning_status',
+            'assigned_teacher__real_name',
+        )
+        .order_by('student_name')[:50]
+    )
     
     students_data = []
     for s in students_qs:
@@ -311,10 +325,9 @@ def student_search(request):
             'id': s.id,
             'student_id': s.student_id,
             'student_name': s.student_name,
-            'groups': s.groups,  # list
-            # 前端期望“第N课”，使用 learning_progress（课程数），不要用 course_progress 百分比
+            'groups': s.groups,
             'course_progress': s.learning_progress,
-            'assigned_teacher_name': s.assigned_teacher_name,
+            'assigned_teacher_name': (s.assigned_teacher.real_name if getattr(s, 'assigned_teacher_id', None) else '未分配'),
             'learning_status': s.learning_status,
             'get_learning_status_display': s.get_learning_status_display_custom(),
         })
@@ -356,7 +369,7 @@ def student_detail(request, student_id):
                 {
                     'id': fb['id'],
                     'teacher_comment': fb['teacher_comment'],
-                    'reply_time': fb['reply_time'].isoformat() if fb['reply_time'] else None,
+                    'reply_time': (timezone.localtime(fb['reply_time']).isoformat() if fb['reply_time'] else None),
                     'teacher': {'real_name': fb['teacher__real_name'] or ''},
                 }
                 for fb in feedbacks
@@ -410,8 +423,6 @@ def update_student_research_note(request, student_id):
         return JsonResponse({'success': False, 'message': str(e)})
 
 
-# 修复 get_task_detail 函数（第350-360行）
-@login_required
 def get_task_detail(request, task_id):
     try:
         task = get_object_or_404(TeachingTask, id=task_id)
@@ -436,7 +447,8 @@ def get_task_detail(request, task_id):
                 'student': student_data,  # 修复：返回单个学员对象
                 'status': task.status,
                 'task_note': task.task_note,
-                'assigned_at': task.assigned_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'assigned_at': timezone.localtime(task.assigned_at).strftime('%Y-%m-%d %H:%M:%S'),
+                'created_at': timezone.localtime(task.created_at).strftime('%Y-%m-%d %H:%M:%S')
             }
         })
     except Exception as e:
@@ -447,27 +459,30 @@ def get_task_detail(request, task_id):
 @login_required
 def get_teacher_stats(request):
     try:
-        # 修复：使用正确的角色查询
-        teachers = User.objects.filter(roles_json__contains='"teacher"')
-        stats = []
-        
-        for teacher in teachers:
-            total_tasks = TeachingTask.objects.filter(teacher=teacher).count()
-            pending_tasks = TeachingTask.objects.filter(teacher=teacher, status='pending').count()
-            completed_tasks = TeachingTask.objects.filter(teacher=teacher, status='completed').count()
-            
-            # 修复：统计分配的学员数量
-            total_students = TeachingTask.objects.filter(teacher=teacher).values('student').distinct().count()
-            
-            stats.append({
-                'teacher_id': teacher.id,
-                'teacher_name': teacher.real_name or teacher.username,
-                'total_tasks': total_tasks,
-                'pending_tasks': pending_tasks,
-                'completed_tasks': completed_tasks,
-                'total_students': total_students
-            })
-        
+        # 修复：单次聚合统计，避免按老师循环产生 N+1
+        teachers_qs = (
+            User.objects.filter(roles_json__contains='"teacher"')
+            .annotate(
+                total_tasks=Count('teachingtask'),
+                pending_tasks=Count('teachingtask', filter=Q(teachingtask__status='pending')),
+                completed_tasks=Count('teachingtask', filter=Q(teachingtask__status='completed')),
+                total_students=Count('teachingtask__student', distinct=True),
+            )
+            .only('id', 'real_name', 'username')
+        )
+
+        stats = [
+            {
+                'teacher_id': t.id,
+                'teacher_name': t.real_name or t.username,
+                'total_tasks': t.total_tasks,
+                'pending_tasks': t.pending_tasks,
+                'completed_tasks': t.completed_tasks,
+                'total_students': t.total_students,
+            }
+            for t in teachers_qs
+        ]
+
         return JsonResponse({'success': True, 'data': stats})
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)})
@@ -488,12 +503,15 @@ def export_assignment_results(request):
             tasks = tasks.filter(teacher_id=teacher_id)
         
         if start_date:
-            start_date = datetime.strptime(start_date, '%Y-%m-%d')
-            tasks = tasks.filter(created_at__gte=start_date)
+            tz = timezone.get_current_timezone()
+            start_dt = timezone.make_aware(datetime.strptime(start_date, '%Y-%m-%d'), tz)
+            tasks = tasks.filter(created_at__gte=start_dt)
         
         if end_date:
-            end_date = datetime.strptime(end_date, '%Y-%m-%d')
-            tasks = tasks.filter(created_at__lte=end_date + timedelta(days=1))
+            tz = timezone.get_current_timezone()
+            # 取到 end_date 当天结束：次日零点（左闭右开更准确）
+            end_dt = timezone.make_aware(datetime.strptime(end_date, '%Y-%m-%d') + timedelta(days=1), tz)
+            tasks = tasks.filter(created_at__lt=end_dt)
         
         # 创建PDF
         buffer = BytesIO()
@@ -516,7 +534,7 @@ def export_assignment_results(request):
             # 任务信息
             p.drawString(50, y_position, f"Teacher: {task.teacher.real_name or task.teacher.username}")
             y_position -= 20
-            p.drawString(50, y_position, f"Date: {task.created_at.strftime('%Y-%m-%d %H:%M')}")
+            p.drawString(50, y_position, f"Date: {timezone.localtime(task.created_at).strftime('%Y-%m-%d %H:%M')}")
             y_position -= 20
             p.drawString(50, y_position, f"Status: {task.get_status_display()}")
             y_position -= 20

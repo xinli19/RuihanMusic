@@ -35,6 +35,10 @@ def get_students_list(request):
         
         # 基础查询 - 修复：user -> assigned_teacher
         students = Student.objects.select_related('assigned_teacher').all()
+        # 统一注入精选数，避免循环内逐个统计造成 N+1
+        students = students.annotate(
+            featured_count=Count('feedback', filter=Q(feedback__is_featured=True))
+        )
         
         # 搜索功能
         if search_term:
@@ -48,10 +52,7 @@ def get_students_list(request):
         if sort_by == 'progress':
             order_field = 'learning_progress'
         elif sort_by == 'featured':
-            # 计算被精选数（点评中标记为精选的数量）
-            students = students.annotate(
-                featured_count=Count('feedback', filter=Q(feedback__is_featured=True))
-            )
+            # 已统一 annotate featured_count，这里只切换排序字段
             order_field = 'featured_count'
         elif sort_by == 'study_time':
             order_field = 'total_study_time'
@@ -70,8 +71,8 @@ def get_students_list(request):
         # 构建返回数据
         students_data = []
         for student in page_obj:
-            # 计算被精选数
-            featured_count = student.feedback_set.filter(is_featured=True).count()
+            # 直接使用注入的 featured_count，避免每行额外 SQL
+            featured_count = getattr(student, 'featured_count', 0) or 0
             
             students_data.append({
                 'id': student.id,
@@ -83,13 +84,9 @@ def get_students_list(request):
                 'featured_count': featured_count,
                 'total_study_time': student.total_study_time or 0,
                 'status': student.status,
-                # 正式字段
                 'research_note': student.research_note or '',
                 'ops_note': student.ops_note or '',
-                # 兼容旧前端键（值取自正式字段）
-                'research_notes': student.research_note or '',
-                'operation_notes': student.ops_note or '',
-                'created_at': student.created_at.strftime('%Y-%m-%d %H:%M')
+                'created_at': timezone.localtime(student.created_at).strftime('%Y-%m-%d %H:%M')
             })
         
         return JsonResponse({
@@ -142,10 +139,8 @@ def create_student(request):
             student_name=student_name,
             alias_name=data.get('alias_name', ''),
             groups=data.get('groups', ['基础班']),
-            # 统一写 ops_note（B 阶段将移除 operation_notes）
-            ops_note=data.get('operation_notes', '') or data.get('ops_note', '')
+            ops_note=data.get('ops_note', '')
         )
-        
         return JsonResponse({
             'success': True,
             'message': '学员创建成功',
@@ -162,19 +157,24 @@ def create_student(request):
 @login_required
 @role_required(['运营'])
 @require_http_methods(["POST"])
-def update_student(request, student_id):
+def update_student_info(request, student_id):
     """更新学员信息"""
     try:
         student = get_object_or_404(Student, id=student_id)
-        data = json.loads(request.body)
-        # 更新字段
-        student.student_name = data.get('student_name', student.student_name)
-        student.alias_name = data.get('alias_name', student.alias_name)
-        student.groups = data.get('groups', student.groups)
-        student.status = data.get('status', student.status)
-        # 统一写 ops_note（B 阶段将移除 operation_notes）
-        if 'ops_note' in data or 'operation_notes' in data:
-            student.ops_note = data.get('ops_note', data.get('operation_notes', student.ops_note))
+        data = json.loads(request.body.decode('utf-8'))
+        # 更新字段（仅标准键）
+        if 'student_name' in data:
+            student.student_name = data['student_name']
+        if 'alias_name' in data:
+            student.alias_name = data['alias_name']
+        if 'groups' in data:
+            student.groups = data['groups']
+        if 'status' in data:
+            student.status = data['status']
+        if 'ops_note' in data:
+            student.ops_note = data['ops_note']
+        if 'research_note' in data:
+            student.research_note = data['research_note']
         student.save()
         return JsonResponse({'success': True, 'message': '学员信息更新成功'})
     except Exception as e:
@@ -183,6 +183,7 @@ def update_student(request, student_id):
 
 @login_required
 @role_required(['运营'])
+@require_http_methods(["GET"])
 def get_student_detail(request, student_id):
     """获取学员详细信息（统一结构 + 向后兼容）"""
     try:
@@ -197,7 +198,7 @@ def get_student_detail(request, student_id):
                 'teacher_name': fb.teacher_name,
                 'lesson_progress': progress_str,
                 'teacher_comment': fb.teacher_comment,
-                'feedback_time': fb.reply_time.strftime('%Y-%m-%d %H:%M'),
+                'feedback_time': timezone.localtime(fb.reply_time).strftime('%Y-%m-%d %H:%M'),
             })
         # 仅评论文本（优先用于展示）
         feedback_comments = [fb.teacher_comment for fb in recent_feedbacks if fb.teacher_comment][:5]
@@ -224,16 +225,13 @@ def get_student_detail(request, student_id):
             'research_note': research_note,
             'ops_note': ops_note,
             'visit_notes': visit_notes,
-        # 旧字段（向后兼容）
-        'student_id': student.student_id,
-        'name': student.student_name,
-        'nickname': student.alias_name,
-        'current_progress': student.current_progress,
-        'total_study_time': getattr(student, 'total_study_time', 0.0),
-        'operation_note': ops_note,
-        'research_notes': research_note,
-        'operation_notes': ops_note,
-        'created_at': student.created_at.strftime('%Y-%m-%d %H:%M'),
+            # 旧字段（向后兼容）
+            'student_id': student.student_id,
+            'name': student.student_name,
+            'nickname': student.alias_name,
+            'current_progress': student.current_progress,
+            'total_study_time': getattr(student, 'total_study_time', 0.0),
+            'created_at': student.created_at.strftime('%Y-%m-%d %H:%M'),
         }
 
         # 同时提供 student 与 data 键，兼容旧前端
@@ -418,7 +416,7 @@ def get_ops_tasks(request):
                 'status': task.get_task_status_display() if hasattr(task, 'get_task_status_display') else task.task_status,
                 'notes': '',
                 'assigned_by': '系统',
-                'created_at': task.created_at.strftime('%Y-%m-%d %H:%M'),
+                'created_at': timezone.localtime(task.created_at).strftime('%Y-%m-%d %H:%M'),
             })
         
         return JsonResponse({
@@ -553,7 +551,7 @@ def create_visit_record(request):
 
 @login_required
 @role_required(['运营'])
-def get_visit_records(request):
+def get_visit_records_v2(request):
     """获取回访记录列表"""
     try:
         # 获取查询参数
@@ -603,13 +601,13 @@ def get_visit_records(request):
                 'id': record.id,
                 'student_id': record.student.id,
                 'student_nickname': record.student.student_name,
-                'visit_time': record.visit_time.strftime('%Y-%m-%d %H:%M'),
+                'visit_time': timezone.localtime(record.visit_time).strftime('%Y-%m-%d %H:%M'),
                 'status': getattr(record, 'get_visit_status_display', lambda: record.visit_status)(),
                 'visit_count': record.visit_count,
                 'teacher_name': record.teacher_name,
                 'operator': '—',
                 'notes': record.visit_note,
-                'created_at': record.created_at.strftime('%Y-%m-%d %H:%M'),
+                'created_at': timezone.localtime(record.created_at).strftime('%Y-%m-%d %H:%M'),
             })
         
         return JsonResponse({
@@ -779,4 +777,4 @@ def get_visit_records(request):
     if student_id:
         qs = qs.filter(student__id=student_id)
     # 继续处理 status / search 等筛选与分页
-    return JsonResponse({'success': True, 'message': '任务状态已更新'})
+    return JsonResponse({'success': True, 'message': '批量导入完成'})

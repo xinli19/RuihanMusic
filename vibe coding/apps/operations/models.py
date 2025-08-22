@@ -77,4 +77,4 @@ class VisitRecord(models.Model):
         ]
     
     def __str__(self):
-        return f"{self.student_name} - {self.visit_time.strftime('%Y-%m-%d')}"
+        return f"{self.student_name} - {timezone.localtime(self.visit_time).strftime('%Y-%m-%d')}"

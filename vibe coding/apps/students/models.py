@@ -36,10 +36,10 @@ class Student(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='joined', verbose_name='学员状态')
     learning_hours = models.FloatField(default=0.0, verbose_name='累计学习时长')
     
-    # 备注字段
+    # 备注字段（保留正式字段）
     research_note = models.TextField(blank=True, verbose_name='教研备注')
     ops_note = models.TextField(blank=True, verbose_name='运营备注')
-
+    
     # 其他字段
     is_difficult = models.BooleanField(default=False, verbose_name='是否需要关注')
     assigned_teacher = models.ForeignKey(

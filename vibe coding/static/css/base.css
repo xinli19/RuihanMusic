@@ -61,6 +61,7 @@ body {
     align-items: center;
     justify-content: space-between;
     min-height: 80px;
+    position: relative;
 }
 
 .logo h3 {
@@ -87,9 +88,39 @@ body {
     transition: var(--transition);
 }
 
-.toggle-btn:hover {
-    background: var(--hover-bg);
-    color: var(--primary-green);
+.sidebar .toggle-btn:hover {
+    background: var(--primary-green-dark);
+    color: #fff;
+}
+
+/* 侧边栏切换按钮：始终固定在右侧中间，折叠状态也可见 */
+.sidebar .toggle-btn {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 36px;
+    height: 36px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    background: var(--primary-green);
+    color: #fff;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+/* 折叠/展开图标切换 */
+.toggle-btn .icon-collapsed { display: none; }
+.sidebar.collapsed .toggle-btn .icon-expand { display: none; }
+.sidebar.collapsed .toggle-btn .icon-collapsed { display: inline-block; }
+
+/* 折叠时按钮保持主题色以更醒目 */
+.sidebar.collapsed .toggle-btn {
+    background: var(--primary-green);
+    color: #fff;
+    border-radius: var(--border-radius);
 }
 
 /* 用户信息区域 */
@@ -223,6 +254,11 @@ body {
     padding: 20px;
     border-top: 1px solid var(--sidebar-border);
     margin-top: auto;
+}
+
+/* 兜底：无论 DOM 结构是否有变动，若 body 有 sidebar-collapsed 标记，则生效主区域缩进 */
+body.sidebar-collapsed .main-content {
+    margin-left: 70px;
 }
 
 .footer-actions {

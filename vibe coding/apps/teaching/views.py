@@ -5,7 +5,6 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.utils import timezone
-from django.views.decorators.csrf import csrf_exempt
 import json
 import time
 
@@ -14,7 +13,6 @@ from apps.students.models import Student
 from apps.teaching.models import Feedback
 from apps.research.models import TeachingTask
 from apps.operations.models import OpsTask, VisitRecord
-from apps.common.models import SystemConfig
 
 
 def has_teacher_permission(user):
@@ -115,13 +113,10 @@ def get_today_tasks(request):
             'current_progress': student.current_progress,
             'is_difficult': student.is_difficult,  # 修复：原先是 status == 'difficult'
             'research_note': student.research_note,
-            'operation_note': getattr(student, 'ops_note', ''),  # 修复：原先是 operation_note
+            'ops_note': getattr(student, 'ops_note', ''),  # 统一使用 ops_note
         })
-    
-    return JsonResponse({
-        'success': True,
-        'tasks': task_list
-    })
+    # 关键修复：添加 success 字段，前端才会渲染任务列表
+    return JsonResponse({'success': True, 'tasks': task_list})
 
 
 @login_required
@@ -184,7 +179,6 @@ def add_to_today_tasks(request):
 
 @login_required
 @require_http_methods(["POST"])
-@csrf_exempt
 def submit_feedback(request):
     """提交点评"""
     if not has_teacher_permission(request.user):
@@ -259,7 +253,6 @@ def submit_feedback(request):
 
 @login_required
 @require_http_methods(["POST"])
-@csrf_exempt
 def manual_feedback(request):
     """手动点评"""
     if not has_teacher_permission(request.user):
@@ -335,7 +328,7 @@ def get_completed_feedbacks(request):
     for feedback in page_obj:
         feedback_list.append({
             'id': feedback.id,
-            'reply_time': feedback.reply_time.strftime('%Y-%m-%d %H:%M'),
+            'reply_time': timezone.localtime(feedback.reply_time).strftime('%Y-%m-%d %H:%M'),
             'student_name': feedback.student_name,
             'progress': feedback.progress,  # 原始列表
             'teacher_name': feedback.teacher_name,
@@ -393,7 +386,6 @@ def search_students(request):
 
 @login_required
 @require_http_methods(["POST"])
-@csrf_exempt
 def push_to_research(request):
     """推送到教研"""
     if not has_teacher_permission(request.user):
@@ -424,27 +416,23 @@ def push_to_research(request):
 
 @login_required
 @require_http_methods(["POST"])
-@csrf_exempt
 def push_to_operation(request):
     """推送到运营"""
     if not has_teacher_permission(request.user):
         return JsonResponse({'error': '权限不足'}, status=403)
     
     try:
-        data = json.loads(request.body)
+        data = json.loads(request.body.decode('utf-8'))
         student_ids = data.get('student_ids', [])
-        operation_note = data.get('operation_note', '')
-        
-        if not student_ids or not operation_note:
-            return JsonResponse({'error': '请选择学员并填写运营备注'}, status=400)
-        
-        # 更新点评记录的运营备注
+        ops_note = data.get('ops_note', '')
+        if not student_ids or not ops_note:
+            return JsonResponse({'error': '参数缺失'}, status=400)
         updated_count = Feedback.objects.filter(
             teacher=request.user,
-            student__student_id__in=student_ids,  # 修复：通过外键字段匹配业务学号
+            student__student_id__in=student_ids,
             push_ops=''
         ).update(
-            push_ops=operation_note
+            push_ops=ops_note
         )
         
         # 创建运营任务（避免冲突，生成简单唯一ID）
@@ -460,7 +448,7 @@ def push_to_operation(request):
                 )
             except Student.DoesNotExist:
                 continue
-        
+
         return JsonResponse({
             'success': True,
             'message': f'成功推送{updated_count}条记录到运营部门'
@@ -474,7 +462,6 @@ def push_to_operation(request):
 
 @login_required
 @require_http_methods(["POST"])
-@csrf_exempt
 def batch_delete_tasks(request):
     """批量删除任务"""
     if not has_teacher_permission(request.user):
@@ -525,7 +512,7 @@ def get_student_detail(request, student_id):
                 'teacher_name': feedback.teacher_name,
                 'lesson_progress': progress_str,
                 'teacher_comment': feedback.teacher_comment,
-                'feedback_time': feedback.reply_time.strftime('%Y-%m-%d %H:%M'),
+                'feedback_time': timezone.localtime(feedback.reply_time).strftime('%Y-%m-%d %H:%M'),
             })
         
         # 只取 teacher_comment（最近5条）
@@ -545,24 +532,20 @@ def get_student_detail(request, student_id):
         return JsonResponse({
             'success': True,
             'student': {
-                # 新结构（本次需求的9个字段）
                 'student_name': student.student_name,
                 'groups': student.groups,
-                'progress': student.progress,  # 返回JSON（数组/对象数组均可）
+                'progress': student.progress,
                 'status': student.status,
                 'learning_hours': student.learning_hours,
                 'feedback_comments': feedback_comments,
                 'research_note': research_note,
                 'ops_note': ops_note,
                 'visit_notes': visit_notes,
-                
-                # 保留旧字段键名，保证向后兼容
                 'student_id': student.student_id,
                 'name': student.student_name,
                 'nickname': student.alias_name,
                 'current_progress': student.current_progress,
                 'total_study_time': getattr(student, 'total_study_time', 0.0),
-                'operation_note': ops_note,
                 'recent_feedbacks': feedback_list,
             }
         })

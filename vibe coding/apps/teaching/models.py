@@ -42,7 +42,7 @@ class Feedback(models.Model):
         ]
     
     def __str__(self):
-        return f"{self.student_name} - {self.teacher_name} - {self.reply_time.strftime('%Y-%m-%d')}"
+        return f"{self.student_name} - {self.teacher_name} - {timezone.localtime(self.reply_time).strftime('%Y-%m-%d')}"
     
     @property
     def progress(self):

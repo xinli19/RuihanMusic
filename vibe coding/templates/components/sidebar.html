@@ -4,8 +4,9 @@
         <div class="logo">
             <h3>睿涵音乐</h3>
         </div>
-        <button class="toggle-btn" onclick="toggleSidebar()">
-            <i class="fas fa-bars"></i>
+        <button class="toggle-btn" aria-label="折叠/展开侧边栏">
+            <i class="fas fa-bars icon-expand" aria-hidden="true"></i>
+            <i class="fas fa-chevron-right icon-collapsed" aria-hidden="true"></i>
         </button>
     </div>
     
@@ -90,10 +91,12 @@
                 <i class="fas fa-user"></i>
                 <span class="footer-text">个人资料</span>
             </a>
-            <a href="/accounts/logout/" class="footer-link logout-link" title="退出登录">
-                <i class="fas fa-sign-out-alt"></i>
-                <span class="footer-text">退出登录</span>
-            </a>
+            <div class="footer-actions">
+                <a href="/accounts/logout/" class="footer-link logout-link" title="退出登录">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span class="footer-text">退出登录</span>
+                </a>
+            </div>
         </div>
     </div>
 </div>

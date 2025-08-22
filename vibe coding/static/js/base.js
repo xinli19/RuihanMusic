@@ -62,18 +62,16 @@ function showError(message) {
     }, 5000);
 }
 
-// 侧边栏功能
+// 侧边栏功能（恢复为可折叠）
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
-    const isCollapsed = sidebar.classList.contains('collapsed');
-    
-    if (isCollapsed) {
-        sidebar.classList.remove('collapsed');
-        localStorage.setItem('sidebarCollapsed', 'false');
-    } else {
-        sidebar.classList.add('collapsed');
-        localStorage.setItem('sidebarCollapsed', 'true');
-    }
+    if (!sidebar) return;
+
+    const isCollapsed = sidebar.classList.toggle('collapsed');
+    // 记忆状态
+    try { localStorage.setItem('sidebarCollapsed', isCollapsed ? 'true' : 'false'); } catch (e) {}
+    // 同步 body 标记用于样式兜底
+    document.body.classList.toggle('sidebar-collapsed', isCollapsed);
 }
 
 // 移动端侧边栏控制
@@ -127,22 +125,34 @@ function addTooltips() {
     });
 }
 
-// 页面加载完成后的初始化
+// 页面加载完成后的初始化（恢复状态 + 绑定按钮）
 document.addEventListener('DOMContentLoaded', function() {
     // 恢复侧边栏状态
-    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed');
     const sidebar = document.getElementById('sidebar');
-    
-    if (sidebar && sidebarCollapsed === 'true') {
-        sidebar.classList.add('collapsed');
+    const collapsedSaved = (function() {
+        try { return localStorage.getItem('sidebarCollapsed') === 'true'; } catch (e) { return false; }
+    })();
+
+    if (sidebar) {
+        sidebar.classList.toggle('collapsed', collapsedSaved);
+        document.body.classList.toggle('sidebar-collapsed', collapsedSaved);
     }
-    
+
+    // 绑定按钮点击（即便模板未写 onclick，也能工作）
+    const toggleBtn = document.querySelector('#sidebar .toggle-btn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            toggleSidebar();
+        });
+    }
+
     // 设置当前激活的导航项
     setActiveNavItem();
-    
+
     // 添加工具提示
     addTooltips();
-    
+
     // 创建移动端遮罩
     if (window.innerWidth <= 768) {
         const overlay = document.createElement('div');
@@ -150,14 +160,14 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.onclick = closeMobileSidebar;
         document.body.appendChild(overlay);
     }
-    
+
     // 监听窗口大小变化
     window.addEventListener('resize', function() {
         if (window.innerWidth > 768) {
             closeMobileSidebar();
         }
     });
-    
+
     // 退出登录确认
     const logoutLink = document.querySelector('.logout-link');
     if (logoutLink) {
