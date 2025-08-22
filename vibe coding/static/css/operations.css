@@ -292,16 +292,152 @@
     cursor: not-allowed;
 }
 
-/* 模态框样式 */
+/* 视觉变量 */
+:root {
+  --ops-gap: 12px;
+  --ops-radius: 8px;
+  --ops-border: 1px solid #eaeaea;
+  --ops-card-bg: #fff;
+  --ops-muted: #6b7280;
+}
+
+/* 顶部操作区 */
+.ops-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ops-gap);
+  margin-bottom: 8px;
+}
+
+/* 搜索区 */
+.ops-search {
+  display: flex;
+  align-items: center;
+  gap: var(--ops-gap);
+  background: var(--ops-card-bg);
+  border: var(--ops-border);
+  border-radius: var(--ops-radius);
+  padding: 10px 12px;
+  margin-bottom: 16px; /* 与搜索区拉开距离 */
+}
+
+.ops-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ops-gap);
+  margin-bottom: 0; /* 放进卡片后不需要额外外边距 */
+}
+.search-input-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  background: #f7f7f7;
+  border-radius: 6px;
+  padding: 6px 10px;
+}
+
+.search-input-group .search-icon {
+  opacity: 0.6;
+}
+
+.search-input-group .search-input {
+  background: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+}
+
+/* 结果表格容器（卡片样式） */
+.table-container {
+  background: var(--ops-card-bg);
+  border: var(--ops-border);
+  border-radius: var(--ops-radius);
+  padding: 8px 10px;
+}
+
+/* 抽屉 */
+.drawer-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1999;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 560px;
+  background: #fff;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.2);
+  z-index: 2000;
+  overflow: auto;
+}
+
+.drawer-content {
+  padding: 16px;
+}
+
+/* 模态 */
 .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0,0,0,0.5);
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  background: rgba(0,0,0,0.45);
+  display: none; /* 用 JS 控制显示 */
+}
+
+.modal .modal-content {
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 520px;
+  background: #fff;
+  border-radius: var(--ops-radius);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.modal .modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: var(--ops-border);
+}
+
+.modal .modal-body {
+  padding: 16px;
+}
+
+.modal .close {
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 20px;
+}
+
+/* 表单 */
+.form-group {
+  margin-bottom: 12px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.muted {
+  color: var(--ops-muted);
+}
+
+.import-result {
+  margin-top: 12px;
 }
 
 .modal-content {

@@ -3,7 +3,6 @@
 // -------------------- 全局状态 --------------------
 let hasInitStudentMgr = false;
 let hasInitOpsTab = false;
-let hasInitVisitTab = false;
 
 document.addEventListener("DOMContentLoaded", () => {
   initTabs();
@@ -97,15 +96,26 @@ function initStudentManagement() {
   const box = document.getElementById("student-mgr-results");
   if (!input || !btn || !box) return;
 
+  // 初始化：未搜索时隐藏结果容器
+  box.style.display = "none";
+
   const doSearch = async () => {
     const q = input.value.trim();
+
+    // 搜索中：显示加载态
+    box.style.display = "block";
     box.innerHTML =
       '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>搜索中...</p></div>';
+
     try {
       const list = await fetchStudents(q);
+      // 成功后：渲染结果并保持容器可见
       renderStudentMgrResults(list);
+      box.style.display = "block";
     } catch (e) {
+      // 失败：显示错误但保持容器可见，便于用户反馈
       box.innerHTML = `<div class="operations-empty-state">搜索失败：${e.message}</div>`;
+      box.style.display = "block";
     }
   };
 
@@ -154,21 +164,14 @@ function renderStudentMgrResults(students) {
   students.forEach((s) => {
     html += `
             <tr>
-                <td>${s.student_name || s.name || "—"}</td>
+                <td><a href="javascript:void(0)" class="js-stu-name" data-id="${s.id}" style="color:#1677ff; text-decoration:none; cursor:pointer;">${s.student_name || s.name || "—"}</a></td>
                 <td>${s.id || s.student_id || "—"}</td>
                 <td>${s.alias_name || "—"}</td>
                 <td>${formatArrayText(s.groups)}</td>
                 <td>${s.created_at || "—"}</td>
                 <td>
-                    <button class="btn btn-primary js-view-stu" data-id="${
-                      s.id
-                    }">详情</button>
-                    <button class="btn btn-warning js-edit-stu" data-id="${
-                      s.id
-                    }" style="margin-left:6px;">编辑</button>
-                    <button class="btn btn-success js-add-task" data-id="${
-                      s.id
-                    }" style="margin-left:6px;">手动增加任务</button>
+                    <button class="btn btn-warning js-edit-stu" data-id="${s.id}" style="margin-left:6px;">编辑</button>
+                    <button class="btn btn-success js-add-task" data-id="${s.id}" style="margin-left:6px;">手动增加任务</button>
                 </td>
             </tr>
         `;
@@ -176,12 +179,14 @@ function renderStudentMgrResults(students) {
   html += "</tbody></table>";
   box.innerHTML = html;
 
-  box.querySelectorAll(".js-view-stu").forEach((btn) => {
-    btn.addEventListener("click", async (e) => {
+  // 学员昵称点击打开详情抽屉
+  box.querySelectorAll(".js-stu-name").forEach((el) => {
+    el.addEventListener("click", (e) => {
       const id = e.currentTarget.getAttribute("data-id");
       viewStudentDetail(id);
     });
   });
+
   box.querySelectorAll(".js-edit-stu").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       const id = e.currentTarget.getAttribute("data-id");
@@ -400,12 +405,130 @@ function submitStudentForm(isEdit) {
     .catch((e) => showError("保存失败：" + e.message));
 }
 
+// -------------------- 学员批量导入（与搜索、导出分离） --------------------
+function openBatchImportModal() {
+  const modal = document.getElementById("batchImportModal");
+  const resBox = document.getElementById("batchImportResult");
+  const file = document.getElementById("importFile");
+  if (resBox) resBox.innerHTML = "";
+  if (file) file.value = "";
+  if (modal) modal.style.display = "block";
+}
+
+function closeBatchImportModal() {
+  const modal = document.getElementById("batchImportModal");
+  if (modal) modal.style.display = "none";
+}
+
+async function submitBatchImport() {
+  const fileInput = document.getElementById("importFile");
+  const resBox = document.getElementById("batchImportResult");
+  if (!fileInput || !fileInput.files || !fileInput.files.length) {
+    showError("请选择要上传的 .xlsx 文件");
+    return;
+  }
+  const file = fileInput.files[0];
+  const fd = new FormData();
+  fd.append("file", file);
+
+  resBox.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>导入中...</p></div>';
+  try {
+    const resp = await fetch("/operations/students/batch-import/", {
+      method: "POST",
+      headers: { "X-CSRFToken": getCookie("csrftoken") },
+      body: fd
+    });
+    const data = await resp.json();
+    if (!data.success) throw new Error(data.message || "导入失败");
+
+    const r = data.result || {};
+    const logs = Array.isArray(r.error_logs) ? r.error_logs : [];
+    resBox.innerHTML = `
+      <div class="operations-empty-state" style="text-align:left;">
+        <p>导入完成：新增 ${r.success_count || 0}，更新 ${r.update_count || 0}，失败 ${r.error_count || 0}</p>
+        ${logs.length ? `<details><summary>错误日志（${logs.length}）</summary><ul style="margin-top:6px;">${logs.map(x=>`<li>${x}</li>`).join("")}</ul></details>` : ""}
+      </div>
+    `;
+    showSuccess("批量导入成功");
+  } catch (e) {
+    resBox.innerHTML = `<div class="operations-empty-state">导入失败：${e.message}</div>`;
+    showError("导入失败：" + e.message);
+  }
+}
+
+// -------------------- 学员导出（与搜索、导入分离） --------------------
+async function exportStudents() {
+  try {
+    const input = document.getElementById("student-mgr-search");
+    const q = input ? input.value.trim() : "";
+    const pageSize = 200;
+    let page = 1;
+    let totalPages = 1;
+    const rows = [];
+    // 表头
+    rows.push(["ID","用户ID","昵称","备注名","分组","创建时间","状态","累计学习时长(分钟)"]); 
+
+    do {
+      const params = new URLSearchParams({
+        page: page,
+        page_size: pageSize,
+        sort: "created_at",
+        order: "desc"
+      });
+      if (q) params.set("search", q);
+
+      const resp = await fetch(`/operations/students/api/?${params.toString()}`);
+      const data = await resp.json();
+      if (!data.success) throw new Error(data.message || "获取学员列表失败");
+
+      const list = Array.isArray(data.data) ? data.data : [];
+      list.forEach(s => {
+        rows.push([
+          s.id || "",
+          s.external_user_id || "",
+          s.student_name || s.name || "",
+          s.alias_name || "",
+          Array.isArray(s.groups) ? s.groups.join("|") : (s.groups || ""),
+          s.created_at || "",
+          s.status || "",
+          (s.total_study_time || 0)
+        ]);
+      });
+
+      const p = data.pagination || {};
+      totalPages = p.total_pages || 1;
+      page = (p.current_page || page) + 1;
+    } while (page <= totalPages);
+
+    // 生成 CSV
+    const csv = rows.map(r => r.map(v => {
+      const s = String(v ?? "");
+      if (s.includes(",") || s.includes("\"") || s.includes("\n")) {
+        return `"${s.replace(/"/g, '""')}"`;
+      }
+      return s;
+    }).join(",")).join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const ts = new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");
+    a.href = url;
+    a.download = `students_export_${ts}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showSuccess("导出完成");
+  } catch (e) {
+    showError("导出失败：" + e.message);
+  }
+}
+
 // -------------------- 运营任务管理 --------------------
 function initOpsTaskTab() {
   // 仅初始化运营任务列表 + 批量操作
   loadOpsTasks(1);
 
-  // 批量“删除” => 实为批量关闭
+  // 批量“删除”（实际为批量关闭）
   const btnDelete = document.getElementById("ops-batch-delete");
   const btnExport = document.getElementById("ops-export");
   if (btnDelete) btnDelete.addEventListener("click", () => batchUpdateOpsTasks("已关闭"));
