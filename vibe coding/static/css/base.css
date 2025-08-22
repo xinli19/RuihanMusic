@@ -468,3 +468,2197 @@ body {
     color: #c62828;
     border-color: #ffcdd2;
 }
+
+/* 二级子菜单（教研模块） */
+.nav-group > .nav-link {
+    font-weight: 600;
+}
+
+.nav-sublist {
+    list-style: none;
+    margin: 4px 0 8px;
+    padding: 0 0 0 44px; /* 与主菜单图标+间距对齐 */
+    border-left: 1px dashed var(--sidebar-border);
+}
+
+.nav-subitem {
+    margin-bottom: 2px;
+}
+
+.nav-sublink {
+    padding: 8px 20px 8px 12px; /* 左侧缩进更紧凑 */
+    color: var(--text-secondary);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    border-radius: 0;
+    transition: var(--transition);
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.nav-sublink:hover {
+    background: var(--hover-bg);
+    color: var(--primary-green);
+}
+
+.nav-sublink.active {
+    background: var(--active-bg);
+    color: var(--primary-green);
+    border-right: 3px solid var(--primary-green);
+}
+
+/* 折叠态隐藏子菜单 */
+.sidebar.collapsed .nav-sublist {
+    display: none;
+}
+
+.nav-sublink i {
+    font-size: 1rem;
+    width: 20px;
+    text-align: center;
+    margin-right: 10px;
+    flex-shrink: 0;
+}

@@ -1,6 +1,9 @@
+{% if page_title or messages %}
 <div class="page-header">
     <div class="header-content">
+        {% if page_title %}
         <h1 class="page-title">{{ page_title }}</h1>
+        {% endif %}
         <!-- 移除头部欢迎与退出，避免占用主内容空间 -->
     </div>
     
@@ -14,3 +17,4 @@
         </div>
     {% endif %}
 </div>
+{% endif %}

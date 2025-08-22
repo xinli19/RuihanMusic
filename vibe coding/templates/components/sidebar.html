@@ -47,13 +47,27 @@
             </li>
             {% endif %}
             
-            <!-- 教研模块 - 仅教研人员可见 -->
+            <!-- 教研模块 - 仅教研人员可见（含子菜单） -->
             {% if user.is_researcher %}
-            <li class="nav-item">
+            <li class="nav-item nav-group">
                 <a href="/research/" class="nav-link" title="教研模块">
                     <i class="fas fa-chart-line"></i>
                     <span class="nav-text">教研模块</span>
                 </a>
+                <ul class="nav-sublist">
+                    <li class="nav-item nav-subitem">
+                        <a href="{% url 'research:quality_monitoring' %}" class="nav-link nav-sublink {% if request.path == '/research/' or request.path|slice:':18' == '/research/quality/' %}active{% endif %}" title="质量监控">
+                            <i class="fas fa-chart-line"></i>
+                            <span class="nav-text">质量监控</span>
+                        </a>
+                    </li>
+                    <li class="nav-item nav-subitem">
+                        <a href="{% url 'research:task_assignment' %}" class="nav-link nav-sublink {% if request.path|slice:':16' == '/research/tasks/' %}active{% endif %}" title="任务分配">
+                            <i class="fas fa-tasks"></i>
+                            <span class="nav-text">任务分配</span>
+                        </a>
+                    </li>
+                </ul>
             </li>
             {% endif %}
             

@@ -36,6 +36,7 @@ def task_assignment(request):
     context = {
         'teachers': teachers,
         'recent_tasks': recent_tasks,
+        'page_title': '教学任务分配',
     }
     return render(request, 'research/task_assignment.html', context)
 
@@ -91,13 +92,24 @@ def search_students(request):
     if len(query) < 2:
         return JsonResponse({'students': []})
     
-    students = Student.objects.filter(
-        Q(student_name__icontains=query) | 
+    # 注意：不能直接 values('groups')，因为 groups 是 property
+    qs = Student.objects.filter(
+        Q(student_name__icontains=query) |
         Q(student_id__icontains=query) |
         Q(alias_name__icontains=query)
-    ).values('id', 'student_id', 'student_name', 'alias_name', 'groups')[:20]
+    ).only('id', 'student_id', 'student_name', 'alias_name', 'groups_json')[:20]
     
-    return JsonResponse({'students': list(students)})
+    students = []
+    for s in qs:
+        students.append({
+            'id': s.id,
+            'student_id': s.student_id,
+            'student_name': s.student_name,
+            'alias_name': s.alias_name,
+            'groups': s.groups,  # property 转为 list
+        })
+    
+    return JsonResponse({'students': students})
 
 @login_required
 def task_history(request):
@@ -178,16 +190,17 @@ def quality_monitoring(request):
     # 获取分组选项
     groups = Student.GROUP_CHOICES
     
-    # 获取需关注学员名单
+    # 获取需关注学员名单（修复 select_related 字段名）
     attention_students = Student.objects.filter(
         is_difficult=True
-    ).select_related('teacher').prefetch_related('feedback_set')
+    ).select_related('assigned_teacher').prefetch_related('feedback_set')
     
     context = {
         'current_user': request.user,
         'teachers': teachers,
         'groups': groups,
         'attention_students': attention_students,
+        'page_title': '教学质量监控',
     }
     
     return render(request, 'research/quality_monitor.html', context)
