@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse, HttpResponse
-from django.db.models import Q, Count
+from django.db.models import Q, Count, OuterRef, Subquery
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.core.paginator import Paginator
@@ -182,26 +182,28 @@ def quality_monitoring(request):
     if not request.user.has_role('researcher'):
         messages.error(request, '您没有权限访问此页面')
         return redirect('accounts:profile')
-    
-    # 获取教师列表用于筛选
-    teachers = User.objects.filter(roles_json__contains='"teacher"') 
-    
-    # 获取分组选项
+    teachers = User.objects.filter(roles_json__contains='"teacher"')
     groups = Student.GROUP_CHOICES
-    
-    # 获取需关注学员名单（修复 select_related 字段名）
-    attention_students = Student.objects.filter(
-        is_difficult=True
-    ).select_related('assigned_teacher').prefetch_related('feedback_set')
-    
+    latest_comment_sq = Feedback.objects.filter(
+        student=OuterRef('pk')
+    ).order_by('-reply_time').values('teacher_comment')[:1]
+    latest_teacher_sq = Feedback.objects.filter(
+        student=OuterRef('pk')
+    ).order_by('-reply_time').values('teacher_name')[:1]
+    attention_students = (
+        Student.objects.filter(is_difficult=True)
+        .select_related('assigned_teacher')
+        .annotate(
+            latest_teacher_comment=Subquery(latest_comment_sq),
+            latest_teacher_name=Subquery(latest_teacher_sq),
+        )
+    )
     context = {
         'current_user': request.user,
         'teachers': teachers,
         'groups': groups,
         'attention_students': attention_students,
-        # 已移除 page_title，避免在 header 中渲染大标题
     }
-    
     return render(request, 'research/quality_monitor.html', context)
 
 @login_required

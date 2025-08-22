@@ -39,7 +39,7 @@ class Student(models.Model):
     # 备注字段
     research_note = models.TextField(blank=True, verbose_name='教研备注')
     ops_note = models.TextField(blank=True, verbose_name='运营备注')
-    
+
     # 其他字段
     is_difficult = models.BooleanField(default=False, verbose_name='是否需要关注')
     assigned_teacher = models.ForeignKey(
@@ -70,8 +70,7 @@ class Student(models.Model):
     # 额外字段
     learning_progress = models.IntegerField(default=0, verbose_name='学习进度（课程数）')
     total_study_time = models.FloatField(default=0.0, verbose_name='总学习时长')
-    research_notes = models.TextField(blank=True, verbose_name='教研备注（别名）')
-    operation_notes = models.TextField(blank=True, verbose_name='运营备注（别名）')
+   
     
     # 时间字段
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='注册时间')
@@ -115,8 +114,21 @@ class Student(models.Model):
     
     @progress.setter
     def progress(self, value):
-        """设置学习进度列表"""
-        self.progress_json = json.dumps(value if value else [])
+        """设置学习进度列表，同时同步 learning_progress（以 progress_json 为事实源）"""
+        import json as _json
+        self.progress_json = _json.dumps(value if value else [])
+        try:
+            lst = value if isinstance(value, list) else []
+            current = lst[-1] if lst else 0
+            if isinstance(current, str) and current.strip().isdigit():
+                self.learning_progress = int(current.strip())
+            elif isinstance(current, int):
+                self.learning_progress = current
+            else:
+                # 兜底策略：无法解析时使用列表长度
+                self.learning_progress = len(lst)
+        except Exception:
+            self.learning_progress = 0
     
     @property
     def current_progress(self):

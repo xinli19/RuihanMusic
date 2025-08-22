@@ -42,8 +42,8 @@ def teacher_dashboard(request):
     for task in today_tasks_qs:
         s = task.student
 
-        # 学员教研备注（兼容 research_notes 与 research_note）
-        s_research = getattr(s, 'research_notes', None) or getattr(s, 'research_note', '')
+        # 学员教研备注（仅用 research_note）
+        s_research = getattr(s, 'research_note', '') or ''
         if s_research:
             msg = f"{s.student_name}：{s_research}".strip()
             if msg not in seen_research:
@@ -57,8 +57,8 @@ def teacher_dashboard(request):
                 notes_from_research.append(msg)
                 seen_research.add(msg)
 
-        # 学员运营备注（兼容 operation_notes 与 ops_note）
-        s_ops = getattr(s, 'operation_notes', None) or getattr(s, 'ops_note', '')
+        # 学员运营备注（仅用 ops_note）
+        s_ops = getattr(s, 'ops_note', '') or ''
         if s_ops:
             msg = f"{s.student_name}：{s_ops}".strip()
             if msg not in seen_ops:
@@ -126,7 +126,6 @@ def get_today_tasks(request):
 
 @login_required
 @require_http_methods(["POST"])
-@csrf_exempt
 def add_to_today_tasks(request):
     """添加单个学员到当前教师的今日任务"""
     if not has_teacher_permission(request.user):
@@ -306,7 +305,7 @@ def manual_feedback(request):
         
         return JsonResponse({
             'success': True,
-            'message': '手动点评提交成功',
+            'message': '手动反馈提交成功',
             'feedback_id': feedback.id
         })
         
@@ -416,11 +415,7 @@ def push_to_research(request):
         ).update(
             push_research=research_note
         )
-        return JsonResponse({
-            'success': True,
-            'message': f'成功推送{updated_count}条记录到教研部门'
-        })
-        
+        return JsonResponse({'success': True, 'message': f'成功推送{updated_count}条记录到教研部门'})
     except json.JSONDecodeError:
         return JsonResponse({'error': '数据格式错误'}, status=400)
     except Exception as e:
@@ -501,11 +496,7 @@ def batch_delete_tasks(request):
             status='cancelled',
             updated_at=timezone.now()
         )
-        return JsonResponse({
-            'success': True,
-            'message': f'成功删除{deleted_count}个任务'
-        })
-        
+        return JsonResponse({'success': True, 'message': f'成功删除{deleted_count}个任务'})
     except json.JSONDecodeError:
         return JsonResponse({'error': '数据格式错误'}, status=400)
     except Exception as e:
@@ -547,9 +538,9 @@ def get_student_detail(request, student_id):
             .values_list('visit_note', flat=True)[:5]
         )
         
-        # 兼容别名字段
-        research_note = student.research_note or getattr(student, 'research_notes', '')
-        ops_note = getattr(student, 'ops_note', '') or getattr(student, 'operation_notes', '')
+        # 备注：仅用正式字段
+        research_note = getattr(student, 'research_note', '') or ''
+        ops_note = getattr(student, 'ops_note', '') or ''
         
         return JsonResponse({
             'success': True,

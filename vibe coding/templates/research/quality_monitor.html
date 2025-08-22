@@ -132,11 +132,9 @@
                 </td>
                 <td>{{ student.assigned_teacher.real_name|default:"未分配" }}</td>
                 <td>
-                  {% if student.latest_feedback %}
-                    {{ student.latest_feedback.teacher_comment|truncatewords:10 }}
-                  {% else %}
-                    暂无评语
-                  {% endif %}
+                  <td>
+                    {{ student.latest_teacher_comment|default:"暂无评语"|truncatewords:10 }}
+                  </td>
                 </td>
                 <td>
                   <textarea class="form-input" placeholder="填写教研备注" 

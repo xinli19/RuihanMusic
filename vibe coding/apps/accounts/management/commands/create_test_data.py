@@ -110,7 +110,7 @@ class Command(BaseCommand):
         teachers = User.objects.filter(roles_json__contains='"teacher"')
         if not teachers.exists():
             self.stdout.write(
-                self.style.WARNING('没有找到教师用户，将创建未分配教师的学员')
+                self.style.WARNING('没有找到教师用户，将创建未分配教师的学生')
             )
         
         students_created = 0
@@ -127,15 +127,14 @@ class Command(BaseCommand):
                 external_user_id=f'ext_{i+1:06d}',
                 student_name=f'学员{i+1:03d}',
                 alias_name=f'别名{i+1:03d}',
-                status=random.choice(['active', 'inactive', 'graduated']),
-                learning_status=random.choice(['normal', 'at_risk', 'excellent']),
+                status=random.choice(['joined', 'active', 'graduated', 'archived']),
+                learning_status=random.choice(['normal', 'attention', 'excellent', 'new']),
                 learning_progress=random.randint(0, 100),
                 total_study_time=random.uniform(10.0, 500.0),
                 is_difficult=random.choice([True, False]),
                 assigned_teacher=random.choice(teachers) if teachers.exists() else None,
                 difficulty_source=random.choice(['system', 'teacher', 'manual']) if random.choice([True, False]) else '',
-                research_notes=f'教研备注{i+1}' if random.choice([True, False]) else '',
-                operation_notes=f'运营备注{i+1}' if random.choice([True, False]) else '',
+                research_note=f'教研备注{i+1}' if random.choice([True, False]) else '',
                 ops_note=f'运营备注{i+1}' if random.choice([True, False]) else ''
             )
             students_created += 1

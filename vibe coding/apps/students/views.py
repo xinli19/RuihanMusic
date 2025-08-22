@@ -33,7 +33,7 @@ class StudentUpdateView(LoginRequiredMixin, UpdateView):
     """学员信息更新视图"""
     model = Student
     template_name = 'students/edit.html'
-    fields = ['student_name', 'alias_name', 'groups', 'status', 'research_notes', 'operation_notes']
+    fields = ['student_name', 'alias_name', 'groups', 'status', 'research_note', 'ops_note']
     success_url = reverse_lazy('students:list')
     
     def form_valid(self, form):

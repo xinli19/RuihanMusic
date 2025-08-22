@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
@@ -76,15 +76,19 @@ def get_students_list(request):
             students_data.append({
                 'id': student.id,
                 'external_user_id': student.external_user_id,
-                'student_name': student.student_name,  # 修复：nickname -> student_name
-                'alias_name': student.alias_name,      # 修复：remark_name -> alias_name
+                'student_name': student.student_name,
+                'alias_name': student.alias_name,
                 'groups': student.groups,
                 'learning_progress': student.learning_progress,
                 'featured_count': featured_count,
                 'total_study_time': student.total_study_time or 0,
                 'status': student.status,
-                'research_notes': student.research_notes or '',
-                'operation_notes': student.operation_notes or '',
+                # 正式字段
+                'research_note': student.research_note or '',
+                'ops_note': student.ops_note or '',
+                # 兼容旧前端键（值取自正式字段）
+                'research_notes': student.research_note or '',
+                'operation_notes': student.ops_note or '',
                 'created_at': student.created_at.strftime('%Y-%m-%d %H:%M')
             })
         
@@ -110,7 +114,6 @@ def get_students_list(request):
 @login_required
 @role_required(['运营'])
 @require_http_methods(["POST"])
-@csrf_exempt
 def create_student(request):
     """创建新学员"""
     try:
@@ -133,14 +136,14 @@ def create_student(request):
                 'message': '该用户ID已存在'
             })
         
-        # 创建学员
+        # 创建学员（不传 status，采用模型默认 'joined'）
         student = Student.objects.create(
             external_user_id=external_user_id,
-            student_name=student_name,                    # 修复：nickname -> student_name
-            alias_name=data.get('alias_name', ''),        # 修复：remark_name -> alias_name
+            student_name=student_name,
+            alias_name=data.get('alias_name', ''),
             groups=data.get('groups', ['基础班']),
-            status='加入',
-            operation_notes=data.get('operation_notes', '')
+            # 统一写 ops_note（B 阶段将移除 operation_notes）
+            ops_note=data.get('operation_notes', '') or data.get('ops_note', '')
         )
         
         return JsonResponse({
@@ -159,32 +162,23 @@ def create_student(request):
 @login_required
 @role_required(['运营'])
 @require_http_methods(["POST"])
-@csrf_exempt
 def update_student(request, student_id):
     """更新学员信息"""
     try:
         student = get_object_or_404(Student, id=student_id)
         data = json.loads(request.body)
-        
         # 更新字段
-        student.student_name = data.get('student_name', student.student_name)  # 修复：nickname -> student_name
-        student.alias_name = data.get('alias_name', student.alias_name)        # 修复：remark_name -> alias_name
+        student.student_name = data.get('student_name', student.student_name)
+        student.alias_name = data.get('alias_name', student.alias_name)
         student.groups = data.get('groups', student.groups)
         student.status = data.get('status', student.status)
-        student.operation_notes = data.get('operation_notes', student.operation_notes)
-        
+        # 统一写 ops_note（B 阶段将移除 operation_notes）
+        if 'ops_note' in data or 'operation_notes' in data:
+            student.ops_note = data.get('ops_note', data.get('operation_notes', student.ops_note))
         student.save()
-        
-        return JsonResponse({
-            'success': True,
-            'message': '学员信息更新成功'
-        })
-        
+        return JsonResponse({'success': True, 'message': '学员信息更新成功'})
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'message': f'更新学员信息失败: {str(e)}'
-        })
+        return JsonResponse({'success': False, 'message': f'更新学员信息失败: {str(e)}'})
 
 
 @login_required
@@ -215,32 +209,31 @@ def get_student_detail(request, student_id):
             .values_list('visit_note', flat=True)[:5]
         )
 
-        # 兼容别名
-        research_note = student.research_note or getattr(student, 'research_notes', '')
-        ops_note = getattr(student, 'ops_note', '') or getattr(student, 'operation_notes', '')
-
+        # 备注：仅用正式字段
+        research_note = student.research_note or ''
+        ops_note = student.ops_note or ''
         # 统一结构
         student_payload = {
-            # 新结构（9个字段）
+            # 新结构
             'student_name': student.student_name,
             'groups': student.groups,
-            'progress': student.progress,  # JSON：字符串数组/对象数组均可
+            'progress': student.progress,
             'status': student.status,
             'learning_hours': student.learning_hours,
             'feedback_comments': feedback_comments,
             'research_note': research_note,
             'ops_note': ops_note,
             'visit_notes': visit_notes,
-
-            # 旧字段（向后兼容）
-            'student_id': student.student_id,
-            'name': student.student_name,
-            'nickname': student.alias_name,
-            'current_progress': student.current_progress,
-            'total_study_time': getattr(student, 'total_study_time', 0.0),
-            'operation_note': ops_note,
-            'recent_feedbacks': feedback_list,
-            'created_at': student.created_at.strftime('%Y-%m-%d %H:%M'),
+        # 旧字段（向后兼容）
+        'student_id': student.student_id,
+        'name': student.student_name,
+        'nickname': student.alias_name,
+        'current_progress': student.current_progress,
+        'total_study_time': getattr(student, 'total_study_time', 0.0),
+        'operation_note': ops_note,
+        'research_notes': research_note,
+        'operation_notes': ops_note,
+        'created_at': student.created_at.strftime('%Y-%m-%d %H:%M'),
         }
 
         # 同时提供 student 与 data 键，兼容旧前端
@@ -259,7 +252,6 @@ def get_student_detail(request, student_id):
 @login_required
 @role_required(['运营'])
 @require_http_methods(["POST"])
-@csrf_exempt
 def batch_import_students(request):
     """批量导入学员"""
     try:
@@ -305,14 +297,13 @@ def batch_import_students(request):
         for index, row in df.iterrows():
             try:
                 external_user_id = str(row['用户ID']).strip()
-                student_name = str(row['昵称']).strip()  # 修复：nickname -> student_name
-                
+                student_name = str(row['昵称']).strip()
                 if not external_user_id or external_user_id == 'nan':
                     error_count += 1
                     error_logs.append(f'第{index+2}行: 用户ID为空')
                     continue
                 
-                if not nickname or nickname == 'nan':
+                if not student_name or student_name == 'nan':
                     error_count += 1
                     error_logs.append(f'第{index+2}行: 昵称为空')
                     continue
@@ -451,7 +442,6 @@ def get_ops_tasks(request):
 @login_required
 @role_required(['运营'])
 @require_http_methods(["POST"])
-@csrf_exempt
 def update_task_status(request, task_id):
     """更新任务状态（支持行内备注），如状态变更为已关闭，前端会刷新列表自动移除"""
     try:
@@ -481,44 +471,32 @@ def update_task_status(request, task_id):
         # 若携带备注，则写入回访记录，并自增任务回访次数
         if notes:
             # 生成唯一记录ID
-            record_id = f"VR{int(datetime.now().timestamp()*1000)}"
+            record_id = f"VR{int(timezone.now().timestamp()*1000)}"
             # 学员与老师信息
             student = task.student
             teacher_name = getattr(student, 'assigned_teacher_name', None)
             if callable(teacher_name):
                 teacher_name = student.assigned_teacher_name
             teacher_name = teacher_name or '未分配'
-            
             task.visit_count = (task.visit_count or 0) + 1
-            
             VisitRecord.objects.create(
                 record_id=record_id,
                 student=student,
                 student_name=student.student_name,
-                visit_status=code,                  # 与任务状态保持一致
-                visit_count=task.visit_count,       # 累计回访次数
+                visit_status=code,
+                visit_count=task.visit_count,
                 teacher_name=teacher_name,
                 visit_note=notes
             )
-        
         task.save()
-        
-        return JsonResponse({
-            'success': True,
-            'message': '任务更新成功'
-        })
-        
+        return JsonResponse({'success': True, 'message': '状态更新成功'})
     except Exception as e:
-        return JsonResponse({
-            'success': False,
-            'message': f'更新任务失败: {str(e)}'
-        })
+        return JsonResponse({'success': False, 'message': f'更新失败: {str(e)}'})
 
 
 @login_required
 @role_required(['运营'])
 @require_http_methods(["POST"])
-@csrf_exempt
 def create_visit_record(request):
     """创建回访记录"""
     try:
@@ -539,7 +517,7 @@ def create_visit_record(request):
         status_code = status_map.get(status_cn, status_cn)
 
         # 生成唯一记录ID
-        record_id = f"VR{int(datetime.now().timestamp()*1000)}"
+        record_id = f"VR{int(timezone.now().timestamp()*1000)}"
 
         # 任课老师名称（尽量复用学员的 assigned_teacher_name 逻辑）
         teacher_name = getattr(student, 'assigned_teacher_name', None)
@@ -655,7 +633,6 @@ def get_visit_records(request):
 @login_required
 @role_required(['运营'])
 @require_http_methods(["POST"])
-@csrf_exempt
 def add_manual_task(request):
     """手动添加运营任务"""
     try:
@@ -802,4 +779,4 @@ def get_visit_records(request):
     if student_id:
         qs = qs.filter(student__id=student_id)
     # 继续处理 status / search 等筛选与分页
-    # ... existing code ...
+    return JsonResponse({'success': True, 'message': '任务状态已更新'})
