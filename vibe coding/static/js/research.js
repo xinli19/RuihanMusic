@@ -63,22 +63,59 @@
       });
   };
 
-  window.searchStudents = function () {
-    const input = document.getElementById("studentSearchInput");
-    const q = ((input && input.value) || "").trim();
-    if (q.length < 1) {
-      alert("请输入至少1个字符");
+  // 统一搜索与筛选：使用学员搜索框(studentSearchInput)作为关键词来源，同时应用课程范围
+  window.applySearchAndFilters = function () {
+    const kwInput = document.getElementById("studentSearchInput");
+    const courseFromEl = document.getElementById("courseFrom");
+    const courseToEl = document.getElementById("courseTo");
+    const keyword = ((kwInput && kwInput.value) || "").trim();
+    const courseFrom = (courseFromEl && courseFromEl.value) || "";
+    const courseTo = (courseToEl && courseToEl.value) || "";
+
+    // 若没有关键词也没有课程范围，则提示
+    if (!keyword && !courseFrom && !courseTo) {
+      alert("请输入学员关键词或设置课程范围后再应用");
       return;
     }
-    fetch(`/research/quality/students/search/?q=${encodeURIComponent(q)}`)
+
+    // 并行请求：刷新点评记录 + 刷新学员搜索结果
+    const qs = new URLSearchParams({ ajax: "1" });
+    if (keyword) qs.set("keyword", keyword);
+    if (courseFrom) qs.set("course_from", courseFrom);
+    if (courseTo) qs.set("course_to", courseTo);
+
+    const p1 = fetch(`/research/quality/feedback/?${qs.toString()}`)
       .then((r) => r.json())
       .then((data) => {
-        window.renderSearchResults((data && data.students) || []);
+        if (!data || data.success === false) {
+          throw new Error((data && data.message) || "加载点评记录失败");
+        }
+        window.renderFeedbackTable(data.feedbacks || []);
       })
-      .catch((err) => {
-        console.error(err);
-        alert("搜索失败");
+      .catch((e) => {
+        console.error(e);
+        alert("加载点评记录失败");
       });
+
+    // 学员搜索：只用关键词（后端暂未支持课程范围筛学生）
+    const p2 = keyword
+      ? fetch(`/research/quality/students/search/?q=${encodeURIComponent(keyword)}`)
+          .then((r) => r.json())
+          .then((data) => {
+            window.renderSearchResults((data && data.students) || []);
+          })
+          .catch((err) => {
+            console.error(err);
+            alert("搜索学员失败");
+          })
+      : Promise.resolve(); // 没有关键词则不搜索学员
+
+    Promise.all([p1, p2]).catch(() => {});
+  };
+
+  // 学员搜索改为走统一逻辑
+  window.searchStudents = function () {
+    window.applySearchAndFilters();
   };
 
   window.updateResearchNote = function (studentId, note) {
@@ -221,8 +258,216 @@
   };
   window.viewStudentDetail = function (id) {
     if (!id) return;
-    window.location.href = `/research/quality/students/${id}/`;
+    // 改为 Ajax + 抽屉
+    fetch(`/research/quality/students/${id}/?ajax=1`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || data.success === false) {
+          throw new Error((data && data.message) || "加载失败");
+        }
+        const s = data.student || {};
+        showStudentDetailDrawer(s);
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("加载学员详情失败");
+      });
   };
+
+  // 抽屉：概览 + 点评记录
+  function showStudentDetailDrawer(student) {
+    const mask = document.getElementById("studentDetailDrawerMask");
+    const drawer = document.getElementById("studentDetailDrawer");
+    const content = document.getElementById("studentDetailDrawerContent");
+    if (!mask || !drawer || !content) return;
+
+    const groups =
+      Array.isArray(student.groups) && student.groups.length
+        ? student.groups.join(", ")
+        : "—";
+    const progress = student.course_progress || student.current_progress || 0;
+    const assigned = student.assigned_teacher_name || "未分配";
+    const note = student.research_note || "";
+
+    content.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:space-between;">
+        <h2 style="margin:0; font-size:18px;">学员详情</h2>
+        <button class="btn btn-sm btn-secondary" id="drawerCloseBtn">关闭</button>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="tab-header">
+          <button class="tab-button active" data-tab="drawerOverview" type="button">概览</button>
+          <button class="tab-button" data-tab="drawerFeedback" type="button">点评记录</button>
+        </div>
+        <div class="tab-pane active" id="drawerOverview" style="padding-top:12px;">
+          <div style="line-height:1.9;">
+            <div><strong>学员ID：</strong>${student.student_id || student.id || "—"}</div>
+            <div><strong>学员昵称：</strong>${student.student_name || "—"}</div>
+            <div><strong>分组：</strong>${groups}</div>
+            <div><strong>学习进度：</strong>第${progress}课</div>
+            <div><strong>点评老师：</strong>${assigned}</div>
+            <div style="margin-top:8px;">
+              <label for="drawerResearchNote"><strong>教研备注：</strong></label>
+              <textarea id="drawerResearchNote" class="form-input" style="width:100%; min-height:80px;" placeholder="填写教研备注">${note}</textarea>
+              <div style="margin-top:8px;">
+                <button class="btn btn-primary btn-sm" id="drawerSaveNoteBtn" data-id="${student.id}">保存备注</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-pane" id="drawerFeedback" style="padding-top:12px;">
+          <div class="filter-row" style="display:flex; gap:8px; align-items:center;">
+            <input type="text" id="drawerFeedbackKeyword" class="form-input" placeholder="按老师评语或昵称搜索">
+            <button class="btn btn-primary btn-sm" id="drawerFeedbackSearchBtn">搜索</button>
+          </div>
+          <div id="drawerFeedbackList" style="margin-top:10px;">
+            <div class="empty-state"><p>加载中...</p></div>
+          </div>
+          <div id="drawerFeedbackPagination" style="margin-top:8px;"></div>
+        </div>
+      </div>
+    `;
+
+    // tab 切换
+    const header = content.querySelector(".tab-header");
+    header.addEventListener("click", (e) => {
+      const btn = e.target.closest(".tab-button");
+      if (!btn) return;
+      header.querySelectorAll(".tab-button").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      const id = btn.getAttribute("data-tab");
+      content.querySelectorAll(".tab-pane").forEach((p) => p.classList.remove("active"));
+      const pane = content.querySelector("#" + id);
+      if (pane) pane.classList.add("active");
+    });
+
+    // 备注保存
+    const saveBtn = document.getElementById("drawerSaveNoteBtn");
+    const noteEl = document.getElementById("drawerResearchNote");
+    if (saveBtn && noteEl) {
+      saveBtn.addEventListener("click", () => {
+        const sid = saveBtn.getAttribute("data-id");
+        fetch(`/research/quality/students/${sid}/note/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({ note: noteEl.value || "" }),
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (!d || d.success === false) throw new Error(d.message || "保存失败");
+            alert("备注已保存");
+          })
+          .catch((e) => {
+            console.error(e);
+            alert("保存备注失败");
+          });
+      });
+    }
+
+    // 点评记录搜索与加载
+    const searchBtn = document.getElementById("drawerFeedbackSearchBtn");
+    const kwEl = document.getElementById("drawerFeedbackKeyword");
+    const doLoad = (page = 1) => {
+      const kw = (kwEl && kwEl.value || "").trim();
+      loadStudentFeedbackRecords(student.id, page, kw);
+    };
+    if (searchBtn) searchBtn.addEventListener("click", () => doLoad(1));
+    // 初次加载
+    doLoad(1);
+
+    // 显示抽屉
+    mask.style.display = "block";
+    drawer.style.display = "block";
+
+    // 关闭
+    const closeBtn = document.getElementById("drawerCloseBtn");
+    if (closeBtn) closeBtn.addEventListener("click", closeStudentDetailDrawer);
+    mask.addEventListener("click", closeStudentDetailDrawer);
+  }
+
+  function closeStudentDetailDrawer() {
+    const mask = document.getElementById("studentDetailDrawerMask");
+    const drawer = document.getElementById("studentDetailDrawer");
+    if (mask) mask.style.display = "none";
+    if (drawer) drawer.style.display = "none";
+  }
+
+  function loadStudentFeedbackRecords(studentId, page = 1, keyword = "") {
+    const listBox = document.getElementById("drawerFeedbackList");
+    const pager = document.getElementById("drawerFeedbackPagination");
+    if (!listBox) return;
+    listBox.innerHTML = `<div class="empty-state"><p>加载中...</p></div>`;
+    const params = new URLSearchParams({ ajax: "1", page: String(page) });
+    if (keyword) params.set("keyword", keyword);
+    if (studentId) params.set("student", String(studentId));
+
+    fetch(`/research/quality/feedback/?${params.toString()}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data || data.success === false) {
+          throw new Error((data && data.message) || "加载失败");
+        }
+        const rows = data.feedbacks || [];
+        if (!rows.length) {
+          listBox.innerHTML = `<div class="empty-state"><p>暂无点评记录</p></div>`;
+        } else {
+          const html = `
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>点评老师</th>
+                  <th>老师评语</th>
+                  <th>点评时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows
+                  .map((fb) => {
+                    const tname = (fb.teacher && fb.teacher.real_name) || "—";
+                    const comment = fb.teacher_comment || "";
+                    const time = fb.reply_time
+                      ? new Date(fb.reply_time).toLocaleString()
+                      : "—";
+                    return `<tr>
+                      <td>${tname}</td>
+                      <td>${comment}</td>
+                      <td>${time}</td>
+                    </tr>`;
+                  })
+                  .join("")}
+              </tbody>
+            </table>
+          `;
+          listBox.innerHTML = html;
+        }
+
+        // 简单分页（每页20条）
+        if (pager) {
+          const total = Number(data.total || 0);
+          const pageSize = 20;
+          const totalPages = Math.max(1, Math.ceil(total / pageSize));
+          const cur = Math.min(Math.max(1, Number(page || 1)), totalPages);
+          pager.innerHTML = `
+            <div style="display:flex; gap:8px; align-items:center;">
+              <button class="btn btn-sm btn-secondary" ${cur <= 1 ? "disabled" : ""} id="drawerPrevPage">上一页</button>
+              <span>第 ${cur} / ${totalPages} 页（共 ${total} 条）</span>
+              <button class="btn btn-sm btn-secondary" ${cur >= totalPages ? "disabled" : ""} id="drawerNextPage">下一页</button>
+            </div>
+          `;
+          const prev = document.getElementById("drawerPrevPage");
+          const next = document.getElementById("drawerNextPage");
+          if (prev) prev.addEventListener("click", () => loadStudentFeedbackRecords(studentId, cur - 1, keyword));
+          if (next) next.addEventListener("click", () => loadStudentFeedbackRecords(studentId, cur + 1, keyword));
+        }
+      })
+      .catch((e) => {
+        console.error(e);
+        listBox.innerHTML = `<div class="empty-state"><p>加载失败：${e.message}</p></div>`;
+      });
+  }
 
   // ===== 任务分配页：新版交互 =====
   function initAssignmentSearchBar() {

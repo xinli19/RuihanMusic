@@ -36,7 +36,6 @@ def task_assignment(request):
     context = {
         'teachers': teachers,
         'recent_tasks': recent_tasks,
-        'page_title': '教学任务分配',
     }
     return render(request, 'research/task_assignment.html', context)
 
@@ -200,7 +199,7 @@ def quality_monitoring(request):
         'teachers': teachers,
         'groups': groups,
         'attention_students': attention_students,
-        'page_title': '教学质量监控',
+        # 已移除 page_title，避免在 header 中渲染大标题
     }
     
     return render(request, 'research/quality_monitor.html', context)
@@ -224,11 +223,12 @@ def feedback_monitoring(request):
         keyword = request.GET.get('keyword')
         course_from = request.GET.get('course_from')
         course_to = request.GET.get('course_to')
+        student_id = request.GET.get('student')  # 新增：按学员ID筛选
         
         feedbacks = Feedback.objects.select_related('student', 'teacher')
         
-        # 默认显示本周点评
-        if not any([teacher_id, group, keyword, course_from, course_to]):
+        # 默认显示本周点评（当没有任何筛选条件时）
+        if not any([teacher_id, group, keyword, course_from, course_to, student_id]):
             feedbacks = feedbacks.filter(reply_time__gte=week_start, reply_time__lt=week_end)
         
         if teacher_id:
@@ -238,6 +238,8 @@ def feedback_monitoring(request):
             # feedbacks = feedbacks.filter(student__groups__contains=[group])
             # 改为SQLite兼容的查询
             feedbacks = feedbacks.filter(student__groups_json__icontains=f'"{group}"')
+        if student_id:
+            feedbacks = feedbacks.filter(student_id=student_id)
         if keyword:
             feedbacks = feedbacks.filter(
                 Q(student__student_name__icontains=keyword) |
@@ -254,9 +256,9 @@ def feedback_monitoring(request):
         page_number = request.GET.get('page')
         page_obj = paginator.get_page(page_number)
         
-        # 序列化数据
+        # 序列化数据（修正：只序列化当前页）
         feedbacks_data = []
-        for feedback in feedbacks:
+        for feedback in page_obj:
             feedbacks_data.append({
                 'id': feedback.id,
                 'student': {
@@ -285,21 +287,37 @@ def feedback_monitoring(request):
 
 @login_required
 def student_search(request):
-    """学员搜索功能"""
+    """学员搜索功能（改为返回 JSON，以供质量监控页的前端 fetch 使用）"""
     if not request.user.has_role('researcher'):
-        messages.error(request, '您没有权限访问此页面')
-        return redirect('accounts:profile')
+        # 前端 fetch 需要 JSON，而不是重定向
+        return JsonResponse({'success': False, 'message': '权限不足'}, status=403)
     
-    query = request.GET.get('q', '')
-    students = []
+    query = (request.GET.get('q') or '').strip()
+    if len(query) < 1:
+        # 与前端最小长度校验保持一致：1 个字符即可
+        return JsonResponse({'success': True, 'students': []})
     
-    if query and len(query) >= 2:
-        students = Student.objects.filter(
-            Q(student_name__icontains=query) |
-            Q(student_id__icontains=query) |
-            Q(alias_name__icontains=query)
-        ).order_by('student_name')[:50]
+    students_qs = Student.objects.filter(
+        Q(student_name__icontains=query) |
+        Q(student_id__icontains=query) |
+        Q(alias_name__icontains=query)
+    ).order_by('student_name')[:50]
     
+    students_data = []
+    for s in students_qs:
+        students_data.append({
+            'id': s.id,
+            'student_id': s.student_id,
+            'student_name': s.student_name,
+            'groups': s.groups,  # list
+            # 前端期望“第N课”，使用 learning_progress（课程数），不要用 course_progress 百分比
+            'course_progress': s.learning_progress,
+            'assigned_teacher_name': s.assigned_teacher_name,
+            'learning_status': s.learning_status,
+            'get_learning_status_display': s.get_learning_status_display_custom(),
+        })
+    
+    return JsonResponse({'success': True, 'students': students_data})
     context = {
         'query': query,
         'students': students,
@@ -308,19 +326,58 @@ def student_search(request):
 
 @login_required
 def student_detail(request, student_id):
-    """学员详情页面"""
+    """学员详情页面 / Ajax 数据"""
     if not request.user.has_role('researcher'):
+        if request.GET.get('ajax') == '1':
+            return JsonResponse({'success': False, 'message': '权限不足'})
         messages.error(request, '您没有权限访问此页面')
         return redirect('accounts:profile')
     
     student = get_object_or_404(Student, id=student_id)
-    
+
+    # Ajax：返回 JSON 供抽屉使用
+    if request.GET.get('ajax') == '1':
+        try:
+            # 最近 5 条点评（抽屉概览可能用到）
+            feedbacks = list(
+                Feedback.objects.filter(student=student)
+                .select_related('teacher')
+                .order_by('-reply_time')[:5]
+                .values(
+                    'id',
+                    'teacher_comment',
+                    'reply_time',
+                    'teacher__real_name',
+                )
+            )
+            feedbacks_payload = [
+                {
+                    'id': fb['id'],
+                    'teacher_comment': fb['teacher_comment'],
+                    'reply_time': fb['reply_time'].isoformat() if fb['reply_time'] else None,
+                    'teacher': {'real_name': fb['teacher__real_name'] or ''},
+                }
+                for fb in feedbacks
+            ]
+            payload = {
+                'id': student.id,
+                'student_id': student.student_id,
+                'student_name': student.student_name,
+                'groups': student.groups,
+                'course_progress': student.course_progress,  # 第几课
+                'assigned_teacher_name': student.assigned_teacher_name,
+                'research_note': getattr(student, 'research_note', '') or '',
+                'recent_feedbacks': feedbacks_payload,
+            }
+            return JsonResponse({'success': True, 'student': payload})
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+
+    # 页面渲染（保留原行为）
     # 获取学员的点评记录
     feedbacks = Feedback.objects.filter(student=student).select_related('teacher').order_by('-reply_time')[:10]
-    
     # 获取学员的任务分配记录
     tasks = TeachingTask.objects.filter(student=student).select_related('teacher', 'researcher').order_by('-created_at')[:10]
-    
     context = {
         'student': student,
         'feedbacks': feedbacks,

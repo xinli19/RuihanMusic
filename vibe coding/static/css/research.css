@@ -50,7 +50,34 @@
 .tab-content.active {
     display: block;
 }
+/* 研究模块样式 */
+/* ... existing code ... */
 
+/* Drawer（复用运营模块样式的一部分） */
+.drawer-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.35);
+  z-index: 1999;
+}
+
+.drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 560px;
+  background: #fff;
+  box-shadow: -2px 0 12px rgba(0,0,0,0.2);
+  z-index: 2000;
+  overflow: auto;
+}
+
+.drawer-content {
+  padding: 16px;
+}
+
+/* ... existing code ... */
 /* 教师选择区域 */
 .teacher-stats {
     background: white;
@@ -1389,4 +1416,3 @@
 .student-item { display:flex; gap:12px; align-items:flex-start; }
 .student-item .task-meta { flex:1; }
 .student-item { display:flex; gap:12px; align-items:flex-start; }
-.student-item .task-

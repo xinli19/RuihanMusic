@@ -9,9 +9,6 @@
 
 {% block content %}
 
-<!-- 跨页 Tab 导航：任务分配 | 质量监控 -->
-<!-- 已移除：通过侧栏导航切换 -->
-
 <div class="quality-monitor-container">
   <div class="module-tabs">
     <div class="tabs">
@@ -23,41 +20,27 @@
       <div id="feedbackRecords" class="tab-pane active">
         <div class="action-bar">
           <button class="btn btn-primary" onclick="getWeeklyFeedback()">获取本周点评</button>
-          <button class="btn btn-secondary" onclick="addToDiscussion()">加入需讨论名单</button>
-          <button class="btn btn-info" onclick="generateQualityReport()">生成质量报告</button>
         </div>
 
-        <!-- 筛选条件 -->
+        <!-- 筛选条件（移除该区域的搜索框，改为使用学员搜索框作为统一关键词来源） -->
         <div class="filter-section">
           <div class="filter-row">
             <input type="text" id="searchInput" placeholder="搜索学员昵称或老师评语" class="form-input">
-            <select id="groupFilter" class="form-input">
-              <option value="">全部分组</option>
-              {% for group in groups %}
-              <option value="{{ group.0 }}">{{ group.1 }}</option>
-              {% endfor %}
-            </select>
-            <select id="teacherFilter" class="form-input">
-              <option value="">全部点评老师</option>
-              {% for teacher in teachers %}
-              <option value="{{ teacher.id }}">{{ teacher.real_name }}</option>
-              {% endfor %}
-            </select>
           </div>
           <div class="filter-row">
             <label>课程范围：</label>
             <input type="number" id="courseFrom" placeholder="从第几课" class="form-input" style="width: 120px;">
             <span>到</span>
             <input type="number" id="courseTo" placeholder="到第几课" class="form-input" style="width: 120px;">
-            <button class="btn btn-primary" onclick="applyFilters && applyFilters()">应用筛选</button>
+            <button class="btn btn-primary" onclick="applySearchAndFilters()">应用筛选</button>
           </div>
         </div>
 
-        <!-- 学员搜索（合并到点评记录管理） -->
+        <!-- 学员搜索（作为统一关键词来源） -->
         <div class="search-form">
           <div class="search-row">
             <input type="text" id="studentSearchInput" placeholder="输入学员昵称或学员ID" class="form-input">
-            <button class="btn btn-primary" onclick="searchStudents()">搜索</button>
+            <button class="btn btn-primary" onclick="applySearchAndFilters()">搜索</button>
           </div>
         </div>
 
@@ -182,7 +165,7 @@
         <div class="search-form">
           <div class="search-row">
             <input type="text" id="studentSearchInput" placeholder="输入学员昵称或学员ID" class="form-input">
-            <button class="btn btn-primary" onclick="searchStudents()">搜索</button>
+            <button class="btn btn-primary" onclick="applySearchAndFilters()">搜索</button>
           </div>
         </div>
 
@@ -216,6 +199,14 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- 抽屉容器（复用运营模块样式类） -->
+<div id="studentDetailDrawerMask" class="drawer-mask" style="display:none;"></div>
+<div id="studentDetailDrawer" class="drawer" style="display:none;">
+  <div class="drawer-content">
+    <div id="studentDetailDrawerContent"></div>
   </div>
 </div>
 
