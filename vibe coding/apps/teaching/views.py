@@ -364,23 +364,23 @@ def search_students(request):
     
     query = request.GET.get('q', '').strip()
     
-    if len(query) < 2:
+    # 允许单字符查询
+    if len(query) < 1:
         return JsonResponse({
             'success': True,
             'students': []
         })
     
-    # 搜索学员
     students = Student.objects.filter(
-        Q(student_name__icontains=query) | Q(alias_name__icontains=query)  # 修复：name/nickname -> student_name/alias_name
-    ).filter(status__in=['active', 'joined'])[:10]  # 修复：移除不存在的 'difficult' 状态，允许 active/joined
+        Q(student_name__icontains=query) | Q(alias_name__icontains=query)
+    ).filter(status__in=['active', 'joined'])[:10]
     
     student_list = []
     for student in students:
         student_list.append({
             'student_id': student.student_id,
-            'student_name': student.student_name,  # 修复：name -> student_name
-            'alias_name': student.alias_name,      # 修复：nickname -> alias_name
+            'student_name': student.student_name,
+            'alias_name': student.alias_name,
             'groups': student.groups,
             'current_progress': student.current_progress,
             'status': student.status,

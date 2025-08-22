@@ -1,643 +1,526 @@
-// 睿涵音乐后台管理系统 - 运营模块JavaScript
+// 睿涵音乐后台管理系统 - 运营模块JavaScript（重写版）
 
-// 全局变量
-let currentPage = 1;
-let currentFilter = 'all';
-let searchQuery = '';
-let studentsData = [];
-let hasLoadedOpsTasks = false;   // 新增：运营任务是否已加载
-let hasLoadedVisits = false;     // 新增：回访记录是否已加载
+// -------------------- 全局状态 --------------------
+let hasInitStudentMgr = false;
+let hasInitOpsTab = false;
+let hasInitVisitTab = false;
 
-// 页面加载完成后初始化
-document.addEventListener('DOMContentLoaded', function() {
-    initOperationsTabs(); // 新增：初始化运营模块Tab切换
-    initializeOperations();
-    loadStudentsList();
-    setupEventListeners();
+document.addEventListener("DOMContentLoaded", () => {
+  initTabs();
 });
 
-// 初始化运营模块
-function initializeOperations() {
-    console.log('运营模块初始化完成');
+// -------------------- 工具函数 --------------------
+function showSuccess(msg) {
+  alert("成功：" + msg);
+}
+function showError(msg) {
+  alert("错误：" + msg);
 }
 
-// 设置事件监听器
-function setupEventListeners() {
-    // 搜索输入框
-    const searchInput = document.getElementById('student-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', function(e) {
-            searchQuery = e.target.value.trim();
-            currentPage = 1;
-            loadStudentsList();
-        });
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== "") {
+    const cookies = document.cookie.split(";");
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.startsWith(name + "=")) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
-    
-    // 筛选标签
-    const filterTabs = document.querySelectorAll('.filter-tab');
-    filterTabs.forEach(tab => {
-        tab.addEventListener('click', function() {
-            // 移除所有active类
-            filterTabs.forEach(t => t.classList.remove('active'));
-            // 添加active类到当前标签
-            this.classList.add('active');
-            
-            currentFilter = this.dataset.filter;
-            currentPage = 1;
-            loadStudentsList();
-        });
-    });
-    // 绑定回访搜索框回车直接搜索
-    const visitSearch = document.getElementById('visit-search');
-    if (visitSearch) {
-        visitSearch.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') {
-                loadVisitRecords(1, visitSearch.value.trim());
-            }
-        });
+  }
+  return cookieValue;
+}
+
+function formatArrayText(val) {
+  if (!val) return "—";
+  if (Array.isArray(val)) return val.join(", ");
+  return String(val);
+}
+
+// -------------------- Tab 初始化 --------------------
+function initTabs() {
+  const header = document.querySelector(".tab-header");
+  if (!header) return;
+
+  const activate = (id, btn) => {
+    document
+      .querySelectorAll(".tab-button")
+      .forEach((b) => b.classList.remove("active"));
+    document
+      .querySelectorAll(".tab-pane")
+      .forEach((p) => p.classList.remove("active"));
+    if (btn) btn.classList.add("active");
+    const pane = document.getElementById(id);
+    if (pane) pane.classList.add("active");
+
+    if (id === "studentManagement" && !hasInitStudentMgr) {
+      initStudentManagement();
+      hasInitStudentMgr = true;
     }
-}
-
-// 加载学员列表
-function loadStudentsList() {
-    const params = new URLSearchParams({
-        page: currentPage,
-        filter: currentFilter,
-        search: searchQuery
-    });
-    
-    fetch(`/operations/students/api/?${params}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                studentsData = data.data;  // 注意：后端返回的是data.data
-                renderStudentsList(data.data);
-                renderPagination(data.pagination);
-                updateStats(data.stats);
-            } else {
-                showError('加载学员列表失败：' + data.message);  // 修复：error -> message
-            }
-        })
-        .catch(error => {
-            showError('网络错误：' + error.message);
-        });
-}
-
-// 查看学员详情
-function viewStudentDetail(studentId) {
-    fetch(`/operations/students/${studentId}/`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const student = data.student || data.data;  // 新旧结构兼容
-                showStudentDetailModal(student);
-            } else {
-                showError('获取学员详情失败：' + (data.message || data.error || '未知错误'));
-            }
-        })
-        .catch(error => {
-            showError('网络错误：' + error.message);
-        });
-}
-
-// 渲染学员列表
-function renderStudentsList(students) {
-    const container = document.getElementById('students-list');
-    if (!container) return;
-    
-    if (students.length === 0) {
-        container.innerHTML = '<div class="operations-empty-state">暂无学员数据</div>';
-        return;
+    if (id === "opsTaskManagement" && !hasInitOpsTab) {
+      initOpsTaskTab();
+      hasInitOpsTab = true;
     }
-    
-    let html = '';
-    students.forEach(student => {
-        const statusClass = getStatusClass(student.status);
-        html += `
-            <div class="student-item" data-student-id="${student.id}">
-                <div class="student-info">
-                    <div class="student-name">${student.name}</div>
-                    <div class="student-details">
-                        ID: ${student.student_id} | 
-                        分组: ${student.groups.join(', ')} | 
-                        状态: <span class="${statusClass}">${student.status}</span>
-                    </div>
-                    <div class="student-details">
-                        进度: ${student.current_progress} | 
-                        学习时长: ${student.total_study_time}小时
-                    </div>
-                    ${student.operation_note ? `<div class="student-details">运营备注: ${student.operation_note}</div>` : ''}
-                </div>
-                <div class="student-actions">
-                    <button class="operations-btn operations-btn-primary" onclick="viewStudentDetail('${student.id}')">详情</button>
-                    <button class="operations-btn operations-btn-warning" onclick="editStudent('${student.id}')">编辑</button>
-                    <button class="operations-btn operations-btn-success" onclick="addNote('${student.id}')">备注</button>
-                </div>
+  };
+
+  header.addEventListener("click", (e) => {
+    const btn = e.target.closest(".tab-button");
+    if (!btn) return;
+    const id = btn.getAttribute("data-tab");
+    if (!id) return;
+    activate(id, btn);
+  });
+
+  header.addEventListener("keydown", (e) => {
+    const btn = e.target.closest(".tab-button");
+    if (!btn) return;
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      const id = btn.getAttribute("data-tab");
+      if (!id) return;
+      activate(id, btn);
+    }
+  });
+
+  // 默认激活当前已有的 active
+  const activeBtn = header.querySelector(".tab-button.active");
+  if (activeBtn) {
+    activate(activeBtn.getAttribute("data-tab"), activeBtn);
+  }
+}
+
+// -------------------- 学员信息管理 --------------------
+function initStudentManagement() {
+  const input = document.getElementById("student-mgr-search");
+  const btn = document.getElementById("student-mgr-search-btn");
+  const box = document.getElementById("student-mgr-results");
+  if (!input || !btn || !box) return;
+
+  const doSearch = async () => {
+    const q = input.value.trim();
+    box.innerHTML =
+      '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>搜索中...</p></div>';
+    try {
+      const list = await fetchStudents(q);
+      renderStudentMgrResults(list);
+    } catch (e) {
+      box.innerHTML = `<div class="operations-empty-state">搜索失败：${e.message}</div>`;
+    }
+  };
+
+  btn.addEventListener("click", doSearch);
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") doSearch();
+  });
+}
+
+async function fetchStudents(query) {
+  const params = new URLSearchParams({ page: 1, page_size: 20 });
+  if (query) params.set("search", query);
+  const res = await fetch(`/operations/students/api/?${params.toString()}`);
+  const data = await res.json();
+  if (!data.success) throw new Error(data.message || "获取学员失败");
+  return Array.isArray(data.data) ? data.data : [];
+}
+
+function renderStudentMgrResults(students) {
+  const box = document.getElementById("student-mgr-results");
+  if (!box) return;
+  if (!students.length) {
+    box.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <p>未找到匹配的学员</p>
             </div>
         `;
+    return;
+  }
+
+  let html = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>学员昵称</th>
+                    <th>ID</th>
+                    <th>备注名</th>
+                    <th>分组</th>
+                    <th>创建时间</th>
+                    <th style="width:260px;">操作</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+  students.forEach((s) => {
+    html += `
+            <tr>
+                <td>${s.student_name || s.name || "—"}</td>
+                <td>${s.id || s.student_id || "—"}</td>
+                <td>${s.alias_name || "—"}</td>
+                <td>${formatArrayText(s.groups)}</td>
+                <td>${s.created_at || "—"}</td>
+                <td>
+                    <button class="btn btn-primary js-view-stu" data-id="${
+                      s.id
+                    }">详情</button>
+                    <button class="btn btn-warning js-edit-stu" data-id="${
+                      s.id
+                    }" style="margin-left:6px;">编辑</button>
+                    <button class="btn btn-success js-add-task" data-id="${
+                      s.id
+                    }" style="margin-left:6px;">手动增加任务</button>
+                </td>
+            </tr>
+        `;
+  });
+  html += "</tbody></table>";
+  box.innerHTML = html;
+
+  box.querySelectorAll(".js-view-stu").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const id = e.currentTarget.getAttribute("data-id");
+      viewStudentDetail(id);
     });
-    
-    container.innerHTML = html;
+  });
+  box.querySelectorAll(".js-edit-stu").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const id = e.currentTarget.getAttribute("data-id");
+      openEditStudentModal(id);
+    });
+  });
+  box.querySelectorAll(".js-add-task").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const id = e.currentTarget.getAttribute("data-id");
+      await addOpsTaskForStudent(id);
+    });
+  });
 }
 
-// 获取状态样式类
-function getStatusClass(status) {
-    switch(status) {
-        case '正常': return 'status-normal';
-        case '暂停': return 'status-paused';
-        case '困难': return 'status-difficult';
-        default: return 'status-unknown';
-    }
+// 学员详情（模态框展示）
+function viewStudentDetail(studentId) {
+  fetch(`/operations/students/${studentId}/`)
+    .then((r) => r.json())
+    .then((data) => {
+      if (!data.success) throw new Error(data.message || "获取学员详情失败");
+      const s = data.student || data.data || data.student_payload || {};
+      // 改为使用“抽屉式侧滑”而非弹窗
+      showStudentDetailDrawer(s);
+    })
+    .catch((e) => showError("获取学员详情失败：" + e.message));
 }
 
-// 渲染分页
-function renderPagination(pagination) {
-    const container = document.getElementById('pagination');
-    if (!container || !pagination) return;
-    
-    let html = '';
-    
-    // 上一页
-    if (pagination.has_previous) {
-        html += `<button class="pagination-btn" onclick="changePage(${pagination.previous_page_number})">上一页</button>`;
-    }
-    
-    // 页码
-    for (let i = 1; i <= pagination.num_pages; i++) {
-        const activeClass = i === pagination.current_page ? 'active' : '';
-        html += `<button class="pagination-btn ${activeClass}" onclick="changePage(${i})">${i}</button>`;
-    }
-    
-    // 下一页
-    if (pagination.has_next) {
-        html += `<button class="pagination-btn" onclick="changePage(${pagination.next_page_number})">下一页</button>`;
-    }
-    
-    container.innerHTML = html;
-}
-
-// 更新统计信息
-function updateStats(stats) {
-    if (!stats) return;
-    
-    const totalElement = document.getElementById('total-students');
-    const activeElement = document.getElementById('active-students');
-    const pausedElement = document.getElementById('paused-students');
-    
-    if (totalElement) totalElement.textContent = stats.total || 0;
-    if (activeElement) activeElement.textContent = stats.active || 0;
-    if (pausedElement) pausedElement.textContent = stats.paused || 0;
-}
-
-// 切换页面
-function changePage(page) {
-    currentPage = page;
-    loadStudentsList();
-}
-
-// 显示学员详情模态框
 function showStudentDetailModal(student) {
-    // 渲染进度：对象数组 -> k:v 列表；字符串数组 -> 逗号拼接
-    function renderProgressText(progress) {
-        if (!progress || progress.length === 0) return '—';
-        if (typeof progress[0] === 'object') {
-            return '<ul style="margin-left:16px;">' + progress.map((p) => {
-                const kv = Object.entries(p || {}).map(([k, v]) => `${k}: ${v}`).join(', ');
-                return `<li>${kv || '[空]'}</li>`;
-            }).join('') + '</ul>';
-        }
-        return Array.isArray(progress) ? progress.join(', ') : String(progress);
-    }
+  const modal = document.getElementById("studentDetailModal");
+  const content = document.getElementById("studentDetailModalContent");
+  if (!modal || !content) {
+    showError("学员详情模态框未找到");
+    return;
+  }
 
-    // 最近点评（仅 teacher_comment）
-    let feedbackListHtml = '';
-    if (Array.isArray(student.feedback_comments) && student.feedback_comments.length > 0) {
-        feedbackListHtml = '<ul style="margin-left:16px;">' + student.feedback_comments.map(c => `<li>${c || ''}</li>`).join('') + '</ul>';
-    } else if (Array.isArray(student.recent_feedbacks) && student.recent_feedbacks.length > 0) {
-        feedbackListHtml = '<ul style="margin-left:16px;">' + student.recent_feedbacks.map(f =>
-            `<li>【${f.feedback_time}】第${f.lesson_progress} - ${f.teacher_name}：${f.teacher_comment || ''}</li>`
-        ).join('') + '</ul>';
-    } else {
-        feedbackListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
+  const groups = Array.isArray(student.groups)
+    ? student.groups.join(", ")
+    : student.groups || "—";
+  const progress = (() => {
+    const p = student.progress || student.learning_progress || [];
+    if (!p || !p.length) return "—";
+    if (typeof p[0] === "object") {
+      return (
+        '<ul style="margin-left:16px;">' +
+        p
+          .map((o) => {
+            const kv = Object.entries(o || {})
+              .map(([k, v]) => `${k}: ${v}`)
+              .join(", ");
+            return `<li>${kv || ""}</li>`;
+          })
+          .join("") +
+        "</ul>"
+      );
     }
+    return Array.isArray(p) ? p.join(", ") : String(p);
+  })();
+  const feedbackListHtml =
+    Array.isArray(student.feedback_comments) && student.feedback_comments.length
+      ? '<ul style="margin-left:16px;">' +
+        student.feedback_comments.map((c) => `<li>${c || ""}</li>`).join("") +
+        "</ul>"
+      : Array.isArray(student.recent_feedbacks) &&
+        student.recent_feedbacks.length
+      ? '<ul style="margin-left:16px;">' +
+        student.recent_feedbacks
+          .map(
+            (f) =>
+              `<li>【${f.feedback_time}】第${f.lesson_progress} - ${
+                f.teacher_name
+              }：${f.teacher_comment || ""}</li>`
+          )
+          .join("") +
+        "</ul>"
+      : '<ul style="margin-left:16px;"><li>暂无</li></ul>';
+  const visitListHtml =
+    Array.isArray(student.visit_notes) && student.visit_notes.length
+      ? '<ul style="margin-left:16px;">' +
+        student.visit_notes.map((n) => `<li>${n || ""}</li>`).join("") +
+        "</ul>"
+      : '<ul style="margin-left:16px;"><li>暂无</li></ul>';
 
-    // 回访记录（visit_note）
-    let visitListHtml = '';
-    if (Array.isArray(student.visit_notes) && student.visit_notes.length > 0) {
-        visitListHtml = '<ul style="margin-left:16px;">' + student.visit_notes.map(n => `<li>${n || ''}</li>`).join('') + '</ul>';
-    } else {
-        visitListHtml = '<ul style="margin-left:16px;"><li>暂无</li></ul>';
-    }
-
-    const modal = document.getElementById('studentDetailModal');
-    const content = document.getElementById('studentDetailModalContent');
-    if (!modal || !content) {
-        alert('模态框元素未找到');
-        return;
-    }
-
-    content.innerHTML = `
-        <div><strong>ID：</strong>${student.student_id || ''}</div>
-        <div><strong>姓名：</strong>${student.student_name || student.name || ''}（${student.nickname || student.alias_name || '无别名'}）</div>
-        <div><strong>分组：</strong>${Array.isArray(student.groups) ? student.groups.join(', ') : (student.groups || '')}</div>
-        <div><strong>进度：</strong>${renderProgressText(student.progress)}</div>
-        <div><strong>状态：</strong>${student.status || '—'}</div>
-        <div><strong>学习时长：</strong>${student.learning_hours ?? student.total_study_time ?? 0} 小时</div>
-        <div><strong>教研备注：</strong>${student.research_note || student.research_notes || '—'}</div>
-        <div><strong>运营备注：</strong>${student.ops_note || student.operation_notes || student.operation_note || '—'}</div>
-        <div style="margin-top:10px;"><strong>最近点评（teacher_comment）：</strong></div>
+  content.innerHTML = `
+        <div><strong>ID：</strong>${
+          student.student_id || student.id || ""
+        }</div>
+        <div><strong>姓名：</strong>${
+          student.student_name || student.name || ""
+        }（${student.alias_name || student.nickname || "无别名"}）</div>
+        <div><strong>分组：</strong>${groups}</div>
+        <div><strong>进度：</strong>${progress}</div>
+        <div><strong>状态：</strong>${student.status || "—"}</div>
+        <div><strong>学习时长：</strong>${
+          student.learning_hours ?? student.total_study_time ?? 0
+        } 小时</div>
+        <div><strong>教研备注：</strong>${
+          student.research_note || student.research_notes || "—"
+        }</div>
+        <div><strong>运营备注：</strong>${
+          student.ops_note ||
+          student.operation_notes ||
+          student.operation_note ||
+          "—"
+        }</div>
+        <div style="margin-top:10px;"><strong>最近点评：</strong></div>
         ${feedbackListHtml}
-        <div style="margin-top:10px;"><strong>回访记录（visit_note）：</strong></div>
+        <div style="margin-top:10px;"><strong>回访记录（摘要）：</strong></div>
         ${visitListHtml}
     `;
 
-    modal.style.display = 'block';
+  modal.style.display = "block";
 }
 
-// 打开添加学员模态框
-function openAddStudentModal() {
-    const modal = document.getElementById('studentModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const form = document.getElementById('studentForm');
-    
-    if (!modal || !modalTitle || !form) {
-        console.error('模态框元素未找到');
-        return;
-    }
-    
-    // 设置标题
-    modalTitle.textContent = '添加学员';
-    
-    // 清空表单
-    form.reset();
-    document.getElementById('studentId').value = '';
-    
-    // 显示模态框
-    modal.style.display = 'block';
-    
-    // 设置表单提交事件
-    form.onsubmit = function(e) {
-        e.preventDefault();
-        submitStudentForm(false); // false表示新增
-    };
-}
-
-// 打开编辑学员模态框
-function openEditStudentModal(studentId) {
-    const modal = document.getElementById('studentModal');
-    const modalTitle = document.getElementById('modalTitle');
-    const form = document.getElementById('studentForm');
-    
-    if (!modal || !modalTitle || !form) {
-        console.error('模态框元素未找到');
-        return;
-    }
-    
-    // 设置标题
-    modalTitle.textContent = '编辑学员';
-    
-    // 获取学员详情并填充表单
-    fetch(`/operations/students/${studentId}/`, {
-        method: 'GET',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken')
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            const student = data.student;
-            document.getElementById('studentId').value = student.id;
-            document.getElementById('studentName').value = student.student_name || '';
-            document.getElementById('aliasName').value = student.alias_name || '';
-            document.getElementById('groupName').value = student.groups ? student.groups.join(', ') : '';
-            document.getElementById('status').value = student.status || 'active';
-            
-            // 显示模态框
-            modal.style.display = 'block';
-            
-            // 设置表单提交事件
-            form.onsubmit = function(e) {
-                e.preventDefault();
-                submitStudentForm(true); // true表示编辑
-            };
-        } else {
-            showError('获取学员信息失败：' + data.message);
-        }
-    })
-    .catch(error => {
-        showError('网络错误：' + error.message);
-    });
-}
-
-// 关闭学员模态框
-function closeStudentModal() {
-    const modal = document.getElementById('studentModal');
-    if (modal) {
-        modal.style.display = 'none';
-    }
-}
-
-// 关闭学员详情模态框
 function closeStudentDetailModal() {
-    const modal = document.getElementById('studentDetailModal');
-    if (modal) modal.style.display = 'none';
+  const modal = document.getElementById("studentDetailModal");
+  if (modal) modal.style.display = "none";
 }
 
-// 提交学员表单
+// -------------------- 添加/编辑学员（模态） --------------------
+function openAddStudentModal() {
+  const modal = document.getElementById("studentModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const form = document.getElementById("studentForm");
+  if (!modal || !modalTitle || !form) return;
+
+  modalTitle.textContent = "添加学员";
+  form.reset();
+  document.getElementById("studentId").value = "";
+
+  modal.style.display = "block";
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    submitStudentForm(false);
+  };
+}
+
+function openEditStudentModal(studentId) {
+  const modal = document.getElementById("studentModal");
+  const modalTitle = document.getElementById("modalTitle");
+  const form = document.getElementById("studentForm");
+  if (!modal || !modalTitle || !form) return;
+
+  modalTitle.textContent = "编辑学员";
+  fetch(`/operations/students/${studentId}/`)
+    .then((r) => r.json())
+    .then((data) => {
+      if (!data.success) throw new Error(data.message || "获取学员失败");
+      const s = data.student || data.data || {};
+      document.getElementById("studentId").value = s.id || "";
+      document.getElementById("studentName").value = s.student_name || "";
+      document.getElementById("aliasName").value = s.alias_name || "";
+      document.getElementById("groupName").value = Array.isArray(s.groups)
+        ? s.groups.join(", ")
+        : s.groups || "";
+      document.getElementById("status").value = s.status || "active";
+      modal.style.display = "block";
+      form.onsubmit = (e) => {
+        e.preventDefault();
+        submitStudentForm(true);
+      };
+    })
+    .catch((e) => showError("获取学员失败：" + e.message));
+}
+
+function closeStudentModal() {
+  const modal = document.getElementById("studentModal");
+  if (modal) modal.style.display = "none";
+}
+
 function submitStudentForm(isEdit) {
-    const form = document.getElementById('studentForm');
-    const formData = new FormData(form);
-    
-    // 构建请求数据
-    const data = {
-        student_name: formData.get('student_name'),
-        alias_name: formData.get('alias_name'),
-        groups: formData.get('group_name') ? formData.get('group_name').split(',').map(g => g.trim()) : [],
-        status: formData.get('status')
-    };
-    
-    // 如果是编辑模式，添加external_user_id
-    if (isEdit) {
-        const studentId = formData.get('student_id');
-        data.external_user_id = formData.get('external_user_id') || '';
-    } else {
-        // 新增模式需要external_user_id
-        data.external_user_id = prompt('请输入用户ID（必填）：');
-        if (!data.external_user_id) {
-            showError('用户ID为必填项');
-            return;
-        }
+  const form = document.getElementById("studentForm");
+  const fd = new FormData(form);
+  const data = {
+    student_name: fd.get("student_name"),
+    alias_name: fd.get("alias_name"),
+    groups: fd.get("group_name")
+      ? fd
+          .get("group_name")
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean)
+      : [],
+    status: fd.get("status"),
+  };
+  let url = "";
+  if (isEdit) {
+    const studentId = fd.get("student_id");
+    url = `/operations/students/${studentId}/update/`;
+    // 可选：更新 external_user_id（如果有该字段）
+    const ext = fd.get("external_user_id");
+    if (ext) data.external_user_id = ext;
+  } else {
+    const ext = prompt("请输入用户ID（必填）：");
+    if (!ext) {
+      showError("用户ID为必填项");
+      return;
     }
-    
-    // 验证必填字段
-    if (!data.student_name) {
-        showError('学员昵称为必填项');
-        return;
-    }
-    
-    // 发送请求
-    const url = isEdit ? `/operations/students/${formData.get('student_id')}/update/` : '/operations/students/create/';
-    
-    fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(data)
+    data.external_user_id = ext;
+    url = "/operations/students/create/";
+  }
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "X-CSRFToken": getCookie("csrftoken"),
+    },
+    body: JSON.stringify(data),
+  })
+    .then((r) => r.json())
+    .then((d) => {
+      if (!d.success) throw new Error(d.message || "保存失败");
+      showSuccess(isEdit ? "学员信息更新成功" : "学员创建成功");
+      closeStudentModal();
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccess(isEdit ? '学员信息更新成功' : '学员创建成功');
-            closeStudentModal();
-            loadStudentsList(); // 重新加载学员列表
-        } else {
-            showError((isEdit ? '更新' : '创建') + '学员失败：' + data.message);
-        }
-    })
-    .catch(error => {
-        showError('网络错误：' + error.message);
+    .catch((e) => showError("保存失败：" + e.message));
+}
+
+// -------------------- 运营任务管理 --------------------
+function initOpsTaskTab() {
+  // 仅初始化运营任务列表 + 批量操作
+  loadOpsTasks(1);
+
+  // 批量“删除” => 实为批量关闭
+  const btnDelete = document.getElementById("ops-batch-delete");
+  const btnExport = document.getElementById("ops-export");
+  if (btnDelete) btnDelete.addEventListener("click", () => batchUpdateOpsTasks("已关闭"));
+  if (btnExport)
+    btnExport.addEventListener("click", () => {
+      const ids = getSelectedTaskIds();
+      if (!ids.length) return;
+      const blob = new Blob([ids.join("\n")], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `ops_tasks_${Date.now()}.txt`;
+      a.click();
+      URL.revokeObjectURL(url);
     });
 }
 
-// 打开批量导入模态框
-function openBatchImportModal() {
-    // 这里可以实现批量导入功能
-    alert('批量导入功能待实现');
-}
-
-// 导出学员数据
-function exportStudents() {
-    // 这里可以实现导出功能
-    alert('导出功能待实现');
-}
-
-// 点击模态框外部关闭模态框
-window.onclick = function(event) {
-    const editModal = document.getElementById('studentModal');
-    const detailModal = document.getElementById('studentDetailModal');
-    if (event.target === editModal) {
-        closeStudentModal();
-    }
-    if (event.target === detailModal) {
-        closeStudentDetailModal();
-    }
-};
-
-// 修改现有的editStudent函数，将其替换为：
-function editStudent(studentId) {
-    openEditStudentModal(studentId);
-}
-
-// 添加备注
-function addNote(studentId) {
-    const note = prompt('请输入运营备注：');
-    if (!note) return;
-    
-    const data = {
-        operation_note: note
-    };
-    
-    fetch(`/operations/students/${studentId}/note/`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': getCookie('csrftoken')
-        },
-        body: JSON.stringify(data)
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showSuccess('备注添加成功');
-            loadStudentsList();
-        } else {
-            showError('添加备注失败：' + data.error);
-        }
-    })
-    .catch(error => {
-        showError('网络错误：' + error.message);
-    });
-}
-
-// 显示成功信息
-function showSuccess(message) {
-    alert('成功：' + message);
-}
-
-// 显示错误信息
-function showError(message) {
-    alert('错误：' + message);
-}
-
-// 获取CSRF Token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-
-// 新增：通用Tab切换（复用teaching的交互）
-function initOperationsTabs() {
-    const header = document.querySelector('.tab-header');
-    const panes = document.querySelectorAll('.tab-pane');
-    if (!header || !panes.length) return;
-
-    const activate = (targetId, btn) => {
-        // 切换激活态
-        document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
-        panes.forEach(p => p.classList.remove('active'));
-        if (btn) btn.classList.add('active');
-        const pane = document.getElementById(targetId);
-        if (pane) pane.classList.add('active');
-
-        // 懒加载两个新Tab的数据
-        if (targetId === 'opsTaskManagement' && !hasLoadedOpsTasks) {
-            loadOpsTasks(1);
-            hasLoadedOpsTasks = true;
-
-            // 删除“批量完成”绑定（不再存在）
-            // const btnComplete = document.getElementById('ops-batch-complete');
-            // if (btnComplete) { ... }
-
-            // 仅保留“批量删除”与“导出列表”
-            const btnDelete = document.getElementById('ops-batch-delete');
-            if (btnDelete) {
-                btnDelete.addEventListener('click', () => batchUpdateOpsTasks('已关闭')); // 暂无物理删除，等同关闭
-            }
-            const btnExport = document.getElementById('ops-export');
-            if (btnExport) {
-                btnExport.addEventListener('click', () => {
-                    const ids = getSelectedTaskIds();
-                    if (ids.length === 0) return;
-                    const blob = new Blob([ids.join('\n')], { type: 'text/plain;charset=utf-8' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = `ops_tasks_${Date.now()}.txt`;
-                    a.click();
-                    URL.revokeObjectURL(url);
-                });
-            }
-
-            // 新增：学员搜索绑定（Enter 或点击按钮触发）
-            const opsSearchInput = document.getElementById('ops-student-search');
-            const opsSearchBtn = document.getElementById('ops-student-search-btn');
-            if (opsSearchInput) {
-                opsSearchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        opsSearchStudents(opsSearchInput.value.trim());
-                    }
-                });
-            }
-            if (opsSearchBtn && opsSearchInput) {
-                opsSearchBtn.addEventListener('click', () => {
-                    opsSearchStudents(opsSearchInput.value.trim());
-                });
-            }
-        } else if (targetId === 'visitRecords' && !hasLoadedVisits) {
-            loadVisitRecords(1);
-            hasLoadedVisits = true;
-        }
-    };
-
-    // 点击事件委托
-    header.addEventListener('click', (e) => {
-        const btn = e.target.closest('.tab-button');
-        if (!btn) return;
-        const target = btn.getAttribute('data-tab');
-        if (!target) return;
-        activate(target, btn);
-    });
-
-    // 键盘可达性：Enter/Space 切换
-    header.addEventListener('keydown', (e) => {
-        const btn = e.target.closest('.tab-button');
-        if (!btn) return;
-        if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            const target = btn.getAttribute('data-tab');
-            if (!target) return;
-            activate(target, btn);
-        }
-    });
-}
-
-// ==================== 学员列表（保留现有） ====================
-function renderStudentsList(students) {
-    const container = document.getElementById('students-list');
-    if (!container) return;
-    
-    if (students.length === 0) {
-        container.innerHTML = '<div class="operations-empty-state">暂无学员数据</div>';
-        return;
-    }
-    
-    let html = '';
-    students.forEach(student => {
-        const statusClass = getStatusClass(student.status);
-        html += `
-            <div class="student-item" data-student-id="${student.id}">
-                <div class="student-info">
-                    <div class="student-name">${student.name}</div>
-                    <div class="student-details">
-                        ID: ${student.student_id} | 
-                        分组: ${student.groups.join(', ')} | 
-                        状态: <span class="${statusClass}">${student.status}</span>
-                    </div>
-                    <div class="student-details">
-                        进度: ${student.current_progress} | 
-                        学习时长: ${student.total_study_time}小时
-                    </div>
-                    ${student.operation_note ? `<div class="student-details">运营备注: ${student.operation_note}</div>` : ''}
-                </div>
-                <div class="student-actions">
-                    <button class="operations-btn operations-btn-primary" onclick="viewStudentDetail('${student.id}')">详情</button>
-                    <button class="operations-btn operations-btn-warning" onclick="editStudent('${student.id}')">编辑</button>
-                    <button class="operations-btn operations-btn-success" onclick="addNote('${student.id}')">备注</button>
-                </div>
+function renderOpsStudentSearchResults(students) {
+  const box = document.getElementById("ops-student-results");
+  if (!box) return;
+  if (!students.length) {
+    box.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🔍</div>
+                <p>未找到匹配的学员</p>
             </div>
         `;
+    return;
+  }
+  let html = `
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>学员昵称</th>
+                    <th>ID</th>
+                    <th>分组</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+  students.forEach((s) => {
+    html += `
+            <tr>
+                <td>${s.student_name || s.name || "—"}</td>
+                <td>${s.id || s.student_id || "—"}</td>
+                <td>${formatArrayText(s.groups)}</td>
+                <td><button class="btn btn-success js-add-task" data-id="${
+                  s.id
+                }">手动增加任务</button></td>
+            </tr>
+        `;
+  });
+  html += "</tbody></table>";
+  box.innerHTML = html;
+
+  box.querySelectorAll(".js-add-task").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const id = e.currentTarget.getAttribute("data-id");
+      await addOpsTaskForStudent(id);
+      // 成功后清空搜索区
+      const input = document.getElementById("ops-student-search");
+      if (input) input.value = "";
+      box.innerHTML = "";
+      // 刷新任务列表
+      loadOpsTasks(1);
     });
-    
-    container.innerHTML = html;
+  });
 }
 
-// ==================== 运营任务管理 - 列表与分页 ====================
-function loadOpsTasks(page = 1, search = '', status = '') {
-    const params = new URLSearchParams({
-        page,
-        page_size: 20,
-        search,
-        status
+async function addOpsTaskForStudent(studentId) {
+  try {
+    const res = await fetch("/operations/tasks/manual/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify({ student_id: studentId }),
     });
-    fetch(`/operations/tasks/api/?${params.toString()}`)
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) {
-                showError('加载运营任务失败：' + (data.message || '未知错误'));
-                return;
-            }
-            renderOpsTasks(data.data || []);
-            renderOpsTaskPagination(data.pagination || null);
-        })
-        .catch(err => showError('网络错误：' + err.message));
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || "添加失败");
+    showSuccess("已添加到运营任务");
+  } catch (e) {
+    showError("添加失败：" + e.message);
+  }
+}
+
+function loadOpsTasks(page = 1, search = "", status = "") {
+  const params = new URLSearchParams({ page, page_size: 20 });
+  if (search) params.set("search", search);
+  if (status) params.set("status", status);
+  fetch(`/operations/tasks/api/?${params.toString()}`)
+    .then((r) => r.json())
+    .then((data) => {
+      if (!data.success) throw new Error(data.message || "加载失败");
+      renderOpsTasks(Array.isArray(data.data) ? data.data : []);
+      renderOpsTaskPagination(data.pagination || null);
+    })
+    .catch((e) => showError("加载运营任务失败：" + e.message));
 }
 
 function renderOpsTasks(tasks) {
-    let html = `
+  const container = document.getElementById("ops-task-list");
+  if (!container) return;
+  if (!tasks.length) {
+    container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-state-icon">🗂️</div>
+                <p>暂无运营任务</p>
+            </div>
+        `;
+    return;
+  }
+  let html = `
         <table class="table">
             <thead>
                 <tr>
@@ -656,383 +539,644 @@ function renderOpsTasks(tasks) {
             </thead>
             <tbody>
     `;
-    tasks.forEach(t => {
-        const groups = Array.isArray(t.student_groups) ? t.student_groups.join(', ') : (t.student_groups || '');
-        const progress = Array.isArray(t.student_progress) ? t.student_progress.join(', ') : (t.student_progress || '—');
-        html += `
+  tasks.forEach((t) => {
+    const groups = formatArrayText(t.student_groups);
+    const progress = formatArrayText(t.student_progress);
+    html += `
             <tr>
-                <td><input type="checkbox" class="ops-task-select" data-id="${t.id}"></td>
-                <td><a href="javascript:void(0)" onclick="viewStudentDetail('${t.student_id}')">${t.student_nickname || t.student_id}</a></td>
-                <td>${groups || '—'}</td>
+                <td><input type="checkbox" class="ops-task-select" data-id="${
+                  t.id
+                }"></td>
+                <td><a href="javascript:void(0)" onclick="viewStudentDetail('${
+                  t.student_id
+                }')">${t.student_nickname || t.student_id}</a></td>
+                <td>${groups}</td>
                 <td>
-                    <select id="ops-status-${t.id}" class="form-input" style="min-width:100px;">
-                        <option value="待办" ${t.status==='待办'?'selected':''}>待办</option>
-                        <option value="已联系" ${t.status==='已联系'?'selected':''}>已联系</option>
-                        <option value="未回复" ${t.status==='未回复'?'selected':''}>未回复</option>
-                        <option value="已关闭" ${t.status==='已关闭'?'selected':''}>已关闭</option>
+                    <select id="ops-status-${
+                      t.id
+                    }" class="form-input" style="min-width:100px;">
+                        <option value="待办" ${
+                          t.status === "待办" ? "selected" : ""
+                        }>待办</option>
+                        <option value="已联系" ${
+                          t.status === "已联系" ? "selected" : ""
+                        }>已联系</option>
+                        <option value="未回复" ${
+                          t.status === "未回复" ? "selected" : ""
+                        }>未回复</option>
+                        <option value="已关闭" ${
+                          t.status === "已关闭" ? "selected" : ""
+                        }>已关闭</option>
                     </select>
                 </td>
-                <td>${progress}</td>
+                <td>${progress || "—"}</td>
                 <td>${t.visit_count ?? 0}</td>
-                <td>${t.source || '—'}</td>
-                <td>${t.assigned_by || '—'}</td>
-                <td>${t.created_at || '—'}</td>
-                <td><input id="ops-note-${t.id}" type="text" class="form-input" placeholder="填写回访备注" value="${t.notes || ''}" /></td>
-                <td><button class="btn btn-primary" onclick="saveOpsTaskEdit(${t.id})">保存</button></td>
+                <td>${t.source || "—"}</td>
+                <td>${t.assigned_by || "—"}</td>
+                <td>${t.created_at || "—"}</td>
+                <td><input id="ops-note-${
+                  t.id
+                }" type="text" class="form-input" placeholder="填写回访备注" value="${
+      t.notes || ""
+    }" /></td>
+                <td><button class="btn btn-primary" onclick="saveOpsTaskEdit(${
+                  t.id
+                })">保存</button></td>
             </tr>
         `;
-    });
-    html += `</tbody></table>`;
-    const container = document.getElementById('ops-task-list');
-    if (!container) return;
-    container.innerHTML = html;
+  });
+  html += "</tbody></table>";
+  container.innerHTML = html;
 
-    // 绑定选择逻辑
-    initOpsTaskSelection();
-    updateOpsToolbarState();
+  initOpsTaskSelection();
+  updateOpsToolbarState();
 }
 
 function renderOpsTaskPagination(pagination) {
-    const container = document.getElementById('ops-task-pagination');
-    if (!container || !pagination) { if (container) container.innerHTML = ''; return; }
+  const container = document.getElementById("ops-task-pagination");
+  if (!container) return;
+  if (!pagination) {
+    container.innerHTML = "";
+    return;
+  }
 
-    let html = '';
-    if (pagination.has_previous) {
-        html += `<button class="pagination-btn" onclick="opsChangePage(${pagination.current_page - 1})">上一页</button>`;
-    }
-    for (let i = 1; i <= pagination.total_pages; i++) {
-        const activeClass = i === pagination.current_page ? 'active' : '';
-        html += `<button class="pagination-btn ${activeClass}" onclick="opsChangePage(${i})">${i}</button>`;
-    }
-    if (pagination.has_next) {
-        html += `<button class="pagination-btn" onclick="opsChangePage(${pagination.current_page + 1})">下一页</button>`;
-    }
-    container.innerHTML = html;
+  let html = "";
+  if (pagination.has_previous) {
+    html += `<button class="pagination-btn" onclick="opsChangePage(${
+      pagination.current_page - 1
+    })">上一页</button>`;
+  }
+  for (
+    let i = 1;
+    i <= (pagination.total_pages || pagination.num_pages || 1);
+    i++
+  ) {
+    const active = i === pagination.current_page ? "active" : "";
+    html += `<button class="pagination-btn ${active}" onclick="opsChangePage(${i})">${i}</button>`;
+  }
+  if (pagination.has_next) {
+    html += `<button class="pagination-btn" onclick="opsChangePage(${
+      pagination.current_page + 1
+    })">下一页</button>`;
+  }
+  container.innerHTML = html;
 }
-
 function opsChangePage(p) {
-    loadOpsTasks(p);
+  loadOpsTasks(p);
 }
 
-// ==================== 回访记录管理 - 列表与分页 ====================
-function loadVisitRecords(page = 1, search = '', status = '') {
-    const params = new URLSearchParams({
-        page,
-        page_size: 20,
-        search,
-        status
-    });
-    fetch(`/operations/visits/?${params.toString()}`)
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) {
-                showError('加载回访记录失败：' + (data.message || '未知错误'));
-                return;
-            }
-            renderVisitRecords(data.data || []);
-            renderVisitPagination(data.pagination || null);
-        })
-        .catch(err => showError('网络错误：' + err.message));
-}
-
-function renderVisitRecords(records) {
-    const container = document.getElementById('visit-records-list');
-    if (!container) return;
-    if (!records || records.length === 0) {
-        container.innerHTML = `
-            <div class="empty-state">
-                <div class="empty-state-icon">📒</div>
-                <p>暂无回访记录</p>
-            </div>
-        `;
-        return;
-    }
-
-    let html = `
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>回访时间</th>
-                    <th>学员昵称</th>
-                    <th>状态</th>
-                    <th>回访次数</th>
-                    <th>老师</th>
-                    <th>运营</th>
-                    <th>备注</th>
-                    <th>创建时间</th>
-                </tr>
-            </thead>
-            <tbody>
-    `;
-    records.forEach(r => {
-        html += `
-            <tr>
-                <td>${r.visit_time || '—'}</td>
-                <td><a href="javascript:void(0)" onclick="viewStudentDetail('${r.student_id}')">${r.student_nickname || r.student_id}</a></td>
-                <td>${r.status || '—'}</td>
-                <td>${r.visit_count ?? 0}</td>
-                <td>${r.teacher_name || '—'}</td>
-                <td>${r.operator || '—'}</td>
-                <td>${r.notes || '—'}</td>
-                <td>${r.created_at || '—'}</td>
-            </tr>
-        `;
-    });
-    html += `</tbody></table>`;
-    container.innerHTML = html;
-}
-
-function renderVisitPagination(pagination) {
-    const container = document.getElementById('visit-pagination');
-    if (!container || !pagination) { if (container) container.innerHTML = ''; return; }
-
-    let html = '';
-    if (pagination.has_previous) {
-        html += `<button class="pagination-btn" onclick="visitsChangePage(${pagination.current_page - 1})">上一页</button>`;
-    }
-    for (let i = 1; i <= pagination.total_pages; i++) {
-        const activeClass = i === pagination.current_page ? 'active' : '';
-        html += `<button class="pagination-btn ${activeClass}" onclick="visitsChangePage(${i})">${i}</button>`;
-    }
-    if (pagination.has_next) {
-        html += `<button class="pagination-btn" onclick="visitsChangePage(${pagination.current_page + 1})">下一页</button>`;
-    }
-    container.innerHTML = html;
-}
-
-function visitsChangePage(p) {
-    const search = (document.getElementById('visit-search')?.value || '').trim();
-    loadVisitRecords(p, search);
-}
-
-// ==================== 其他保留逻辑（学员详情等） ====================
-function renderStudentsList(students) {
-    const container = document.getElementById('students-list');
-    if (!container) return;
-    
-    if (students.length === 0) {
-        container.innerHTML = '<div class="operations-empty-state">暂无学员数据</div>';
-        return;
-    }
-    
-    let html = '';
-    students.forEach(student => {
-        const statusClass = getStatusClass(student.status);
-        html += `
-            <div class="student-item" data-student-id="${student.id}">
-                <div class="student-info">
-                    <div class="student-name">${student.name}</div>
-                    <div class="student-details">
-                        ID: ${student.student_id} | 
-                        分组: ${student.groups.join(', ')} | 
-                        状态: <span class="${statusClass}">${student.status}</span>
-                    </div>
-                    <div class="student-details">
-                        进度: ${student.current_progress} | 
-                        学习时长: ${student.total_study_time}小时
-                    </div>
-                    ${student.operation_note ? `<div class="student-details">运营备注: ${student.operation_note}</div>` : ''}
-                </div>
-                <div class="student-actions">
-                    <button class="operations-btn operations-btn-primary" onclick="viewStudentDetail('${student.id}')">详情</button>
-                    <button class="operations-btn operations-btn-warning" onclick="editStudent('${student.id}')">编辑</button>
-                    <button class="operations-btn operations-btn-success" onclick="addNote('${student.id}')">备注</button>
-                </div>
-            </div>
-        `;
-    });
-    
-    container.innerHTML = html;
-}
-
-// 全局：运营任务多选集合（修复 ReferenceError）
+// 多选逻辑
 const selectedOpsTaskIds = new Set();
-
 function initOpsTaskSelection() {
-    const selectAll = document.getElementById('ops-task-select-all');
-    const checkboxes = document.querySelectorAll('.ops-task-select');
+  const selectAll = document.getElementById("ops-task-select-all");
+  const checkboxes = document.querySelectorAll(".ops-task-select");
 
-    // 初始化选中状态
-    checkboxes.forEach(cb => {
-        const id = cb.getAttribute('data-id');
-        cb.checked = selectedOpsTaskIds.has(id);
-        cb.addEventListener('change', () => {
-            if (cb.checked) {
-                selectedOpsTaskIds.add(id);
-            } else {
-                selectedOpsTaskIds.delete(id);
-            }
-            updateOpsToolbarState();
-        });
+  checkboxes.forEach((cb) => {
+    const id = cb.getAttribute("data-id");
+    cb.checked = selectedOpsTaskIds.has(id);
+    cb.addEventListener("change", () => {
+      if (cb.checked) selectedOpsTaskIds.add(id);
+      else selectedOpsTaskIds.delete(id);
+      updateOpsToolbarState();
     });
+  });
 
-    // 表头全选
-    if (selectAll) {
-        // 根据当前行选中状态同步全选框
-        const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
-        selectAll.checked = allChecked;
-
-        selectAll.addEventListener('change', () => {
-            const checked = selectAll.checked;
-            checkboxes.forEach(cb => {
-                cb.checked = checked;
-                const id = cb.getAttribute('data-id');
-                if (checked) {
-                    selectedOpsTaskIds.add(id);
-                } else {
-                    selectedOpsTaskIds.delete(id);
-                }
-            });
-            updateOpsToolbarState();
-        });
-    }
+  if (selectAll) {
+    const allChecked =
+      checkboxes.length > 0 && Array.from(checkboxes).every((cb) => cb.checked);
+    selectAll.checked = allChecked;
+    selectAll.addEventListener("change", () => {
+      const checked = selectAll.checked;
+      checkboxes.forEach((cb) => {
+        cb.checked = checked;
+        const id = cb.getAttribute("data-id");
+        if (checked) selectedOpsTaskIds.add(id);
+        else selectedOpsTaskIds.delete(id);
+      });
+      updateOpsToolbarState();
+    });
+  }
 }
-
 function updateOpsToolbarState() {
-    const count = selectedOpsTaskIds.size;
-    // 移除“批量完成”的控制
-    const btnDelete = document.getElementById('ops-batch-delete');
-    const btnExport = document.getElementById('ops-export');
-
-    if (btnDelete) btnDelete.disabled = count === 0;
-    if (btnExport) btnExport.disabled = count === 0;
+  const count = selectedOpsTaskIds.size;
+  const btnDelete = document.getElementById("ops-batch-delete");
+  const btnExport = document.getElementById("ops-export");
+  if (btnDelete) btnDelete.disabled = count === 0;
+  if (btnExport) btnExport.disabled = count === 0;
 }
-
 function getSelectedTaskIds() {
-    return Array.from(selectedOpsTaskIds);
+  return Array.from(selectedOpsTaskIds);
 }
 
 async function batchUpdateOpsTasks(newStatusCN) {
-    const ids = getSelectedTaskIds();
-    if (ids.length === 0) return;
-    try {
-        await Promise.all(ids.map(id => {
-            return fetch(`/operations/tasks/${id}/update/`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCookie('csrftoken')
-                },
-                body: JSON.stringify({ status: newStatusCN })
-            }).then(res => res.json()).then(r => {
-                if (!r.success) throw new Error(r.message || '更新失败');
-            });
-        }));
-        showSuccess('批量更新成功');
-        selectedOpsTaskIds.clear();
-        // 刷新列表（默认不显示已关闭任务，关闭后自动从列表消失）
-        loadOpsTasks(1);
-    } catch (e) {
-        showError('批量更新失败：' + e.message);
-    }
+  const ids = getSelectedTaskIds();
+  if (!ids.length) return;
+  try {
+    await Promise.all(
+      ids.map((id) =>
+        fetch(`/operations/tasks/${id}/update/`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRFToken": getCookie("csrftoken"),
+          },
+          body: JSON.stringify({ status: newStatusCN }),
+        })
+          .then((r) => r.json())
+          .then((d) => {
+            if (!d.success) throw new Error(d.message || "更新失败");
+          })
+      )
+    );
+    showSuccess("批量更新成功");
+    selectedOpsTaskIds.clear();
+    loadOpsTasks(1);
+  } catch (e) {
+    showError("批量更新失败：" + e.message);
+  }
 }
 
-// 新增：行内保存（状态 + 回访备注）
-// 插入位置建议：紧跟在 saveOpsTaskEdit 后面
 async function saveOpsTaskEdit(taskId) {
-    const statusEl = document.getElementById(`ops-status-${taskId}`);
-    const noteEl = document.getElementById(`ops-note-${taskId}`);
-    if (!statusEl || !noteEl) return;
-    const status = statusEl.value;
-    const notes = noteEl.value.trim();
+  const statusEl = document.getElementById(`ops-status-${taskId}`);
+  const noteEl = document.getElementById(`ops-note-${taskId}`);
+  if (!statusEl || !noteEl) return;
 
-    try {
-        const res = await fetch(`/operations/tasks/${taskId}/update/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ status, notes })
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || '更新失败');
-        showSuccess('保存成功');
-        // 刷新列表，若状态为已关闭，会自动消失
-        loadOpsTasks(1);
-    } catch (e) {
-        showError('保存失败：' + e.message);
-    }
+  try {
+    const res = await fetch(`/operations/tasks/${taskId}/update/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": getCookie("csrftoken"),
+      },
+      body: JSON.stringify({
+        status: statusEl.value,
+        notes: noteEl.value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.message || "更新失败");
+    showSuccess("保存成功");
+    loadOpsTasks(1);
+  } catch (e) {
+    showError("保存失败：" + e.message);
+  }
 }
 
-// 新增：在“运营任务管理”Tab内搜索学员（基于 /operations/students/api/?search=）
-async function opsSearchStudents(query) {
-    const container = document.getElementById('ops-student-results');
-    if (!container) return;
-    const q = (query || '').trim();
-    if (!q) {
-        container.innerHTML = '';
-        return;
-    }
+// -------------------- 回访记录管理（点击学员 -> 下方展示信息+历史记录） --------------------
+function initVisitRecordsTab() {
+  const input = document.getElementById("visit-mgr-search");
+  const btn = document.getElementById("visit-mgr-search-btn");
+  const box = document.getElementById("visit-mgr-results");
+  if (!input || !btn || !box) return;
+
+  const doSearch = async () => {
+    const q = input.value.trim();
+    box.innerHTML =
+      '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>搜索中...</p></div>';
     try {
-        const params = new URLSearchParams({ page: 1, search: q });
-        const res = await fetch(`/operations/students/api/?${params.toString()}`);
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || '搜索失败');
-        const students = Array.isArray(data.data) ? data.data.slice(0, 10) : [];
-        renderOpsStudentSearchResults(students);
+      const list = await fetchStudents(q);
+      renderVisitMgrStudentResults(list);
     } catch (e) {
-        container.innerHTML = `<div class="operations-empty-state">搜索失败：${e.message}</div>`;
+      box.innerHTML = `<div class="operations-empty-state">搜索失败：${e.message}</div>`;
     }
+  };
+
+  btn.addEventListener("click", doSearch);
+  input.addEventListener("keypress", (e) => {
+    if (e.key === "Enter") doSearch();
+  });
 }
 
-// 新增：渲染学员搜索结果，提供“手动增加任务”按钮
-function renderOpsStudentSearchResults(students) {
-    const container = document.getElementById('ops-student-results');
-    if (!container) return;
-    if (!students || students.length === 0) {
-        container.innerHTML = `
+function renderVisitMgrStudentResults(students) {
+  const box = document.getElementById("visit-mgr-results");
+  if (!box) return;
+  if (!students.length) {
+    box.innerHTML = `
             <div class="empty-state">
                 <div class="empty-state-icon">🔍</div>
                 <p>未找到匹配的学员</p>
             </div>
         `;
-        return;
-    }
-    let html = `
+    return;
+  }
+  let html = `
         <table class="table">
             <thead>
                 <tr>
                     <th>学员昵称</th>
                     <th>ID</th>
+                    <th>备注名</th>
                     <th>分组</th>
-                    <th>操作</th>
+                    <th style="width:160px;">操作</th>
                 </tr>
             </thead>
             <tbody>
     `;
-    students.forEach(s => {
-        const groups = Array.isArray(s.groups) ? s.groups.join(', ') : (s.groups || '');
-        html += `
+  students.forEach((s) => {
+    html += `
             <tr>
-                <td>${s.name || s.student_name || s.student_nickname || '—'}</td>
-                <td>${s.student_id || s.id || '—'}</td>
-                <td>${groups || '—'}</td>
-                <td><button class="btn btn-success" onclick="addOpsTaskForStudent('${s.id}')">手动增加任务</button></td>
+                <td>${s.student_name || s.name || "—"}</td>
+                <td>${s.id || s.student_id || "—"}</td>
+                <td>${s.alias_name || "—"}</td>
+                <td>${formatArrayText(s.groups)}</td>
+                <td><button class="btn btn-primary js-visit-detail" data-id="${
+                  s.id
+                }" data-name="${
+      s.student_name || s.name || ""
+    }">查看详情</button></td>
             </tr>
         `;
+  });
+  html += "</tbody></table>";
+  box.innerHTML = html;
+
+  box.querySelectorAll(".js-visit-detail").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      const sid = e.currentTarget.getAttribute("data-id");
+      const sname = e.currentTarget.getAttribute("data-name") || "";
+      await loadVisitStudentPanel(sid, sname);
     });
-    html += '</tbody></table>';
-    container.innerHTML = html;
+  });
 }
 
-// 新增：调用后端接口将学员加入运营任务
-async function addOpsTaskForStudent(studentId) {
-    try {
-        const res = await fetch('/operations/tasks/manual/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ student_id: studentId })
-        });
-        const data = await res.json();
-        if (!data.success) throw new Error(data.message || '添加失败');
-        showSuccess('已添加到运营任务');
-        // 新任务创建为待办；列表默认不含已关闭任务，因此直接刷新
-        loadOpsTasks(1);
-    } catch (e) {
-        showError('添加失败：' + e.message);
+async function loadVisitStudentPanel(studentId, studentNameHint = "") {
+  const box = document.getElementById("visit-mgr-results");
+  if (!box) return;
+
+  // 1) 学员详情
+  let student;
+  try {
+    const r = await fetch(`/operations/students/${studentId}/`);
+    const d = await r.json();
+    if (!d.success) throw new Error(d.message || "获取学员失败");
+    student = d.student || d.data || d.student_payload || {};
+  } catch (e) {
+    showError("获取学员详情失败：" + e.message);
+    return;
+  }
+
+  const nickname =
+    student.student_name || student.name || studentNameHint || "";
+  const groups = Array.isArray(student.groups)
+    ? student.groups.join(", ")
+    : student.groups || "—";
+  const progress = (() => {
+    const p = student.progress || student.learning_progress || [];
+    if (!p || !p.length) return "—";
+    if (typeof p[0] === "object") {
+      return (
+        '<ul style="margin-left:16px;">' +
+        p
+          .map((o) => {
+            const kv = Object.entries(o || {})
+              .map(([k, v]) => `${k}: ${v}`)
+              .join(", ");
+            return `<li>${kv || ""}</li>`;
+          })
+          .join("") +
+        "</ul>"
+      );
     }
+    return Array.isArray(p) ? p.join(", ") : String(p);
+  })();
+
+  // 2) 历史回访记录（后端不支持 student_id 查询，这里用昵称搜索再前端用 student_id 精确过滤）
+  let visitRecords = [];
+  try {
+    const ps = new URLSearchParams({ page: 1, page_size: 100 });
+    if (nickname) ps.set("search", nickname);
+    const rr = await fetch(`/operations/visits/?${ps.toString()}`);
+    const rd = await rr.json();
+    if (!rd.success) throw new Error(rd.message || "获取回访记录失败");
+    const all = Array.isArray(rd.data) ? rd.data : [];
+    visitRecords = all.filter(
+      (v) => String(v.student_id) === String(studentId)
+    );
+  } catch (e) {
+    showError("获取回访记录失败：" + e.message);
+  }
+
+  // 3) 渲染学员信息 + 回访记录列表
+  let visitsHtml = "";
+  if (!visitRecords.length) {
+    visitsHtml = `
+            <div class="empty-state">
+                <div class="empty-state-icon">📒</div>
+                <p>暂无回访记录</p>
+            </div>
+        `;
+  } else {
+    visitsHtml = `
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>回访时间</th>
+                        <th>状态</th>
+                        <th>回访次数</th>
+                        <th>老师</th>
+                        <th>备注</th>
+                        <th>创建时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${visitRecords
+                      .map(
+                        (r) => `
+                        <tr>
+                            <td>${r.visit_time || "—"}</td>
+                            <td>${r.status || "—"}</td>
+                            <td>${r.visit_count ?? 0}</td>
+                            <td>${r.teacher_name || "—"}</td>
+                            <td>${r.notes || "—"}</td>
+                            <td>${r.created_at || "—"}</td>
+                        </tr>
+                    `
+                      )
+                      .join("")}
+                </tbody>
+            </table>
+        `;
+  }
+
+  box.innerHTML = `
+        <div style="margin:8px 0;">
+            <button class="btn btn-secondary" id="visit-back">返回搜索结果</button>
+        </div>
+        <div class="card" style="margin-top:8px;">
+            <div class="card-header"><strong>学员信息</strong></div>
+            <div class="card-body">
+                <div><strong>ID：</strong>${
+                  student.student_id || student.id || ""
+                }</div>
+                <div><strong>姓名：</strong>${nickname}（${
+    student.alias_name || "无别名"
+  }）</div>
+                <div><strong>分组：</strong>${groups}</div>
+                <div><strong>进度：</strong>${progress}</div>
+                <div><strong>状态：</strong>${student.status || "—"}</div>
+                <div><strong>学习时长：</strong>${
+                  student.learning_hours ?? student.total_study_time ?? 0
+                } 小时</div>
+                <div><strong>教研备注：</strong>${
+                  student.research_note || student.research_notes || "—"
+                }</div>
+                <div><strong>运营备注：</strong>${
+                  student.ops_note ||
+                  student.operation_notes ||
+                  student.operation_note ||
+                  "—"
+                }</div>
+            </div>
+        </div>
+        <div class="card" style="margin-top:12px;">
+            <div class="card-header"><strong>历史回访记录</strong></div>
+            <div class="card-body">
+                ${visitsHtml}
+            </div>
+        </div>
+    `;
+
+  const backBtn = document.getElementById("visit-back");
+  if (backBtn) {
+    backBtn.addEventListener("click", async () => {
+      // 返回时，复用当前输入框的关键词重新搜索
+      const input = document.getElementById("visit-mgr-search");
+      const q = input ? input.value.trim() : "";
+      const list = await fetchStudents(q);
+      renderVisitMgrStudentResults(list);
+    });
+  }
+}
+
+// -------------------- 关闭编辑回访记录弹窗（若未来启用） --------------------
+function closeVisitEditModal() {
+  const modal = document.getElementById("visitEditModal");
+  if (modal) modal.style.display = "none";
+}
+
+function showStudentDetailDrawer(student) {
+    const mask = document.getElementById("studentDetailDrawerMask");
+    const drawer = document.getElementById("studentDetailDrawer");
+    const content = document.getElementById("studentDetailDrawerContent");
+    if (!mask || !drawer || !content) {
+        showError("未找到学员详情抽屉容器");
+        return;
+    }
+
+    const sid = student.id || student.student_id || "";
+    const nickname = student.student_name || student.name || "";
+    const alias = student.alias_name || student.nickname || "无别名";
+    const groups = Array.isArray(student.groups) ? student.groups.join(", ") : (student.groups || "—");
+    const progress = (() => {
+        const p = student.progress || student.learning_progress || [];
+        if (!p || !p.length) return "—";
+        if (typeof p[0] === "object") {
+            return (
+                '<ul style="margin-left:16px;">' +
+                p.map((o) => {
+                    const kv = Object.entries(o || {})
+                        .map(([k, v]) => `${k}: ${v}`)
+                        .join(", ");
+                    return `<li>${kv || ""}</li>`;
+                }).join("") +
+                "</ul>"
+            );
+        }
+        return Array.isArray(p) ? p.join(", ") : String(p);
+    })();
+
+    const researchNote = student.research_note || student.research_notes || "—";
+    const opsNote = student.ops_note || student.operation_notes || student.operation_note || "—";
+    const status = student.status || "—";
+    const hours = student.learning_hours ?? student.total_study_time ?? 0;
+
+    content.innerHTML = `
+        <div class="drawer-header" style="position:sticky; top:0; z-index:10; background:#fff; padding:12px 16px; border-bottom:1px solid #eee;">
+            <div style="font-weight:600; font-size:16px;">学员详情 - ${nickname}（${alias}）</div>
+            <div style="margin-top:8px;">
+                <button class="btn btn-secondary" onclick="closeStudentDetailDrawer()">关闭</button>
+            </div>
+        </div>
+
+        <div class="drawer-tabs" style="padding:10px 16px; border-bottom:1px solid #eee;">
+            <button class="tab-btn active" data-tab="drawer-overview" style="margin-right:8px;">概览</button>
+            <button class="tab-btn" data-tab="drawer-visits">回访记录</button>
+        </div>
+
+        <div id="drawer-overview" class="drawer-tab active" style="padding:12px 16px;">
+            <div><strong>ID：</strong>${sid}</div>
+            <div><strong>姓名：</strong>${nickname}（${alias}）</div>
+            <div><strong>分组：</strong>${groups}</div>
+            <div><strong>进度：</strong>${progress}</div>
+            <div><strong>状态：</strong>${status}</div>
+            <div><strong>学习时长：</strong>${hours} 小时</div>
+            <div><strong>教研备注：</strong>${researchNote}</div>
+            <div><strong>运营备注：</strong>${opsNote}</div>
+        </div>
+
+        <div id="drawer-visits" class="drawer-tab" style="display:none; padding:12px 16px;">
+            <div class="filter-row" style="margin-bottom:10px; display:flex; gap:8px; align-items:center;">
+                <select id="drawer-visit-status" class="form-input" style="min-width:120px;">
+                    <option value="">全部状态</option>
+                    <option value="待办">待办</option>
+                    <option value="已联系">已联系</option>
+                    <option value="未回复">未回复</option>
+                    <option value="已关闭">已关闭</option>
+                </select>
+                <input id="drawer-visit-search" type="text" class="search-input" placeholder="搜索备注/老师名..." style="flex:1;">
+                <button id="drawer-visit-filter-btn" class="btn btn-primary">筛选</button>
+            </div>
+            <div id="drawer-visit-list"></div>
+            <div id="drawer-visit-pagination" style="margin-top:12px;"></div>
+        </div>
+    `;
+
+    // Tab 切换
+    content.querySelectorAll(".tab-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+            content.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
+            btn.classList.add("active");
+            const tab = btn.getAttribute("data-tab");
+            content.querySelectorAll(".drawer-tab").forEach((el) => (el.style.display = "none"));
+            const pane = content.querySelector(`#${tab}`);
+            if (pane) pane.style.display = "block";
+            if (tab === "drawer-visits") {
+                // 首次或切换时加载回访记录
+                const st = document.getElementById("drawer-visit-status").value || "";
+                const kw = (document.getElementById("drawer-visit-search").value || "").trim();
+                loadStudentVisitRecords(sid, 1, st, kw);
+            }
+        });
+    });
+
+    // 回访筛选按钮/回车绑定
+    const btnFilter = document.getElementById("drawer-visit-filter-btn");
+    const inputSearch = document.getElementById("drawer-visit-search");
+    if (btnFilter) btnFilter.addEventListener("click", () => {
+        const st = document.getElementById("drawer-visit-status").value || "";
+        const kw = (document.getElementById("drawer-visit-search").value || "").trim();
+        loadStudentVisitRecords(sid, 1, st, kw);
+    });
+    if (inputSearch) inputSearch.addEventListener("keypress", (e) => {
+        if (e.key === "Enter") {
+            const st = document.getElementById("drawer-visit-status").value || "";
+            const kw = (document.getElementById("drawer-visit-search").value || "").trim();
+            loadStudentVisitRecords(sid, 1, st, kw);
+        }
+    });
+
+    // 打开抽屉
+    mask.style.display = "block";
+    drawer.style.display = "block";
+
+    // ESC 关闭
+    const escHandler = (e) => {
+        if (e.key === "Escape") {
+            closeStudentDetailDrawer();
+        }
+    };
+    document.addEventListener("keydown", escHandler);
+    // 保存 handler 以便移除
+    window._drawerEscHandler = escHandler;
+
+    // 点击遮罩关闭
+    mask.onclick = () => closeStudentDetailDrawer();
+
+    // 默认进入“回访记录”分页加载一次数据，提升可见性
+    const visitsTabBtn = content.querySelector('.tab-btn[data-tab="drawer-visits"]');
+    if (visitsTabBtn) visitsTabBtn.click();
+}
+
+function closeStudentDetailDrawer() {
+    const mask = document.getElementById("studentDetailDrawerMask");
+    const drawer = document.getElementById("studentDetailDrawer");
+    if (mask) mask.style.display = "none";
+    if (drawer) drawer.style.display = "none";
+    if (window._drawerEscHandler) {
+        document.removeEventListener("keydown", window._drawerEscHandler);
+        window._drawerEscHandler = null;
+    }
+}
+
+// 新增：按 student_id 拉取并分页渲染回访记录，支持状态与关键词筛选
+async function loadStudentVisitRecords(studentId, page = 1, status = "", keyword = "") {
+    const listBox = document.getElementById("drawer-visit-list");
+    const pagerBox = document.getElementById("drawer-visit-pagination");
+    if (!listBox || !pagerBox) return;
+
+    // 保存当前筛选状态，供分页点击复用
+    window._drawerVisitState = { studentId, status, keyword };
+
+    listBox.innerHTML = '<div class="empty-state"><div class="empty-state-icon">⏳</div><p>加载中...</p></div>';
+    pagerBox.innerHTML = "";
+
+    try {
+        const ps = new URLSearchParams({ page, page_size: 10, student_id: String(studentId) });
+        if (status) ps.set("status", status);
+        if (keyword) ps.set("search", keyword);
+        const res = await fetch(`/operations/visits/?${ps.toString()}`);
+        const data = await res.json();
+        if (!data.success) throw new Error(data.message || "获取回访记录失败");
+        const rows = Array.isArray(data.data) ? data.data : [];
+        if (!rows.length) {
+            listBox.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-state-icon">📒</div>
+                    <p>暂无回访记录</p>
+                </div>
+            `;
+        } else {
+            listBox.innerHTML = `
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>回访时间</th>
+                            <th>状态</th>
+                            <th>回访次数</th>
+                            <th>老师</th>
+                            <th>备注</th>
+                            <th>创建时间</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map(r => `
+                            <tr>
+                                <td>${r.visit_time || "—"}</td>
+                                <td>${r.status || "—"}</td>
+                                <td>${r.visit_count ?? 0}</td>
+                                <td>${r.teacher_name || "—"}</td>
+                                <td>${r.notes || "—"}</td>
+                                <td>${r.created_at || "—"}</td>
+                            </tr>
+                        `).join("")}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        // 渲染分页
+        const p = data.pagination || {};
+        let html = "";
+        if (p.has_previous) {
+            html += `<button class="pagination-btn" onclick="drawerVisitChangePage(${p.current_page - 1})">上一页</button>`;
+        }
+        const totalPages = p.total_pages || p.num_pages || 1;
+        for (let i = 1; i <= totalPages; i++) {
+            const active = i === p.current_page ? "active" : "";
+            html += `<button class="pagination-btn ${active}" onclick="drawerVisitChangePage(${i})">${i}</button>`;
+        }
+        if (p.has_next) {
+            html += `<button class="pagination-btn" onclick="drawerVisitChangePage(${p.current_page + 1})">下一页</button>`;
+        }
+        pagerBox.innerHTML = html;
+    } catch (e) {
+        listBox.innerHTML = `<div class="operations-empty-state">加载失败：${e.message}</div>`;
+    }
+}
+
+// 供分页按钮调用，复用上一次的筛选条件
+function drawerVisitChangePage(page) {
+    const s = window._drawerVisitState || {};
+    if (!s.studentId) return;
+    loadStudentVisitRecords(s.studentId, page, s.status || "", s.keyword || "");
 }

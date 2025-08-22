@@ -639,7 +639,7 @@ function initTeachingModule() {
     function manualSearch() {
         if (!manualSearchInput) return;
         const q = manualSearchInput.value.trim();
-        if (q.length < 2) {
+        if (q.length < 1) {
             renderManualSearchResults([]);
             return;
         }
@@ -684,6 +684,48 @@ if (document.readyState === 'loading') {
     const btn = document.getElementById('today-add-search-btn');
     const resultBox = document.getElementById('today-add-search-result');
 
+    if (!input || !resultBox) return;
+
+    // 使用通用搜索栏模块
+    window.createSearchBar({
+        inputSelector: input,
+        buttonSelector: btn,
+        resultContainerSelector: resultBox,
+        minChars: 1,
+        debounceMs: 300,
+        search: async (q) => {
+            const resp = await fetch(`/teaching/students/search/?q=${encodeURIComponent(q)}`);
+            const data = await resp.json();
+            if (!data.success) return [];
+            return data.students || [];
+        },
+        renderItems: (list) => {
+            return list.map(item => {
+                const displayName = item.student_name || item.alias_name || item.student_id;
+                const groups = (item.groups || []).join(', ');
+                return `
+                    <div class="search-item" style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f0f0f0;">
+                        <div>
+                            <strong>${displayName}</strong>
+                            <span style="color:#888;margin-left:6px;">ID: ${item.student_id}</span>
+                            <span style="color:#888;margin-left:6px;">分组：${groups || '—'}</span>
+                        </div>
+                        <button class="btn btn-sm btn-primary btn-add-today" data-student-id="${item.student_id}">添加到今日任务</button>
+                    </div>
+                `;
+            }).join('');
+        },
+        onBind: (container) => {
+            container.querySelectorAll('.btn-add-today').forEach(b => {
+                b.addEventListener('click', async (e) => {
+                    const sid = e.currentTarget.getAttribute('data-student-id');
+                    await addStudentToToday(sid);
+                });
+            });
+        },
+        emptyHtml: '<div class="empty-state" style="padding:8px;color:#666;">未找到匹配学员</div>',
+        errorHtml: '<div class="empty-state" style="padding:8px;color:#c00;">搜索失败，请稍后重试</div>',
+    });
     function renderTodayAddSearchResults(list) {
         if (!resultBox) return;
         // 有发起搜索（无论是否有结果）都显示容器

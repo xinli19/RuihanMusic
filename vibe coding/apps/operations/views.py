@@ -11,6 +11,7 @@ import json
 import pandas as pd
 import os
 from datetime import datetime, timedelta
+import uuid
 
 # 修复导入
 from apps.accounts.models import User
@@ -522,24 +523,49 @@ def create_visit_record(request):
     """创建回访记录"""
     try:
         data = json.loads(request.body)
-        
         student_id = data.get('student_id')
+        if not student_id:
+            return JsonResponse({'success': False, 'message': '缺少 student_id'}, status=400)
         student = get_object_or_404(Student, id=student_id)
-        
+
+        # 中文状态 -> 枚举
+        status_cn = (data.get('status') or '').strip() or '已联系'
+        status_map = {
+            '待办': 'pending',
+            '已联系': 'contacted',
+            '未回复': 'no_reply',
+            '已关闭': 'closed',
+        }
+        status_code = status_map.get(status_cn, status_cn)
+
+        # 生成唯一记录ID
+        record_id = f"VR{int(datetime.now().timestamp()*1000)}"
+
+        # 任课老师名称（尽量复用学员的 assigned_teacher_name 逻辑）
+        teacher_name = getattr(student, 'assigned_teacher_name', None)
+        if callable(teacher_name):
+            teacher_name = student.assigned_teacher_name
+        teacher_name = teacher_name or '未分配'
+
+        # 计算累计回访次数（简单按该学员已有记录数+1）
+        visit_count = VisitRecord.objects.filter(student=student).count() + 1
+
         visit_record = VisitRecord.objects.create(
+            record_id=record_id,
             student=student,
-            operator=request.user,
-            visit_time=timezone.now(),
-            status=data.get('status', '已联系'),
-            notes=data.get('notes', '')
+            student_name=student.student_name,
+            visit_status=status_code,
+            visit_count=visit_count,
+            teacher_name=teacher_name,
+            visit_note=data.get('notes', '').strip(),
+            # visit_time 使用模型的 auto_now_add
         )
-        
+
         return JsonResponse({
             'success': True,
             'message': '回访记录创建成功',
             'visit_id': visit_record.id
         })
-        
     except Exception as e:
         return JsonResponse({
             'success': False,
@@ -555,11 +581,16 @@ def get_visit_records(request):
         # 获取查询参数
         status_filter = request.GET.get('status', '')
         search_term = request.GET.get('search', '').strip()
+        student_id = request.GET.get('student_id', '').strip()
         page = int(request.GET.get('page', 1))
         page_size = int(request.GET.get('page_size', 20))
         
-        # 基础查询（去掉无效的 operator）
+        # 基础查询
         records = VisitRecord.objects.select_related('student').all()
+
+        # 按学员过滤
+        if student_id:
+            records = records.filter(student__id=student_id)
         
         # 状态筛选：兼容中文或枚举值
         if status_filter:
@@ -572,7 +603,7 @@ def get_visit_records(request):
             code = status_map.get(status_filter, status_filter)
             records = records.filter(visit_status=code)
         
-        # 搜索功能（使用存在的字段）
+        # 搜索（学员名/别名/备注）
         if search_term:
             records = records.filter(
                 Q(student__student_name__icontains=search_term) |
@@ -598,7 +629,7 @@ def get_visit_records(request):
                 'status': getattr(record, 'get_visit_status_display', lambda: record.visit_status)(),
                 'visit_count': record.visit_count,
                 'teacher_name': record.teacher_name,
-                'operator': '—',  # 模型无 operator 字段，兜底
+                'operator': '—',
                 'notes': record.visit_note,
                 'created_at': record.created_at.strftime('%Y-%m-%d %H:%M'),
             })
@@ -614,7 +645,6 @@ def get_visit_records(request):
                 'has_previous': page_obj.has_previous()
             }
         })
-        
     except Exception as e:
         return JsonResponse({
             'success': False,
@@ -646,8 +676,15 @@ def add_manual_task(request):
                 'message': '该学员已存在未完成的运营任务'
             })
         
+        # 生成唯一的任务ID：OPS-学员编码-随机片段
+        task_id_val = f"OPS-{getattr(student, 'student_id', student.id)}-{uuid.uuid4().hex[:8].upper()}"
+        # 极低概率冲突，再做一次兜底检查
+        while OpsTask.objects.filter(task_id=task_id_val).exists():
+            task_id_val = f"OPS-{getattr(student, 'student_id', student.id)}-{uuid.uuid4().hex[:8].upper()}"
+
         # 创建任务，使用现有字段
         task = OpsTask.objects.create(
+            task_id=task_id_val,
             student=student,
             student_name=student.student_name,
             source='manual',          # 使用枚举值
@@ -658,7 +695,8 @@ def add_manual_task(request):
         return JsonResponse({
             'success': True,
             'message': '运营任务添加成功',
-            'task_id': task.id
+            'id': task.id,
+            'task_id': task.task_id
         })
         
     except Exception as e:
@@ -754,3 +792,14 @@ class VisitRecordCreateView(LoginRequiredMixin, CreateView):
         form.instance.visited_by = self.request.user
         form.instance.visit_date = timezone.now()
         return super().form_valid(form)
+
+
+def get_visit_records(request):
+    # 构建查询集
+    qs = VisitRecord.objects.select_related("student").all()
+    # 新增：支持按 student_id 精确过滤（与现有参数兼容）
+    student_id = request.GET.get("student_id")
+    if student_id:
+        qs = qs.filter(student__id=student_id)
+    # 继续处理 status / search 等筛选与分页
+    # ... existing code ...

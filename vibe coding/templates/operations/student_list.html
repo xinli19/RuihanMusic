@@ -17,118 +17,35 @@
             <div class="tab-header">
                 <button class="tab-button active" data-tab="studentManagement" type="button">学员信息管理</button>
                 <button class="tab-button" data-tab="opsTaskManagement" type="button">运营任务管理</button>
-                <button class="tab-button" data-tab="visitRecords" type="button">回访记录管理</button>
             </div>
 
             <div id="studentManagement" class="tab-pane active">
-                <!-- 保留现有“学员信息管理”页面内容 -->
-                <!-- 操作工具栏 -->
+                <!-- 学员信息管理：改为通用搜索 + 直接编辑，不再展示列表页 -->
                 <div class="toolbar">
                     <div class="search-section">
-                        <form method="GET" class="search-form">
-                            <input type="text" name="search" class="search-input" placeholder="搜索学员昵称、备注名..." value="{{ request.GET.search }}">
-                            <button type="submit" class="btn btn-primary">搜索</button>
-                        </form>
+                        <input type="text" id="student-mgr-search" class="search-input" placeholder="搜索学员昵称、备注名...">
+                        <button type="button" class="btn btn-primary" id="student-mgr-search-btn">搜索</button>
                     </div>
-                    
                     <div class="actions-section">
                         <button class="btn btn-success" onclick="openAddStudentModal()">添加学员</button>
                         <button class="btn btn-info" onclick="openBatchImportModal()">批量导入</button>
                         <button class="btn btn-warning" onclick="exportStudents()">导出数据</button>
                     </div>
                 </div>
-                
-                <!-- 学员列表表格 -->
-                <div class="table-container">
-                    <table class="table">
-                        <thead>
-                            <tr>
-                                <th class="sortable" onclick="sortTable('student_name')">学员昵称 <span class="sort-icon">↕</span></th>
-                                <th class="sortable" onclick="sortTable('alias_name')">备注名 <span class="sort-icon">↕</span></th>
-                                <th>分组</th>
-                                <th>状态</th>
-                                <th class="sortable" onclick="sortTable('created_at')">创建时间 <span class="sort-icon">↕</span></th>
-                                <th>操作</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for student in students %}
-                            <tr>
-                                <td>{{ student.student_name }}</td>
-                                <td>{{ student.alias_name|default:"-" }}</td>
-                                <td>
-                                    <div class="group-tags">
-                                        {% if student.group_name %}
-                                            <span class="group-tag">{{ student.group_name }}</span>
-                                        {% else %}
-                                            <span class="group-tag">未分组</span>
-                                        {% endif %}
-                                    </div>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-{{ student.status }}">
-                                        {% if student.status == 'active' %}正常学习
-                                        {% elif student.status == 'joined' %}已入学
-                                        {% elif student.status == 'graduated' %}已毕业
-                                        {% else %}{{ student.get_status_display }}
-                                        {% endif %}
-                                    </span>
-                                </td>
-                                <td>{{ student.created_at|date:"Y-m-d" }}</td>
-                                <td>
-                                    <button class="btn-edit" onclick="editStudent('{{ student.student_id }}')">编辑</button>
-                                </td>
-                            </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="6">
-                                    <div class="empty-state">
-                                        <div class="empty-state-icon">👥</div>
-                                        <p>暂无学员数据</p>
-                                    </div>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- 分页 -->
-                {% if is_paginated %}
-                <div class="pagination">
-                    {% if page_obj.has_previous %}
-                        <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">首页</a>
-                        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">上一页</a>
-                    {% endif %}
-                    
-                    <span class="page-info">
-                        第 {{ page_obj.number }} 页，共 {{ page_obj.paginator.num_pages }} 页
-                    </span>
-                    
-                    {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">下一页</a>
-                        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="page-link">末页</a>
-                    {% endif %}
-                </div>
-                {% endif %}
+                <div id="student-mgr-results" class="table-container" style="margin-top:8px;"></div>
             </div>
 
             <!-- 运营任务管理 Tab -->
             <div id="opsTaskManagement" class="tab-pane">
                 <div class="toolbar">
-                    <div class="search-section">
-                        <input type="text" id="ops-student-search" class="search-input" placeholder="搜索学员昵称/备注名...">
-                        <button type="button" class="btn btn-primary" id="ops-student-search-btn">搜索</button>
-                    </div>
+                    <!-- 下线搜索框：删除搜索区域，仅保留批量操作 -->
                     <div class="actions-section">
                         <button class="btn btn-danger" id="ops-batch-delete" disabled>批量删除</button>
                         <button class="btn btn-info" id="ops-export" disabled>导出列表</button>
                     </div>
                 </div>
 
-                <!-- 学员搜索结果（在此渲染可“手动增加任务”的学员列表） -->
-                <div id="ops-student-results" class="table-container" style="margin-top:8px;"></div>
-
+                <!-- 删除：ops-student-results 搜索结果容器 -->
                 <div id="ops-task-list" class="table-container">
                     <div class="empty-state">
                         <div class="empty-state-icon">🗂️</div>
@@ -137,84 +54,14 @@
                 </div>
                 <div id="ops-task-pagination" class="pagination"></div>
             </div>
-
-            <!-- 回访记录管理 Tab -->
-            <div id="visitRecords" class="tab-pane">
-                <div class="toolbar">
-                    <div class="search-section">
-                        <input type="text" id="visit-search" class="search-input" placeholder="搜索学员昵称/备注名/内容...">
-                        <button type="button" class="btn btn-primary" onclick="loadVisitRecords(1, document.getElementById('visit-search').value.trim())">搜索</button>
-                    </div>
-                </div>
-                <div id="visit-records-list" class="table-container">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">📒</div>
-                        <p>回访记录列表加载中/或暂无数据</p>
-                    </div>
-                </div>
-                <div id="visit-pagination" class="pagination"></div>
-            </div>
         </div>
     </div>
 </div>
 
-<!-- 添加/编辑学员模态框 -->
-<div id="studentModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2 id="modalTitle">添加学员</h2>
-            <span class="close" onclick="closeStudentModal()">&times;</span>
-        </div>
-        <form id="studentForm">
-            {% csrf_token %}
-            <input type="hidden" id="studentId" name="student_id">
-            
-            <div class="form-group">
-                <label class="form-label">学员昵称 *</label>
-                <input type="text" id="studentName" name="student_name" class="form-input" required>
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">备注名</label>
-                <input type="text" id="aliasName" name="alias_name" class="form-input">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">分组</label>
-                <input type="text" id="groupName" name="group_name" class="form-input">
-            </div>
-            
-            <div class="form-group">
-                <label class="form-label">状态</label>
-                <select id="status" name="status" class="form-input">
-                    <option value="active">正常学习</option>
-                    <option value="joined">已入学</option>
-                    <option value="graduated">已毕业</option>
-                </select>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary">保存</button>
-                <button type="button" class="btn btn-secondary" onclick="closeStudentModal()">取消</button>
-            </div>
-        </form>
-    </div>
-</div>
-
-<!-- 新增：学员详情模态框 -->
-<div id="studentDetailModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h2>学员详情</h2>
-            <span class="close" onclick="closeStudentDetailModal()">&times;</span>
-        </div>
-        <div id="studentDetailModalContent" class="modal-body">
-            加载中...
-        </div>
-        <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" onclick="closeStudentDetailModal()">关闭</button>
-        </div>
-    </div>
+<!-- 学员详情抽屉保留 -->
+<div id="studentDetailDrawerMask" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.35); z-index: 1999;"></div>
+<div id="studentDetailDrawer" style="display:none; position:fixed; top:0; right:0; bottom:0; width:560px; background:#fff; box-shadow:-2px 0 12px rgba(0,0,0,0.2); z-index: 2000; overflow:auto;">
+    <div id="studentDetailDrawerContent"></div>
 </div>
 {% endblock %}
 
