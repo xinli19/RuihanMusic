@@ -39,6 +39,9 @@ class Student(models.Model):
     # 备注字段（保留正式字段）
     research_note = models.TextField(blank=True, verbose_name='教研备注')
     ops_note = models.TextField(blank=True, verbose_name='运营备注')
+    # 兼容数据库中历史字段（别名），避免 NOT NULL 约束导致插入失败
+    research_notes = models.TextField(blank=True, default='', verbose_name='教研备注（别名）')
+    operation_notes = models.TextField(blank=True, default='', verbose_name='运营备注（别名）')
     
     # 其他字段
     is_difficult = models.BooleanField(default=False, verbose_name='是否需要关注')
